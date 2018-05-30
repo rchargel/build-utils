@@ -1,25 +1,248 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>net.zcarioca.maven</groupId>
-  <artifactId>build-utils</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>pom</packaging>
-  <name>Maven Build Utilities</name>
-  <description>A collection of Maven Plugins and Build utilities</description>
-  <modules>
-    <module>base-plugin-harness</module>
-  </modules>
-  <licenses>
-    <license>
-        <name>MIT</name>
-        <distribution>repo</distribution>
-    </license>
-  </licenses>
-  <scm>
-      <connection>scm:git:git@github.com:rchargel/build-utils.git</connection>
-      <developerConnection>scm:git:git@github.com:rchargel/build-utils.git</developerConnection>
-      <url>https://github.com/rchargel/build-utils</url>
-      <tag>HEAD</tag>
-  </scm>
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>net.zcarioca.maven</groupId>
+    <artifactId>build-utils</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Maven Build Utilities</name>
+    <description>A collection of Maven Plugins and Build utilities</description>
+
+    <modules>
+        <module>base-plugin-harness</module>
+        <module>jmh-benchmarking-plugin</module>
+    </modules>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- Java Target Version -->
+        <javaTargetVersion>1.8</javaTargetVersion>
+        <maven.compiler.target>${javaTargetVersion}</maven.compiler.target>
+        <maven.compiler.source>${javaTargetVersion}</maven.compiler.source>
+
+        <!-- Dependencies -->
+        <mavenPluginVersion>3.5.2</mavenPluginVersion>
+        <mavenDependencyTreeVersion>3.0.1</mavenDependencyTreeVersion>
+        <plexusUtilsVersion>3.1.0</plexusUtilsVersion>
+        <jmhVersion>1.21</jmhVersion>
+        <reflectionsVersion>0.9.11</reflectionsVersion>
+        <junitVersion>4.12</junitVersion>
+
+        <!-- Plugins -->
+        <owaspPluginVersion>3.1.2</owaspPluginVersion>
+        <mavenGpgPluginVersion>1.6</mavenGpgPluginVersion>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- BASE dependencies -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>base-plugin-harness</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- MAVEN dependencies -->
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-core</artifactId>
+                <version>${mavenPluginVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-plugin-api</artifactId>
+                <version>${mavenPluginVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.plugin-tools</groupId>
+                <artifactId>maven-plugin-annotations</artifactId>
+                <version>${mavenPluginVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.shared</groupId>
+                <artifactId>maven-dependency-tree</artifactId>
+                <version>${mavenDependencyTreeVersion}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.codehaus.plexus</groupId>
+                <artifactId>plexus-utils</artifactId>
+                <version>${plexusUtilsVersion}</version>
+            </dependency>
+
+            <!-- JMH dependencies -->
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>${jmhVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-generator-annprocess</artifactId>
+                <version>${jmhVersion}</version>
+            </dependency>
+
+            <!-- Reflections -->
+            <dependency>
+                <groupId>org.reflections</groupId>
+                <artifactId>reflections</artifactId>
+                <version>${reflectionsVersion}</version>
+            </dependency>
+
+            <!-- MISC dependencies -->
+            <dependency>
+                <groupId>net.dempsy</groupId>
+                <artifactId>dempsy-utils</artifactId>
+                <version>2.1.0</version>
+            </dependency>
+
+            <!-- Test Dependencies -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junitVersion}</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.mindrot</groupId>
+                <artifactId>jbcrypt</artifactId>
+                <version>0.4</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-plugin-plugin</artifactId>
+                    <version>${mavenPluginVersion}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-invoker-plugin</artifactId>
+                    <version>3.1.0</version>
+                    <executions>
+                        <execution>
+                            <id>integration-test</id>
+                            <goals>
+                                <goal>install</goal>
+                                <goal>integration-test</goal>
+                                <goal>verify</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-gpg-plugin</artifactId>
+                    <version>${mavenGpgPluginVersion}</version>
+                    <executions>
+                        <execution>
+                            <id>sign-artifacts</id>
+                            <phase>deploy</phase>
+                            <goals>
+                                <goal>sign</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.owasp</groupId>
+                    <artifactId>dependency-check-maven</artifactId>
+                    <version>${owaspPluginVersion}</version>
+                    <configuration>
+                        <failBuildOnCVSS>7</failBuildOnCVSS>
+                        <skipProvidedScope>true</skipProvidedScope>
+                        <skipTestScope>true</skipTestScope>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-plugin-plugin</artifactId>
+                                        <versionRange>[3.5.2,)</versionRange>
+                                        <goals>
+                                            <goal>descriptor</goal>
+                                            <goal>helpmojo</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.owasp</groupId>
+                <artifactId>dependency-check-maven</artifactId>
+                <version>${owaspPluginVersion}</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>aggregate</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
+
+    <licenses>
+        <license>
+            <name>MIT</name>
+            <distribution>repo</distribution>
+            <url>https://raw.githubusercontent.com/rchargel/build-utils/master/LICENSE.txt</url>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git@github.com:rchargel/build-utils.git</connection>
+        <developerConnection>scm:git:git@github.com:rchargel/build-utils.git</developerConnection>
+        <url>https://github.com/rchargel/build-utils</url>
+        <tag>HEAD</tag>
+    </scm>
+    <developers>
+        <developer>
+            <name>Rafael P Chargel</name>
+            <url>http://zcarioca.net</url>
+        </developer>
+    </developers>
 </project>
