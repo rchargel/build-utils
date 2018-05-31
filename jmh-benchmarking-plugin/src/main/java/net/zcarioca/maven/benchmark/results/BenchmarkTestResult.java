@@ -1,4 +1,4 @@
-package net.zcarioca.maven;
+package net.zcarioca.maven.benchmark.results;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,34 +21,59 @@ import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.util.ListStatistics;
 import org.openjdk.jmh.util.Statistics;
 
+import net.zcarioca.maven.utils.DistributionStatistics;
+
 public class BenchmarkTestResult implements StatisticalSummary {
 
     private static final int MEDIAN_PERCENTILE = 50;
     private static final double CONFIDENCE_INTERVAL = 0.999;
 
-    private String packageName;
-    private String className;
-    private String methodName;
-    private String mode;
-    private int numberOfTestThreads;
-    private int numberOfTestRepetitions;
-    private int numberOfWarmupIterations;
-    private int numberOfMeasurementIterations;
-    private long measurementTimeInMilliseconds;
-    private long warmupTimeInMilliseconds;
-    private String scoreUnits;
-    private double min;
-    private double max;
-    private double mean;
-    private double median;
-    private double meanErrorAt999;
-    private double standardDeviation;
-    private double variance;
-    private double sum;
-    private List<Double> rawMeasurements;
+    public final String packageName;
+    public final String className;
+    public final String methodName;
+    public final String mode;
+    public final int numberOfTestThreads;
+    public final int numberOfTestRepetitions;
+    public final int numberOfWarmupIterations;
+    public final int numberOfMeasurementIterations;
+    public final long measurementTimeInMilliseconds;
+    public final long warmupTimeInMilliseconds;
+    public final String scoreUnits;
+    public final double min;
+    public final double max;
+    public final double mean;
+    public final double median;
+    public final double meanErrorAt999;
+    public final double standardDeviation;
+    public final double variance;
+    public final double sum;
+    public final double kurtosis;
+    public final double skewness;
+    public final List<Double> rawMeasurements;
 
     private BenchmarkTestResult() {
-
+        this.packageName = null;
+        this.className = null;
+        this.methodName = null;
+        this.mode = null;
+        this.numberOfTestThreads = 0;
+        this.numberOfTestRepetitions = 0;
+        this.numberOfWarmupIterations = 0;
+        this.numberOfMeasurementIterations = 0;
+        this.measurementTimeInMilliseconds = 0;
+        this.warmupTimeInMilliseconds = 0;
+        this.scoreUnits = null;
+        this.min = 0;
+        this.max = 0;
+        this.mean = 0;
+        this.median = 0;
+        this.meanErrorAt999 = 0;
+        this.standardDeviation = 0;
+        this.variance = 0;
+        this.sum = 0;
+        this.kurtosis = 0;
+        this.skewness = 0;
+        this.rawMeasurements = null;
     }
 
     private BenchmarkTestResult(final Builder builder) {
@@ -63,15 +88,20 @@ public class BenchmarkTestResult implements StatisticalSummary {
         this.measurementTimeInMilliseconds = builder.measurementTimeInMilliseconds;
         this.warmupTimeInMilliseconds = builder.warmupTimeInMilliseconds;
         this.scoreUnits = builder.scoreUnits;
-        this.min = builder.minimumMeasurement;
-        this.max = builder.maximumMeasurement;
-        this.mean = builder.meanMeasurement;
         this.median = builder.medianMeasurement;
         this.meanErrorAt999 = builder.meanErrorAt999;
-        this.standardDeviation = builder.standardDeviation;
-        this.variance = builder.variance;
-        this.sum = builder.sum;
-        this.rawMeasurements = builder.rawMeasurements;
+        this.rawMeasurements = Collections.unmodifiableList(builder.rawMeasurements);
+
+        final DistributionStatistics stats = rawMeasurements.parallelStream().reduce(new DistributionStatistics(),
+                DistributionStatistics::aggregate, DistributionStatistics::merge);
+        this.sum = stats.sum;
+        this.min = stats.minimum;
+        this.max = stats.maximum;
+        this.mean = stats.mean;
+        this.variance = stats.variance;
+        this.standardDeviation = stats.standardDeviation;
+        this.skewness = stats.skewness;
+        this.kurtosis = stats.kurtosis;
     }
 
     private BenchmarkTestResult(final RunResult runResult) {
@@ -91,20 +121,25 @@ public class BenchmarkTestResult implements StatisticalSummary {
 
         mode = runResult.getParams().getMode().toString();
         scoreUnits = runResult.getAggregatedResult().getScoreUnit();
-        min = runResult.getAggregatedResult().getPrimaryResult().getStatistics().getMin();
-        max = runResult.getAggregatedResult().getPrimaryResult().getStatistics().getMax();
-        mean = runResult.getAggregatedResult().getPrimaryResult().getStatistics().getMean();
         median = runResult.getAggregatedResult().getPrimaryResult().getStatistics().getPercentile(50);
         meanErrorAt999 = runResult.getAggregatedResult().getPrimaryResult().getStatistics().getMeanErrorAt(.999);
-        standardDeviation = runResult.getAggregatedResult().getPrimaryResult().getStatistics().getStandardDeviation();
-        variance = runResult.getAggregatedResult().getPrimaryResult().getStatistics().getVariance();
-        sum = runResult.getAggregatedResult().getPrimaryResult().getStatistics().getSum();
 
         rawMeasurements = Collections.unmodifiableList(runResult.getAggregatedResult()
                 .getIterationResults()
                 .stream()
                 .map(iterationResult -> Double.valueOf(iterationResult.getPrimaryResult().getScore()))
                 .collect(Collectors.toList()));
+
+        final DistributionStatistics stats = rawMeasurements.parallelStream().reduce(new DistributionStatistics(),
+                DistributionStatistics::aggregate, DistributionStatistics::merge);
+        sum = stats.sum;
+        min = stats.minimum;
+        max = stats.maximum;
+        mean = stats.mean;
+        variance = stats.variance;
+        standardDeviation = stats.standardDeviation;
+        skewness = stats.skewness;
+        kurtosis = stats.kurtosis;
     }
 
     public BenchmarkTestResult merge(final BenchmarkTestResult other) {
@@ -125,14 +160,8 @@ public class BenchmarkTestResult implements StatisticalSummary {
                 .warmupTimeInMilliseconds(this.warmupTimeInMilliseconds)
                 .mode(this.mode)
                 .scoreUnits(this.scoreUnits)
-                .maximumMeasurement(Math.max(this.max, other.max))
-                .minimumMeasurement(Math.min(this.min, other.min))
-                .meanMeasurement(stats.getMean())
                 .medianMeasurement(stats.getPercentile(MEDIAN_PERCENTILE))
                 .meanErrorAt999(stats.getMeanErrorAt(CONFIDENCE_INTERVAL))
-                .standardDeviation(stats.getStandardDeviation())
-                .variance(stats.getVariance())
-                .sum(stats.getSum())
                 .rawMeasurements(Collections.unmodifiableList(rawData))
                 .build();
     }
@@ -141,53 +170,9 @@ public class BenchmarkTestResult implements StatisticalSummary {
         return String.format("%s.%s.%s - %s", packageName, className, methodName, mode);
     }
 
-    public String getPackageName() {
-        return packageName;
-    }
-
-    public String getClassName() {
-        return className;
-    }
-
-    public String getMethodName() {
-        return methodName;
-    }
-
-    public String getMode() {
-        return mode;
-    }
-
-    public int getNumberOfWarmupIterations() {
-        return numberOfWarmupIterations;
-    }
-
-    public int getNumberOfMeasurementIterations() {
-        return numberOfMeasurementIterations;
-    }
-
-    public int getNumberOfTestThreads() {
-        return numberOfTestThreads;
-    }
-
-    public int getNumberOfTestRepetitions() {
-        return numberOfTestRepetitions;
-    }
-
     @Override
     public long getN() {
-        return getRawMeasurements().size();
-    }
-
-    public long getMeasurementTimeInMilliseconds() {
-        return measurementTimeInMilliseconds;
-    }
-
-    public long getWarmupTimeInMilliseconds() {
-        return warmupTimeInMilliseconds;
-    }
-
-    public String getScoreUnits() {
-        return scoreUnits;
+        return rawMeasurements.size();
     }
 
     @Override
@@ -205,14 +190,6 @@ public class BenchmarkTestResult implements StatisticalSummary {
         return mean;
     }
 
-    public double getMedian() {
-        return median;
-    }
-
-    public double getMeanErrorAt999() {
-        return meanErrorAt999;
-    }
-
     @Override
     public double getStandardDeviation() {
         return standardDeviation;
@@ -226,10 +203,6 @@ public class BenchmarkTestResult implements StatisticalSummary {
     @Override
     public double getSum() {
         return sum;
-    }
-
-    public List<Double> getRawMeasurements() {
-        return rawMeasurements;
     }
 
     @Override
@@ -352,14 +325,8 @@ public class BenchmarkTestResult implements StatisticalSummary {
         private long measurementTimeInMilliseconds;
         private long warmupTimeInMilliseconds;
         private String scoreUnits;
-        private double minimumMeasurement;
-        private double maximumMeasurement;
-        private double meanMeasurement;
         private double medianMeasurement;
         private double meanErrorAt999;
-        private double standardDeviation;
-        private double variance;
-        private double sum;
         private List<Double> rawMeasurements = new ArrayList<>();
         private Map<String, String> params = new HashMap<>();
 
@@ -408,21 +375,6 @@ public class BenchmarkTestResult implements StatisticalSummary {
             return this;
         }
 
-        public Builder minimumMeasurement(final double minimumMeasurement) {
-            this.minimumMeasurement = minimumMeasurement;
-            return this;
-        }
-
-        public Builder maximumMeasurement(final double maximumMeasurement) {
-            this.maximumMeasurement = maximumMeasurement;
-            return this;
-        }
-
-        public Builder meanMeasurement(final double meanMeasurement) {
-            this.meanMeasurement = meanMeasurement;
-            return this;
-        }
-
         public Builder medianMeasurement(final double medianMeasurement) {
             this.medianMeasurement = medianMeasurement;
             return this;
@@ -430,21 +382,6 @@ public class BenchmarkTestResult implements StatisticalSummary {
 
         public Builder meanErrorAt999(final double meanErrorAt999) {
             this.meanErrorAt999 = meanErrorAt999;
-            return this;
-        }
-
-        public Builder standardDeviation(final double standardDeviation) {
-            this.standardDeviation = standardDeviation;
-            return this;
-        }
-
-        public Builder variance(final double variance) {
-            this.variance = variance;
-            return this;
-        }
-
-        public Builder sum(final double sum) {
-            this.sum = sum;
             return this;
         }
 

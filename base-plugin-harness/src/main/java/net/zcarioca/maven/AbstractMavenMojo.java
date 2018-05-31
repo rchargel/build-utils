@@ -69,7 +69,7 @@ public abstract class AbstractMavenMojo extends AbstractMojo {
 
     protected abstract void executeMojo() throws MojoExecutionException, MojoFailureException;
 
-    protected static String getResourceAsFile(final String resourceName) throws Exception {
+    public static String getResourceAsFile(final String resourceName) throws Exception {
         final ClassLoader loader = Thread.currentThread().getContextClassLoader();
         final String findName = resourceName.startsWith("/") ? resourceName.substring(1) : resourceName;
 

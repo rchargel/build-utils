@@ -28,6 +28,7 @@
         <plexusUtilsVersion>3.1.0</plexusUtilsVersion>
         <jmhVersion>1.21</jmhVersion>
         <reflectionsVersion>0.9.11</reflectionsVersion>
+        <oshiVersion>3.5.0</oshiVersion>
         <junitVersion>4.12</junitVersion>
 
         <!-- Plugins -->
@@ -82,6 +83,13 @@
                 <groupId>org.openjdk.jmh</groupId>
                 <artifactId>jmh-generator-annprocess</artifactId>
                 <version>${jmhVersion}</version>
+            </dependency>
+            
+            <!-- OSHI dependencies -->
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshiVersion}</version>
             </dependency>
 
             <!-- Reflections -->
