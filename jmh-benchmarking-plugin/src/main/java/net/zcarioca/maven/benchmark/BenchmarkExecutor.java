@@ -25,6 +25,7 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import net.zcarioca.maven.benchmark.results.BenchmarkResults;
 import net.zcarioca.maven.benchmark.results.BenchmarkTestResult;
 
 public class BenchmarkExecutor {
@@ -39,15 +40,15 @@ public class BenchmarkExecutor {
         this.log = log;
     }
 
-    public Collection<BenchmarkTestResult> executeBenchmarks() throws MojoExecutionException {
-        return recheck(() -> findClassesContainingAnnotation(Benchmark.class)
+    public BenchmarkResults executeBenchmarks() throws MojoExecutionException {
+        return new BenchmarkResults(recheck(() -> findClassesContainingAnnotation(Benchmark.class)
                 .map(this::createOptions)
                 .map(this::createRunner)
                 .map(r -> uncheck(() -> executeRunner(r)))
                 .map(BenchmarkTestResult::build)
                 .flatMap(List::stream)
                 .reduce(null, BenchmarkExecutor::addResultToSet, BenchmarkExecutor::merge)
-                .values(), MojoExecutionException.class);
+                .values(), MojoExecutionException.class));
     }
 
     private Options createOptions(final Class<?> benchmarkClass) {

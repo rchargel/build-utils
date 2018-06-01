@@ -29,6 +29,8 @@
         <jmhVersion>1.21</jmhVersion>
         <reflectionsVersion>0.9.11</reflectionsVersion>
         <oshiVersion>3.5.0</oshiVersion>
+        <jacksonVersion>2.9.5</jacksonVersion>
+        <doxiaVersion>1.8</doxiaVersion>
         <junitVersion>4.12</junitVersion>
 
         <!-- Plugins -->
@@ -73,6 +75,120 @@
                 <version>${plexusUtilsVersion}</version>
             </dependency>
 
+            <!-- MAVEN REPORTING dependencies -->
+            <dependency>
+                <groupId>org.apache.maven.reporting</groupId>
+                <artifactId>maven-reporting-api</artifactId>
+                <version>3.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.reporting</groupId>
+                <artifactId>maven-reporting-impl</artifactId>
+                <version>3.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.reporting</groupId>
+                <artifactId>maven-reporting-exec</artifactId>
+                <version>1.4</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.eclipse.aether</groupId>
+                        <artifactId>aether-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.sonatype.aether</groupId>
+                        <artifactId>aether-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.sonatype.aether</groupId>
+                        <artifactId>aether-impl</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.sonatype.aether</groupId>
+                        <artifactId>aether-spi</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- DOXIA dependencies -->
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-core</artifactId>
+                <version>${doxiaVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-sink-api</artifactId>
+                <version>${doxiaVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-site-renderer</artifactId>
+                <version>${doxiaVersion}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-collections</groupId>
+                        <artifactId>commons-collections</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>commons-beanutils</groupId>
+                        <artifactId>commons-beanutils</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.struts</groupId>
+                        <artifactId>struts-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.struts</groupId>
+                        <artifactId>struts-tiles</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.struts</groupId>
+                        <artifactId>struts-taglib</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- APACHE dependencies -->
+            <dependency><!-- required by doxia -->
+                <groupId>commons-collections</groupId>
+                <artifactId>commons-collections</artifactId>
+                <version>3.2.2</version>
+            </dependency>
+            <dependency><!-- required by doxia -->
+                <groupId>commons-beanutils</groupId>
+                <artifactId>commons-beanutils</artifactId>
+                <version>1.9.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.7</version>
+            </dependency>
+            <dependency><!-- required by doxia -->
+                <groupId>commons-lang</groupId>
+                <artifactId>commons-lang</artifactId>
+                <version>2.6</version>
+            </dependency>
+
+
+            <!-- JACKSON dependencies -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jacksonVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jacksonVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jacksonVersion}</version>
+            </dependency>
+
             <!-- JMH dependencies -->
             <dependency>
                 <groupId>org.openjdk.jmh</groupId>
@@ -84,7 +200,7 @@
                 <artifactId>jmh-generator-annprocess</artifactId>
                 <version>${jmhVersion}</version>
             </dependency>
-            
+
             <!-- OSHI dependencies -->
             <dependency>
                 <groupId>com.github.oshi</groupId>
@@ -124,6 +240,12 @@
     </dependencyManagement>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <pluginManagement>
             <plugins>
                 <plugin>

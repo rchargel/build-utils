@@ -21,6 +21,10 @@ import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.util.ListStatistics;
 import org.openjdk.jmh.util.Statistics;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.zcarioca.maven.utils.DistributionStatistics;
 
 public class BenchmarkTestResult implements StatisticalSummary {
@@ -166,6 +170,7 @@ public class BenchmarkTestResult implements StatisticalSummary {
                 .build();
     }
 
+    @JsonIgnore
     public String getKey() {
         return String.format("%s.%s.%s - %s", packageName, className, methodName, mode);
     }
@@ -292,6 +297,15 @@ public class BenchmarkTestResult implements StatisticalSummary {
             return false;
 
         return true;
+    }
+
+    @Override
+    public String toString() {
+        try {
+            return new ObjectMapper().writerWithDefaultPrettyPrinter().writeValueAsString(this);
+        } catch (final JsonProcessingException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     public static List<BenchmarkTestResult> build(final Collection<RunResult> results) {

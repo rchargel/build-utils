@@ -1,28 +1,44 @@
 package net.zcarioca.maven.benchmark.plugin;
 
 import java.io.File;
-import java.util.Collection;
+import java.io.IOException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 
-import net.zcarioca.maven.AbstractMavenMojo;
+import net.zcarioca.maven.AbstractMavenReportMojo;
 import net.zcarioca.maven.benchmark.BenchmarkExecutor;
-import net.zcarioca.maven.benchmark.results.BenchmarkTestResult;
+import net.zcarioca.maven.benchmark.reports.BenchmarkTestReport;
+import net.zcarioca.maven.benchmark.results.BenchmarkResults;
 
 @Mojo(name = "run", defaultPhase = LifecyclePhase.TEST)
-public class JMHBenchmarkingMojo extends AbstractMavenMojo {
-    @Parameter(defaultValue = "${project.build.directory}/benchmark-reports")
-    private File reportsDirectory;
+public class JMHBenchmarkingMojo extends AbstractMavenReportMojo {
+
+    private static final String JSON_FILE_NAME = "benchmark-reports.json";
+    private static final String REPORT_FILE_NAME = "benchmark-reports.html";
+    private static final String GOAL_NAME = "run";
 
     @Override
     protected void executeMojo() throws MojoExecutionException, MojoFailureException {
         getLog().info("Running Benchmarks");
 
-        final Collection<BenchmarkTestResult> results = new BenchmarkExecutor(getLog()).executeBenchmarks();
-        getLog().info(results.toString());
+        final BenchmarkResults results = new BenchmarkExecutor(getLog()).executeBenchmarks();
+        final File file = new File(outputDirectory, JSON_FILE_NAME);
+        try {
+            FileUtils.write(file, results.toString(), getOutputEncoding());
+        } catch (final IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+
+        generateFinalReport((sink, log, locale, bundle, encoding) -> new BenchmarkTestReport(results, sink, log, locale, bundle, encoding),
+                REPORT_FILE_NAME);
+    }
+
+    @Override
+    protected String getGoalName() {
+        return GOAL_NAME;
     }
 }
