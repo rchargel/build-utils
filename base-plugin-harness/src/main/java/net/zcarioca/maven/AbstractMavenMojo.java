@@ -5,8 +5,12 @@ import static net.dempsy.util.Functional.uncheck;
 
 import java.io.File;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,6 +32,8 @@ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 
 public abstract class AbstractMavenMojo extends AbstractMojo {
+    private static final String JAVA_CLASS_PATH = "java.class.path";
+
     @Parameter(defaultValue = "${project}", readonly = true)
     protected MavenProject project;
 
@@ -60,11 +66,25 @@ public abstract class AbstractMavenMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        final String originalClasspath = System.getProperty(JAVA_CLASS_PATH);
         final URL[] classes = scanClasses();
+        try {
+            final String classpath = recheck(() -> Arrays.stream(classes)
+                    .map(url -> uncheck(() -> url.toURI()))
+                    .map(Paths::get)
+                    .map(Path::toFile)
+                    .map(File::getAbsolutePath)
+                    .reduce("", (l, r) -> l + File.pathSeparator + r), URISyntaxException.class);
+            System.setProperty(JAVA_CLASS_PATH, classpath);
+        } catch (final URISyntaxException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
         final ClassLoader customContextClassLoader = URLClassLoader.newInstance(classes, Thread.currentThread().getContextClassLoader());
         Thread.currentThread().setContextClassLoader(customContextClassLoader);
 
         executeMojo();
+
+        System.setProperty(JAVA_CLASS_PATH, originalClasspath);
     }
 
     protected abstract void executeMojo() throws MojoExecutionException, MojoFailureException;

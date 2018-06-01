@@ -19,8 +19,8 @@ import org.openjdk.jmh.infra.Blackhole;
 
 @Fork(value = 1, warmups = 1)
 @BenchmarkMode({ Mode.AverageTime })
-@Warmup(iterations = 1, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(iterations = 3, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+@Warmup(iterations = 1, time = 100, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 3, time = 100, timeUnit = TimeUnit.MILLISECONDS)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 public class ExampleBenchmark {
 
