@@ -10,6 +10,10 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- Java Target Version -->
+        <javaTargetVersion>1.8</javaTargetVersion>
+        <maven.compiler.target>${javaTargetVersion}</maven.compiler.target>
+        <maven.compiler.source>${javaTargetVersion}</maven.compiler.source>
     </properties>
 
     <dependencies>

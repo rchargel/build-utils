@@ -290,6 +290,7 @@
                         <failBuildOnCVSS>7</failBuildOnCVSS>
                         <skipProvidedScope>true</skipProvidedScope>
                         <skipTestScope>true</skipTestScope>
+                        <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
                     </configuration>
                     <executions>
                         <execution>
