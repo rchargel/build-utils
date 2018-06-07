@@ -1,44 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>net.zcarioca.maven</groupId>
+        <groupId>net.zcarioca.build</groupId>
         <artifactId>build-utils</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <packaging>maven-plugin</packaging>
     <artifactId>jmh-benchmarking-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
 
     <dependencies>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>base-plugin-harness</artifactId>
-        </dependency>
 
         <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-core</artifactId>
+            <groupId>net.zcarioca.build</groupId>
+            <artifactId>base-maven-plugin-harness</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.openjdk.jmh</groupId>
-            <artifactId>jmh-generator-annprocess</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.oshi</groupId>
-            <artifactId>oshi-core</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
+            <groupId>net.zcarioca.build</groupId>
+            <artifactId>jmh-benchmarking-executor</artifactId>
         </dependency>
 
         <dependency>
