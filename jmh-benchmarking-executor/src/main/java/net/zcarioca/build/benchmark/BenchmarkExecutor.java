@@ -1,7 +1,7 @@
-package net.zcarioca.maven.benchmark;
+package net.zcarioca.build.benchmark;
 
-import net.zcarioca.maven.benchmark.results.BenchmarkResults;
-import net.zcarioca.maven.benchmark.results.BenchmarkTestResult;
+import net.zcarioca.build.benchmark.results.BenchmarkResults;
+import net.zcarioca.build.benchmark.results.BenchmarkTestResult;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.BenchmarkList;

@@ -94,7 +94,7 @@ public class ClasspathUtil {
             final URI url = urls.nextElement().toURI();
             if (!url.getScheme().toLowerCase().startsWith("jar")) {
                 final File file = new File(url);
-                if (file != null || file.exists()) {
+                if (file.exists()) {
                     return file.getAbsolutePath();
                 }
             }

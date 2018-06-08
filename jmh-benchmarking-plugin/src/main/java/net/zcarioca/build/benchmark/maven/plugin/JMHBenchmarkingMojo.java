@@ -1,16 +1,18 @@
-package net.zcarioca.maven.benchmark.plugin;
+package net.zcarioca.build.benchmark.maven.plugin;
 
-import net.zcarioca.maven.AbstractMavenReportMojo;
-import net.zcarioca.maven.benchmark.BenchmarkExecutor;
-import net.zcarioca.maven.benchmark.reports.BenchmarkTestReport;
-import net.zcarioca.maven.benchmark.results.BenchmarkResults;
+import net.zcarioca.build.benchmark.BenchmarkExecutor;
+import net.zcarioca.build.benchmark.maven.reports.BenchmarkTestReport;
+import net.zcarioca.build.benchmark.results.BenchmarkResults;
+import net.zcarioca.build.maven.AbstractMavenReportMojo;
+import net.zcarioca.build.report.ReportBuilder;
 import org.apache.commons.io.FileUtils;
+import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
 import java.io.File;
+import java.util.function.BiFunction;
 
 @Mojo(name = "run", defaultPhase = LifecyclePhase.TEST)
 public class JMHBenchmarkingMojo extends AbstractMavenReportMojo {
@@ -20,7 +22,7 @@ public class JMHBenchmarkingMojo extends AbstractMavenReportMojo {
     private static final String GOAL_NAME = "run";
 
     @Override
-    protected void executeMojo() throws MojoExecutionException, MojoFailureException {
+    protected BiFunction<Sink, ReportBuilder<BenchmarkTestReport>, BenchmarkTestReport> executeReportMojo() throws MojoExecutionException {
         getLog().info("Running Benchmarks");
 
         final BenchmarkResults results;
@@ -31,9 +33,12 @@ public class JMHBenchmarkingMojo extends AbstractMavenReportMojo {
         } catch (final Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
+        return (sink, builder) -> new BenchmarkTestReport(results, sink, builder);
+    }
 
-        generateFinalReport((sink, log, locale, bundle, encoding) -> new BenchmarkTestReport(results, sink, log, locale, bundle, encoding),
-                REPORT_FILE_NAME);
+    @Override
+    protected String getOutputFileName() {
+        return REPORT_FILE_NAME;
     }
 
     @Override

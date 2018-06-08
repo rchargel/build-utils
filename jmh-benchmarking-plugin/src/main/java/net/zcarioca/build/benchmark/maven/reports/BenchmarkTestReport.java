@@ -1,21 +1,18 @@
-package net.zcarioca.maven.benchmark.reports;
+package net.zcarioca.build.benchmark.maven.reports;
 
-import static java.util.Comparator.comparing;
+import net.zcarioca.build.benchmark.results.BenchmarkResults;
+import net.zcarioca.build.benchmark.results.BenchmarkTestResult;
+import net.zcarioca.build.report.AbstractSystemReportRenderer;
+import net.zcarioca.build.report.ReportBuilder;
+import org.apache.maven.doxia.sink.Sink;
 
 import java.util.AbstractMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
-import org.apache.maven.doxia.sink.Sink;
-import org.apache.maven.plugin.logging.Log;
-
-import net.zcarioca.maven.AbstractSystemReportRenderer;
-import net.zcarioca.maven.benchmark.results.BenchmarkResults;
-import net.zcarioca.maven.benchmark.results.BenchmarkTestResult;
+import static java.util.Comparator.comparing;
 
 public class BenchmarkTestReport extends AbstractSystemReportRenderer {
 
@@ -26,9 +23,8 @@ public class BenchmarkTestReport extends AbstractSystemReportRenderer {
     private static final String SUMMARY_SECTION_TITLE = "summary.section.title";
     private final BenchmarkResults results;
 
-    public BenchmarkTestReport(final BenchmarkResults results, final Sink sink, final Log log, final Locale locale, final ResourceBundle bundle,
-            final String encoding) {
-        super(sink, log, locale, bundle, encoding);
+    public BenchmarkTestReport(final BenchmarkResults results, final Sink sink, final ReportBuilder builder) {
+        super(sink, builder);
         this.results = results;
     }
 
@@ -67,6 +63,13 @@ public class BenchmarkTestReport extends AbstractSystemReportRenderer {
         sink.section1_();
     }
 
+    private Map<String, Map<String, Map<String, Map<String, BenchmarkTestResult>>>> createHierarchy() {
+        return results.results.stream().collect(Collectors.groupingBy(r -> r.mode,
+                Collectors.groupingBy(r -> r.packageName,
+                        Collectors.groupingBy(r -> r.className,
+                                Collectors.toMap(r -> r.methodName, r -> r)))));
+    }
+
     private void renderSystemTable() {
         sink.section2();
         sink.sectionTitle2();
@@ -88,15 +91,8 @@ public class BenchmarkTestReport extends AbstractSystemReportRenderer {
         sink.section2_();
     }
 
-    private Map<String, Map<String, Map<String, Map<String, BenchmarkTestResult>>>> createHierarchy() {
-        return results.results.stream().collect(Collectors.groupingBy(r -> r.mode,
-                Collectors.groupingBy(r -> r.packageName,
-                        Collectors.groupingBy(r -> r.className,
-                                Collectors.toMap(r -> r.methodName, r -> r)))));
-    }
-
     private <R extends BenchmarkTestResult> void renderEvaluations(final Map<String, Map<String, Map<String, Map<String, R>>>> evalMap,
-            final EvaluationRenderer<R> evalRenderer) {
+                                                                   final EvaluationRenderer<R> evalRenderer) {
         evalMap.entrySet().stream().sorted(comparing(Entry::getKey)).forEach(modeEntry -> {
             evalRenderer.startModeSection(sink, modeEntry.getKey().toString());
 

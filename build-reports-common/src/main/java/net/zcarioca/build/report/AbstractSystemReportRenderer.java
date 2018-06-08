@@ -1,14 +1,4 @@
-package net.zcarioca.maven;
-
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.text.NumberFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+package net.zcarioca.build.report;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -18,12 +8,18 @@ import org.apache.maven.doxia.markup.HtmlMarkup;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.doxia.sink.SinkEventAttributes;
 import org.apache.maven.doxia.sink.impl.SinkEventAttributeSet;
-import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.reporting.AbstractMavenReportRenderer;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.text.MessageFormat;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public abstract class AbstractSystemReportRenderer extends AbstractMavenReportRenderer {
 
-    private static final String[] ABBREVIATIONS = new String[] {
+    private static final String[] ABBREVIATIONS = new String[]{
             "B",
             "KB",
             "MB",
@@ -39,17 +35,17 @@ public abstract class AbstractSystemReportRenderer extends AbstractMavenReportRe
     private static final String INFO_GIF = "data:image/gif;base64,R0lGODlhDwAPAOYAAAAAAP////39/vn6/Pj5+9rg63KDntHZ5tXc6Nfe6dbd6AknU0ddfV15olZwlk9nikxjhUpggUVZeENXdElefkZaeWWBqmiErGeDq2qFrWyHrm2Ir3CKsFhsi3SNsnaPtGR5mHeQtHyUt36VuHeNrYCXuXWKqW6BnoSau4OZuoWbvHqOrIqfv3eJpIugv42hwJCkwoWXspmsx5irxoKSqZKiuoaVq6Gyy6a2zqm50K280qy70Z+swLG/1LC+07XC1rjF2LzI2sHM3cPO3sLN3bK8y8nT4sbQ38vU4s3W5MzV49Pb59La5sjP2ent8+Pn7fX3+vT2+fP1+EBUcEFVcXmOq32OppWpxZ6wyae0xbnG2MDJ1eDm7t/l7eHn7+Xq8eTp8PDz9+/y9t3k7dzj7Nvi6+fs8ubr8ezw9evv9Oru89jf5+Lo7/H09/b4+vv8/fr7/P7+/v///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAHIALAAAAAAPAA8AAAe7gHKCg4SFgmBmZ2BsXGQFCkxHg15xcQJvcANuUW1iai6HAgKZTR1PYmhOZ6ByXG8DBFA2C1tpZ4wlgmQEm21FNGtfXmVMHoIJUFJhaAYLWWMISEIYggfLamZWCzxKREA+DYJG2GBcLQs1Wj05Nw6CRGBdCkknCzHsMzAPgkBLSUNBQCyoIgMGixQRBOkA+GPHChMkWKAQ8UGCIBg/dODAcuWFihEhOGigMujChgwWHkCgUGHCFAaGYhIKBAA7";
 
     protected final NumberFormat numberFormat;
-    protected final Log log;
     protected final Locale locale;
     protected final ResourceBundle messages;
-    protected final String encoding;
+    protected final Charset encoding;
+    protected final boolean includeToc;
 
-    public AbstractSystemReportRenderer(final Sink sink, final Log log, final Locale locale, final ResourceBundle bundle, final String encoding) {
+    public AbstractSystemReportRenderer(final Sink sink, final ReportBuilder reportBuilder) {
         super(sink);
-        this.log = log;
-        this.locale = locale;
-        this.encoding = encoding;
-        this.messages = bundle;
+        locale = reportBuilder.locale;
+        encoding = reportBuilder.encoding;
+        messages = reportBuilder.resourcBundle;
+        includeToc = reportBuilder.includeToc;
         Locale.setDefault(locale);
         numberFormat = NumberFormat.getNumberInstance();
         numberFormat.setGroupingUsed(true);
@@ -57,41 +53,28 @@ public abstract class AbstractSystemReportRenderer extends AbstractMavenReportRe
         numberFormat.setMaximumFractionDigits(5);
     }
 
-    @Override
-    public String getTitle() {
-        return getTranslatedText("report.title");
-    }
+    public static String convertBytesToString(final Long bytes) {
+        double b = bytes.doubleValue();
 
-    public String getTranslatedText(final String messageCode, final Object... parameters) {
-        try {
-            return MessageFormat.format(messages.getString(messageCode), parameters);
-        } catch (final Exception e) {
-            return messageCode;
+        for (int i = 0; i < 4; i++) {
+            if (b < LIMIT) {
+                return toString(b, i);
+            }
+            b = b / TEN_24;
         }
+        return toString(b, 4);
     }
 
-    public SinkEventAttributes createColspan(final int colspan) {
-        return createAttrs(SinkEventAttributes.COLSPAN, Integer.valueOf(colspan));
+    private static String toString(final double b, final int i) {
+        final NumberFormat format = NumberFormat.getNumberInstance();
+        format.setGroupingUsed(false);
+        format.setMinimumFractionDigits(0);
+        format.setMaximumFractionDigits(3);
+        return format.format(b) + ABBREVIATIONS[i];
     }
 
-    public SinkEventAttributes createAttrs(final String attribute, final Object value) {
-        final SinkEventAttributeSet set = new SinkEventAttributeSet();
-        set.addAttribute(attribute, value);
-        return set;
-    }
-
-    public void renderCellText(final String text) {
-        renderCellText(text, null);
-    }
-
-    public void renderCellText(final String text, final SinkEventAttributes attrs) {
-        if (attrs != null) {
-            sink.tableCell(attrs);
-        } else {
-            sink.tableCell();
-        }
-        sink.text(text);
-        sink.tableCell_();
+    public static String camelCaseToWords(final String name) {
+        return WordUtils.capitalizeFully(StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(name), " "));
     }
 
     public void renderNumericValue(final Double value, final String units) {
@@ -111,6 +94,16 @@ public abstract class AbstractSystemReportRenderer extends AbstractMavenReportRe
         renderCellText(text, attrs);
     }
 
+    public void renderCellText(final String text, final SinkEventAttributes attrs) {
+        if (attrs != null) {
+            sink.tableCell(attrs);
+        } else {
+            sink.tableCell();
+        }
+        sink.text(text);
+        sink.tableCell_();
+    }
+
     public void renderCellHeaderText(final String text) {
         renderCellHeaderText(text, null);
     }
@@ -125,25 +118,53 @@ public abstract class AbstractSystemReportRenderer extends AbstractMavenReportRe
         sink.tableHeaderCell_();
     }
 
+    public String getTranslatedText(final String messageCode, final Object... parameters) {
+        try {
+            return MessageFormat.format(messages.getString(messageCode), parameters);
+        } catch (final Exception e) {
+            return messageCode;
+        }
+    }
+
     public void renderExceptionText(final int colspan, final String exception) {
         final String exceptionId = RandomStringUtils.randomAlphabetic(10);
         sink.tableRow();
         renderCellText(" ");
         sink.tableCell(createColspan(colspan - 1));
-        sink.unknown("a", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_START) },
+        sink.unknown("a", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_START)},
                 createAttrs(SinkEventAttributes.HREF, String.format("javascript:toggleException(\'err_%s')", exceptionId)));
         sink.text("Show/Hide Exception");
-        sink.unknown("a", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_END) }, null);
+        sink.unknown("a", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_END)}, null);
 
-        sink.unknown("pre", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_START) }, createAttrs(SinkEventAttributes.ID, "err_" + exceptionId));
+        sink.unknown("pre", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_START)}, createAttrs(SinkEventAttributes.ID, "err_" + exceptionId));
         sink.text(exception);
-        sink.unknown("pre", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_END) }, null);
+        sink.unknown("pre", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_END)}, null);
         sink.tableCell_();
         sink.tableRow_();
     }
 
+    public void renderCellText(final String text) {
+        renderCellText(text, null);
+    }
+
+    public SinkEventAttributes createColspan(final int colspan) {
+        return createAttrs(SinkEventAttributes.COLSPAN, Integer.valueOf(colspan));
+    }
+
+    public SinkEventAttributes createAttrs(final String attribute, final Object value) {
+        final SinkEventAttributeSet set = new SinkEventAttributeSet();
+        set.addAttribute(attribute, value);
+        return set;
+    }
+
     public void renderErrorIcon() {
         renderImage(ERROR_GIF);
+    }
+
+    public void renderImage(final String url) {
+        sink.figure();
+        sink.figureGraphics(url);
+        sink.figure_();
     }
 
     public void renderSuccessIcon() {
@@ -152,12 +173,6 @@ public abstract class AbstractSystemReportRenderer extends AbstractMavenReportRe
 
     public void renderInfoIcon() {
         renderImage(INFO_GIF);
-    }
-
-    public void renderImage(final String url) {
-        sink.figure();
-        sink.figureGraphics(url);
-        sink.figure_();
     }
 
     public void renderPropertyValueRow(final String property, final String value) {
@@ -196,46 +211,6 @@ public abstract class AbstractSystemReportRenderer extends AbstractMavenReportRe
         return new SimpleDateFormat("HH:mm:ss.SSS").format(instant);
     }
 
-    public static AttributeBuilder createAttributeBuilder() {
-        return new AttributeBuilder();
-    }
-
-    public static class AttributeBuilder {
-        private final Map<String, Object> attrs = new HashMap<>();
-
-        public AttributeBuilder addAttribute(final String attribute, final Object value) {
-            attrs.put(attribute, value);
-            return this;
-        }
-
-        public SinkEventAttributeSet build() {
-            final SinkEventAttributeSet attrSet = new SinkEventAttributeSet();
-            attrs.entrySet().forEach(entry -> {
-                attrSet.addAttribute(entry.getKey(), entry.getValue());
-            });
-            return attrSet;
-        }
-    }
-
-    public void renderCustomHeaderContent() {
-        try {
-            final String css = IOUtils.toString(getClass().getResourceAsStream("/report-style.css"), encoding);
-            final String printCss = IOUtils.toString(getClass().getResourceAsStream("/print.css"), encoding);
-
-            if (sink instanceof CustomSiteSink) {
-                ((CustomSiteSink) sink).style(css, createAttributeBuilder()
-                        .addAttribute(SinkEventAttributes.TYPE, "text/css")
-                        .addAttribute("media", "all").build());
-
-                ((CustomSiteSink) sink).style(printCss, createAttributeBuilder()
-                        .addAttribute(SinkEventAttributes.TYPE, "text/css")
-                        .addAttribute("media", "print").build());
-            }
-        } catch (final IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
-
     @Override
     public void render() {
         sink.head();
@@ -258,23 +233,39 @@ public abstract class AbstractSystemReportRenderer extends AbstractMavenReportRe
         sink.close();
     }
 
-    public NumberFormat getNumberFormat() {
-        return numberFormat;
+    @Override
+    public String getTitle() {
+        return getTranslatedText("report.title");
     }
 
-    public Log getLog() {
-        return log;
+    public void renderCustomHeaderContent() {
+        try {
+            final String css = IOUtils.toString(getClass().getResourceAsStream("/report-style.css"), encoding);
+            final String printCss = IOUtils.toString(getClass().getResourceAsStream("/print.css"), encoding);
+
+            if (sink instanceof CustomSiteSink) {
+                ((CustomSiteSink) sink).style(css, createAttributeBuilder()
+                        .addAttribute(SinkEventAttributes.TYPE, "text/css")
+                        .addAttribute("media", "all").build());
+
+                ((CustomSiteSink) sink).style(printCss, createAttributeBuilder()
+                        .addAttribute(SinkEventAttributes.TYPE, "text/css")
+                        .addAttribute("media", "print").build());
+            }
+        } catch (final IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
     }
 
     private void renderTableOfContentsStart() {
         sink.section1();
-        sink.unknown("div", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_START) }, createAttrs(SinkEventAttributes.CLASS, "hideFromPrint"));
+        sink.unknown("div", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_START)}, createAttrs(SinkEventAttributes.CLASS, "hideFromPrint"));
         sink.sectionTitle1();
         sink.text(getTranslatedText("table.of.contents"));
         sink.sectionTitle1_();
-        sink.unknown("div", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_END) }, null);
-        sink.unknown("div", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_START) }, createAttrs(SinkEventAttributes.ID, "tableofcontents"));
-        sink.unknown("div", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_END) }, null);
+        sink.unknown("div", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_END)}, null);
+        sink.unknown("div", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_START)}, createAttrs(SinkEventAttributes.ID, "tableofcontents"));
+        sink.unknown("div", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_END)}, null);
         sink.section1_();
     }
 
@@ -282,10 +273,8 @@ public abstract class AbstractSystemReportRenderer extends AbstractMavenReportRe
         renderTableOfContentsEnd();
     }
 
-    protected void renderPageBreak() {
-        sink.unknown("div", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_START) }, createAttrs(SinkEventAttributes.CLASS, "pageBreak"));
-
-        sink.unknown("div", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_END) }, null);
+    public static AttributeBuilder createAttributeBuilder() {
+        return new AttributeBuilder();
     }
 
     private void renderTableOfContentsEnd() {
@@ -309,35 +298,38 @@ public abstract class AbstractSystemReportRenderer extends AbstractMavenReportRe
                 "} listText += '</li>'; } listText += '</ol>'; } return listText; };" +
                 "(function() {var toc = document.getElementById('tableofcontents');" +
                 "toc.innerHTML = loadLevel(document, 2);})();\n //";
-        sink.unknown("script", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_START) }, createAttrs(SinkEventAttributes.TYPE, "text/javascript"));
+        sink.unknown("script", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_START)}, createAttrs(SinkEventAttributes.TYPE, "text/javascript"));
 
-        sink.unknown("cdata", new Object[] { Integer.valueOf(HtmlMarkup.CDATA_TYPE), script }, null);
+        sink.unknown("cdata", new Object[]{Integer.valueOf(HtmlMarkup.CDATA_TYPE), script}, null);
 
-        sink.unknown("script", new Object[] { Integer.valueOf(HtmlMarkup.TAG_TYPE_END) }, null);
+        sink.unknown("script", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_END)}, null);
     }
 
-    public static String convertBytesToString(final Long bytes) {
-        double b = bytes.doubleValue();
+    public NumberFormat getNumberFormat() {
+        return numberFormat;
+    }
 
-        for (int i = 0; i < 4; i++) {
-            if (b < LIMIT) {
-                return toString(b, i);
-            }
-            b = b / TEN_24;
+    protected void renderPageBreak() {
+        sink.unknown("div", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_START)}, createAttrs(SinkEventAttributes.CLASS, "pageBreak"));
+
+        sink.unknown("div", new Object[]{Integer.valueOf(HtmlMarkup.TAG_TYPE_END)}, null);
+    }
+
+    public static class AttributeBuilder {
+        private final Map<String, Object> attrs = new HashMap<>();
+
+        public AttributeBuilder addAttribute(final String attribute, final Object value) {
+            attrs.put(attribute, value);
+            return this;
         }
-        return toString(b, 4);
-    }
 
-    public static String camelCaseToWords(final String name) {
-        return WordUtils.capitalizeFully(StringUtils.join(StringUtils.splitByCharacterTypeCamelCase(name), " "));
-    }
-
-    private static String toString(final double b, final int i) {
-        final NumberFormat format = NumberFormat.getNumberInstance();
-        format.setGroupingUsed(false);
-        format.setMinimumFractionDigits(0);
-        format.setMaximumFractionDigits(3);
-        return format.format(b) + ABBREVIATIONS[i];
+        public SinkEventAttributeSet build() {
+            final SinkEventAttributeSet attrSet = new SinkEventAttributeSet();
+            attrs.entrySet().forEach(entry -> {
+                attrSet.addAttribute(entry.getKey(), entry.getValue());
+            });
+            return attrSet;
+        }
     }
 
 }

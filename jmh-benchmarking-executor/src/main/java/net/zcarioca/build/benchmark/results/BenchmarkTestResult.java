@@ -1,31 +1,20 @@
-package net.zcarioca.maven.benchmark.results;
+package net.zcarioca.build.benchmark.results;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.zcarioca.build.common.DistributionStatistics;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.util.ListStatistics;
 import org.openjdk.jmh.util.Statistics;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import net.zcarioca.build.common.DistributionStatistics;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class BenchmarkTestResult implements StatisticalSummary {
 
@@ -56,68 +45,68 @@ public class BenchmarkTestResult implements StatisticalSummary {
     public final List<Double> rawMeasurements;
 
     private BenchmarkTestResult() {
-        this.packageName = null;
-        this.className = null;
-        this.methodName = null;
-        this.mode = null;
-        this.numberOfTestThreads = 0;
-        this.numberOfTestRepetitions = 0;
-        this.numberOfWarmupIterations = 0;
-        this.numberOfMeasurementIterations = 0;
-        this.measurementTimeInMilliseconds = 0;
-        this.warmupTimeInMilliseconds = 0;
-        this.scoreUnits = null;
-        this.min = 0;
-        this.max = 0;
-        this.mean = 0;
-        this.median = 0;
-        this.meanErrorAt999 = 0;
-        this.standardDeviation = 0;
-        this.variance = 0;
-        this.sum = 0;
-        this.kurtosis = 0;
-        this.skewness = 0;
-        this.rawMeasurements = null;
+        packageName = null;
+        className = null;
+        methodName = null;
+        mode = null;
+        numberOfTestThreads = 0;
+        numberOfTestRepetitions = 0;
+        numberOfWarmupIterations = 0;
+        numberOfMeasurementIterations = 0;
+        measurementTimeInMilliseconds = 0;
+        warmupTimeInMilliseconds = 0;
+        scoreUnits = null;
+        min = 0;
+        max = 0;
+        mean = 0;
+        median = 0;
+        meanErrorAt999 = 0;
+        standardDeviation = 0;
+        variance = 0;
+        sum = 0;
+        kurtosis = 0;
+        skewness = 0;
+        rawMeasurements = null;
     }
 
     private BenchmarkTestResult(final Builder builder) {
-        this.numberOfTestThreads = builder.numberOfTestThreads;
-        this.numberOfTestRepetitions = builder.numberOfTestRepetitions;
-        this.methodName = builder.methodName;
-        this.className = builder.className;
-        this.packageName = builder.packageName;
-        this.mode = builder.mode;
-        this.numberOfWarmupIterations = builder.numberOfWarmupIterations;
-        this.numberOfMeasurementIterations = builder.numberOfMeasurementIterations;
-        this.measurementTimeInMilliseconds = builder.measurementTimeInMilliseconds;
-        this.warmupTimeInMilliseconds = builder.warmupTimeInMilliseconds;
-        this.scoreUnits = builder.scoreUnits;
-        this.median = builder.medianMeasurement;
-        this.meanErrorAt999 = builder.meanErrorAt999;
-        this.rawMeasurements = Collections.unmodifiableList(builder.rawMeasurements);
+        numberOfTestThreads = builder.numberOfTestThreads;
+        numberOfTestRepetitions = builder.numberOfTestRepetitions;
+        methodName = builder.methodName;
+        className = builder.className;
+        packageName = builder.packageName;
+        mode = builder.mode;
+        numberOfWarmupIterations = builder.numberOfWarmupIterations;
+        numberOfMeasurementIterations = builder.numberOfMeasurementIterations;
+        measurementTimeInMilliseconds = builder.measurementTimeInMilliseconds;
+        warmupTimeInMilliseconds = builder.warmupTimeInMilliseconds;
+        scoreUnits = builder.scoreUnits;
+        median = builder.medianMeasurement;
+        meanErrorAt999 = builder.meanErrorAt999;
+        rawMeasurements = Collections.unmodifiableList(builder.rawMeasurements);
 
         final DistributionStatistics stats = rawMeasurements.parallelStream().reduce(new DistributionStatistics(),
                 DistributionStatistics::aggregate, DistributionStatistics::merge);
-        this.sum = stats.sum;
-        this.min = stats.minimum;
-        this.max = stats.maximum;
-        this.mean = stats.mean;
-        this.variance = stats.variance;
-        this.standardDeviation = stats.standardDeviation;
-        this.skewness = stats.skewness;
-        this.kurtosis = stats.kurtosis;
+        sum = stats.sum;
+        min = stats.minimum;
+        max = stats.maximum;
+        mean = stats.mean;
+        variance = stats.variance;
+        standardDeviation = stats.standardDeviation;
+        skewness = stats.skewness;
+        kurtosis = stats.kurtosis;
     }
 
     private BenchmarkTestResult(final RunResult runResult) {
-        this.numberOfTestThreads = runResult.getParams().getThreads();
+        numberOfTestThreads = runResult.getParams().getThreads();
         final String[] nameParts = runResult.getParams().getBenchmark().split("\\.");
         final Map<String, String> params = runResult.getParams().getParamsKeys().stream().collect(Collectors.toMap(Function.identity(), paramKey -> {
             return runResult.getParams().getParam(paramKey);
         }));
-        this.numberOfTestRepetitions = 1;
-        this.methodName = nameParts[nameParts.length - 1] + stringifyParams(params.entrySet());
-        this.className = nameParts[nameParts.length - 2];
-        this.packageName = StringUtils.join(Arrays.asList(nameParts).subList(0, nameParts.length - 2), ".");
+        numberOfTestRepetitions = 1;
+        methodName = nameParts[nameParts.length - 1] + stringifyParams(params.entrySet());
+        className = nameParts[nameParts.length - 2];
+        packageName = StringUtils.join(Arrays.asList(nameParts).subList(0, nameParts.length - 2), ".");
         numberOfWarmupIterations = runResult.getParams().getWarmup().getCount();
         numberOfMeasurementIterations = runResult.getParams().getMeasurement().getCount();
         measurementTimeInMilliseconds = runResult.getParams().getMeasurement().getTime().convertTo(TimeUnit.MILLISECONDS);
@@ -146,24 +135,41 @@ public class BenchmarkTestResult implements StatisticalSummary {
         kurtosis = stats.kurtosis;
     }
 
+    static String stringifyParams(final Set<Entry<String, String>> paramEntries) {
+        if (paramEntries == null || paramEntries.isEmpty()) {
+            return "";
+        }
+        final List<String> params = paramEntries.stream()
+                .sorted(Comparator.comparing(Entry::getKey))
+                .map(e -> e.getKey() + " = " + e.getValue())
+                .collect(Collectors.toList());
+        return " [ " + StringUtils.join(params, ", ") + " ]";
+    }
+
+    public static List<BenchmarkTestResult> build(final Collection<RunResult> results) {
+        return results.stream()
+                .map(BenchmarkTestResult::new)
+                .collect(Collectors.toList());
+    }
+
     public BenchmarkTestResult merge(final BenchmarkTestResult other) {
-        final List<Double> rawData = new ArrayList<>(this.rawMeasurements);
+        final List<Double> rawData = new ArrayList<>(rawMeasurements);
         rawData.addAll(other.rawMeasurements);
 
         final Statistics stats = new ListStatistics(rawData.stream().mapToDouble(Double::doubleValue).toArray());
 
         return new Builder()
-                .numberOfTestThreads(this.numberOfTestThreads)
-                .numberOfTestRepetitions(this.numberOfTestRepetitions + other.numberOfTestRepetitions)
-                .methodName(this.methodName)
-                .className(this.className)
-                .packageName(this.packageName)
-                .numberOfWarmupIterations(this.numberOfWarmupIterations)
-                .numberOfMeasurementIterations(this.numberOfMeasurementIterations)
-                .measurementTimeInMilliseconds(this.measurementTimeInMilliseconds)
-                .warmupTimeInMilliseconds(this.warmupTimeInMilliseconds)
-                .mode(this.mode)
-                .scoreUnits(this.scoreUnits)
+                .numberOfTestThreads(numberOfTestThreads)
+                .numberOfTestRepetitions(numberOfTestRepetitions + other.numberOfTestRepetitions)
+                .methodName(methodName)
+                .className(className)
+                .packageName(packageName)
+                .numberOfWarmupIterations(numberOfWarmupIterations)
+                .numberOfMeasurementIterations(numberOfMeasurementIterations)
+                .measurementTimeInMilliseconds(measurementTimeInMilliseconds)
+                .warmupTimeInMilliseconds(warmupTimeInMilliseconds)
+                .mode(mode)
+                .scoreUnits(scoreUnits)
                 .medianMeasurement(stats.getPercentile(MEDIAN_PERCENTILE))
                 .meanErrorAt999(stats.getMeanErrorAt(CONFIDENCE_INTERVAL))
                 .rawMeasurements(Collections.unmodifiableList(rawData))
@@ -176,23 +182,13 @@ public class BenchmarkTestResult implements StatisticalSummary {
     }
 
     @Override
-    public long getN() {
-        return rawMeasurements.size();
-    }
-
-    @Override
-    public double getMin() {
-        return min;
-    }
-
-    @Override
-    public double getMax() {
-        return max;
-    }
-
-    @Override
     public double getMean() {
         return mean;
+    }
+
+    @Override
+    public double getVariance() {
+        return variance;
     }
 
     @Override
@@ -201,8 +197,18 @@ public class BenchmarkTestResult implements StatisticalSummary {
     }
 
     @Override
-    public double getVariance() {
-        return variance;
+    public double getMax() {
+        return max;
+    }
+
+    @Override
+    public double getMin() {
+        return min;
+    }
+
+    @Override
+    public long getN() {
+        return rawMeasurements.size();
     }
 
     @Override
@@ -248,53 +254,76 @@ public class BenchmarkTestResult implements StatisticalSummary {
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final BenchmarkTestResult other = (BenchmarkTestResult) obj;
-        if (!Objects.equals(packageName, other.packageName))
+        if (!Objects.equals(packageName, other.packageName)) {
             return false;
-        if (!Objects.equals(className, other.className))
+        }
+        if (!Objects.equals(className, other.className)) {
             return false;
-        if (!Objects.equals(methodName, other.methodName))
+        }
+        if (!Objects.equals(methodName, other.methodName)) {
             return false;
-        if (!Objects.equals(mode, other.mode))
+        }
+        if (!Objects.equals(mode, other.mode)) {
             return false;
-        if (numberOfTestThreads != other.numberOfTestThreads)
+        }
+        if (numberOfTestThreads != other.numberOfTestThreads) {
             return false;
-        if (numberOfTestRepetitions != other.numberOfTestRepetitions)
+        }
+        if (numberOfTestRepetitions != other.numberOfTestRepetitions) {
             return false;
-        if (numberOfWarmupIterations != other.numberOfWarmupIterations)
+        }
+        if (numberOfWarmupIterations != other.numberOfWarmupIterations) {
             return false;
-        if (numberOfMeasurementIterations != other.numberOfMeasurementIterations)
+        }
+        if (numberOfMeasurementIterations != other.numberOfMeasurementIterations) {
             return false;
-        if (measurementTimeInMilliseconds != other.measurementTimeInMilliseconds)
+        }
+        if (measurementTimeInMilliseconds != other.measurementTimeInMilliseconds) {
             return false;
-        if (warmupTimeInMilliseconds != other.warmupTimeInMilliseconds)
+        }
+        if (warmupTimeInMilliseconds != other.warmupTimeInMilliseconds) {
             return false;
-        if (!Objects.equals(scoreUnits, other.scoreUnits))
+        }
+        if (!Objects.equals(scoreUnits, other.scoreUnits)) {
             return false;
-        if (Double.doubleToLongBits(min) != Double.doubleToLongBits(other.min))
+        }
+        if (Double.doubleToLongBits(min) != Double.doubleToLongBits(other.min)) {
             return false;
-        if (Double.doubleToLongBits(max) != Double.doubleToLongBits(other.max))
+        }
+        if (Double.doubleToLongBits(max) != Double.doubleToLongBits(other.max)) {
             return false;
-        if (Double.doubleToLongBits(mean) != Double.doubleToLongBits(other.mean))
+        }
+        if (Double.doubleToLongBits(mean) != Double.doubleToLongBits(other.mean)) {
             return false;
-        if (Double.doubleToLongBits(median) != Double.doubleToLongBits(other.median))
+        }
+        if (Double.doubleToLongBits(median) != Double.doubleToLongBits(other.median)) {
             return false;
-        if (Double.doubleToLongBits(meanErrorAt999) != Double.doubleToLongBits(other.meanErrorAt999))
+        }
+        if (Double.doubleToLongBits(meanErrorAt999) != Double.doubleToLongBits(other.meanErrorAt999)) {
             return false;
-        if (Double.doubleToLongBits(standardDeviation) != Double.doubleToLongBits(other.standardDeviation))
+        }
+        if (Double.doubleToLongBits(standardDeviation) != Double.doubleToLongBits(other.standardDeviation)) {
             return false;
-        if (Double.doubleToLongBits(variance) != Double.doubleToLongBits(other.variance))
+        }
+        if (Double.doubleToLongBits(variance) != Double.doubleToLongBits(other.variance)) {
             return false;
-        if (Double.doubleToLongBits(sum) != Double.doubleToLongBits(other.sum))
+        }
+        if (Double.doubleToLongBits(sum) != Double.doubleToLongBits(other.sum)) {
             return false;
-        if (!Objects.equals(rawMeasurements, other.rawMeasurements))
+        }
+        if (!Objects.equals(rawMeasurements, other.rawMeasurements)) {
             return false;
+        }
 
         return true;
     }
@@ -306,23 +335,6 @@ public class BenchmarkTestResult implements StatisticalSummary {
         } catch (final JsonProcessingException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    public static List<BenchmarkTestResult> build(final Collection<RunResult> results) {
-        return results.stream()
-                .map(BenchmarkTestResult::new)
-                .collect(Collectors.toList());
-    }
-
-    static String stringifyParams(final Set<Entry<String, String>> paramEntries) {
-        if (paramEntries == null || paramEntries.isEmpty()) {
-            return "";
-        }
-        final List<String> params = paramEntries.stream()
-                .sorted(Comparator.comparing(Entry::getKey))
-                .map(e -> e.getKey() + " = " + e.getValue())
-                .collect(Collectors.toList());
-        return " [ " + StringUtils.join(params, ", ") + " ]";
     }
 
     public static class Builder {
@@ -405,7 +417,7 @@ public class BenchmarkTestResult implements StatisticalSummary {
         }
 
         public Builder addRawMeasurement(final double value) {
-            this.rawMeasurements.add(value);
+            rawMeasurements.add(value);
             return this;
         }
 
@@ -415,7 +427,7 @@ public class BenchmarkTestResult implements StatisticalSummary {
         }
 
         public Builder addParam(final String key, final String value) {
-            this.params.put(key, value);
+            params.put(key, value);
             return this;
         }
 
@@ -437,9 +449,9 @@ public class BenchmarkTestResult implements StatisticalSummary {
         public BenchmarkTestResult build() {
             if (methodName == null) {
                 final String[] nameParts = name.split("\\.");
-                this.methodName = nameParts[nameParts.length - 1] + stringifyParams(params.entrySet());
-                this.className = nameParts[nameParts.length - 2];
-                this.packageName = StringUtils.join(Arrays.asList(nameParts).subList(0, nameParts.length - 2), ".");
+                methodName = nameParts[nameParts.length - 1] + stringifyParams(params.entrySet());
+                className = nameParts[nameParts.length - 2];
+                packageName = StringUtils.join(Arrays.asList(nameParts).subList(0, nameParts.length - 2), ".");
             }
             return new BenchmarkTestResult(this);
         }

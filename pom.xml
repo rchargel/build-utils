@@ -11,6 +11,7 @@
 
     <modules>
         <module>build-utils-common</module>
+        <module>build-reports-common</module>
         <module>jmh-benchmarking-executor</module>
         <module>base-maven-plugin-harness</module>
         <module>jmh-benchmarking-plugin</module>
@@ -39,6 +40,7 @@
         <!-- Plugins -->
         <owaspPluginVersion>3.1.2</owaspPluginVersion>
         <mavenGpgPluginVersion>1.6</mavenGpgPluginVersion>
+        <findbugsMavenPluginVersion>3.0.5</findbugsMavenPluginVersion>
     </properties>
 
     <dependencyManagement>
@@ -47,6 +49,11 @@
             <dependency>
                 <groupId>net.zcarioca.build</groupId>
                 <artifactId>build-utils-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.zcarioca.build</groupId>
+                <artifactId>build-reports-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -296,6 +303,22 @@
                     </executions>
                 </plugin>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>findbugs-maven-plugin</artifactId>
+                    <version>${findbugsMavenPluginVersion}</version>
+                    <executions>
+                        <execution>
+                            <phase>verify</phase>
+                            <goals>
+                                <goal>check</goal>
+                            </goals>
+                            <configuration>
+                                <debug>true</debug>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.owasp</groupId>
                     <artifactId>dependency-check-maven</artifactId>
                     <version>${owaspPluginVersion}</version>
@@ -349,6 +372,10 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>findbugs-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>

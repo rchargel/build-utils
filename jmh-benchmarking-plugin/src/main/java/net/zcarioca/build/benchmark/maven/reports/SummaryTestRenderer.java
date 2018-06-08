@@ -1,9 +1,8 @@
-package net.zcarioca.maven.benchmark.reports;
+package net.zcarioca.build.benchmark.maven.reports;
 
+import net.zcarioca.build.benchmark.results.BenchmarkTestResult;
+import net.zcarioca.build.report.AbstractSystemReportRenderer;
 import org.apache.maven.doxia.sink.Sink;
-
-import net.zcarioca.maven.AbstractSystemReportRenderer;
-import net.zcarioca.maven.benchmark.results.BenchmarkTestResult;
 
 public class SummaryTestRenderer implements EvaluationRenderer<BenchmarkTestResult> {
 
