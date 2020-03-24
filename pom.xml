@@ -33,7 +33,7 @@
         <jmhVersion>1.21</jmhVersion>
         <reflectionsVersion>0.9.11</reflectionsVersion>
         <oshiVersion>3.5.0</oshiVersion>
-        <jacksonVersion>2.9.5</jacksonVersion>
+        <jacksonVersion>2.9.10.3</jacksonVersion>
         <doxiaVersion>1.8</doxiaVersion>
         <junitVersion>4.12</junitVersion>
 
