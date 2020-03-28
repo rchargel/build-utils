@@ -30,15 +30,14 @@
         <mavenPluginVersion>3.5.2</mavenPluginVersion>
         <mavenDependencyTreeVersion>3.0.1</mavenDependencyTreeVersion>
         <plexusUtilsVersion>3.1.0</plexusUtilsVersion>
-        <jmhVersion>1.21</jmhVersion>
+        <jmhVersion>1.23</jmhVersion>
         <reflectionsVersion>0.9.11</reflectionsVersion>
         <oshiVersion>3.5.0</oshiVersion>
-        <jacksonVersion>2.9.10.3</jacksonVersion>
+        <jacksonVersion>2.10.3</jacksonVersion>
         <doxiaVersion>1.8</doxiaVersion>
         <junitVersion>4.12</junitVersion>
 
         <!-- Plugins -->
-        <owaspPluginVersion>3.1.2</owaspPluginVersion>
         <mavenGpgPluginVersion>1.6</mavenGpgPluginVersion>
         <findbugsMavenPluginVersion>3.0.5</findbugsMavenPluginVersion>
     </properties>
@@ -303,9 +302,9 @@
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>${findbugsMavenPluginVersion}</version>
+                    <groupId>com.github.spotbugs</groupId>
+                    <artifactId>spotbugs-maven-plugin</artifactId>
+                    <version>4.0.0</version>
                     <executions>
                         <execution>
                             <phase>verify</phase>
@@ -318,49 +317,6 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>org.owasp</groupId>
-                    <artifactId>dependency-check-maven</artifactId>
-                    <version>${owaspPluginVersion}</version>
-                    <configuration>
-                        <failBuildOnCVSS>7</failBuildOnCVSS>
-                        <skipProvidedScope>true</skipProvidedScope>
-                        <skipTestScope>true</skipTestScope>
-                        <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <goals>
-                                <goal>check</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.eclipse.m2e</groupId>
-                    <artifactId>lifecycle-mapping</artifactId>
-                    <version>1.0.0</version>
-                    <configuration>
-                        <lifecycleMappingMetadata>
-                            <pluginExecutions>
-                                <pluginExecution>
-                                    <pluginExecutionFilter>
-                                        <groupId>org.apache.maven.plugins</groupId>
-                                        <artifactId>maven-plugin-plugin</artifactId>
-                                        <versionRange>[3.5.2,)</versionRange>
-                                        <goals>
-                                            <goal>descriptor</goal>
-                                            <goal>helpmojo</goal>
-                                        </goals>
-                                    </pluginExecutionFilter>
-                                    <action>
-                                        <ignore></ignore>
-                                    </action>
-                                </pluginExecution>
-                            </pluginExecutions>
-                        </lifecycleMappingMetadata>
-                    </configuration>
-                </plugin>
             </plugins>
         </pluginManagement>
 
@@ -370,32 +326,11 @@
                 <artifactId>maven-gpg-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>findbugs-maven-plugin</artifactId>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
             </plugin>
         </plugins>
     </build>
-
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.owasp</groupId>
-                <artifactId>dependency-check-maven</artifactId>
-                <version>${owaspPluginVersion}</version>
-                <reportSets>
-                    <reportSet>
-                        <reports>
-                            <report>aggregate</report>
-                        </reports>
-                    </reportSet>
-                </reportSets>
-            </plugin>
-        </plugins>
-    </reporting>
 
     <licenses>
         <license>
