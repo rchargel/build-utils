@@ -1,6 +1,6 @@
 package com.github.rchargel.build.benchmark.maven.reports;
 
-import net.zcarioca.build.benchmark.results.BenchmarkTestResult;
+import com.github.rchargel.build.benchmark.results.BenchmarkTestResult;
 import org.apache.maven.doxia.sink.Sink;
 
 public interface EvaluationRenderer<R extends BenchmarkTestResult> {

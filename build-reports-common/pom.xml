@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>net.zcarioca.build</groupId>
+            <groupId>com.github.rchargel.build</groupId>
             <artifactId>build-utils-common</artifactId>
         </dependency>
         

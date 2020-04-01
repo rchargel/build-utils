@@ -1,9 +1,9 @@
 package com.github.rchargel.build.benchmark.maven.reports;
 
-import net.zcarioca.build.benchmark.results.BenchmarkResults;
-import net.zcarioca.build.benchmark.results.BenchmarkTestResult;
-import net.zcarioca.build.report.AbstractSystemReportRenderer;
-import net.zcarioca.build.report.ReportBuilder;
+import com.github.rchargel.build.benchmark.results.BenchmarkResults;
+import com.github.rchargel.build.benchmark.results.BenchmarkTestResult;
+import com.github.rchargel.build.report.AbstractSystemReportRenderer;
+import com.github.rchargel.build.report.ReportBuilder;
 import org.apache.maven.doxia.sink.Sink;
 
 import java.util.AbstractMap;

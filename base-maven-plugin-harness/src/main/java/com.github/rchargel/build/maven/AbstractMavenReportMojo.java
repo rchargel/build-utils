@@ -1,8 +1,8 @@
 package com.github.rchargel.build.maven;
 
 import com.github.rchargel.build.maven.AbstractMavenMojo;
-import net.zcarioca.build.report.AbstractSystemReportRenderer;
-import net.zcarioca.build.report.ReportBuilder;
+import com.github.rchargel.build.report.AbstractSystemReportRenderer;
+import com.github.rchargel.build.report.ReportBuilder;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.doxia.sink.Sink;

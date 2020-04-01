@@ -22,8 +22,8 @@ import java.util.stream.Stream;
 
 import static net.dempsy.util.Functional.recheck;
 import static net.dempsy.util.Functional.uncheck;
-import static net.zcarioca.build.common.ClasspathUtil.findClassesContainingAnnotation;
-import static net.zcarioca.build.common.ClasspathUtil.getResourceAsFile;
+import static com.github.rchargel.build.common.ClasspathUtil.findClassesContainingAnnotation;
+import static com.github.rchargel.build.common.ClasspathUtil.getResourceAsFile;
 
 public class BenchmarkExecutor {
 
