@@ -13,8 +13,8 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.function.BiFunction;
 
-import static net.zcarioca.build.common.Validators.requireNotBlank;
-import static net.zcarioca.build.common.Validators.requireNotNull;
+import static com.github.rchargel.build.common.Validators.requireNotBlank;
+import static com.github.rchargel.build.common.Validators.requireNotNull;
 
 public class ReportBuilder<R extends AbstractSystemReportRenderer> {
     private static final String DOXIA_TEMPLATE = "org/apache/maven/doxia/siterenderer/resources/default-site.vm";

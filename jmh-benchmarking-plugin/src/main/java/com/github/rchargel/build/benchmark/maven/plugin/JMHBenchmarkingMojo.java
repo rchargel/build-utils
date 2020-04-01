@@ -1,10 +1,10 @@
 package com.github.rchargel.build.benchmark.maven.plugin;
 
-import net.zcarioca.build.benchmark.BenchmarkExecutor;
+import com.github.rchargel.build.benchmark.BenchmarkExecutor;
 import com.github.rchargel.build.benchmark.maven.reports.BenchmarkTestReport;
-import net.zcarioca.build.benchmark.results.BenchmarkResults;
-import net.zcarioca.build.maven.AbstractMavenReportMojo;
-import net.zcarioca.build.report.ReportBuilder;
+import com.github.rchargel.build.benchmark.results.BenchmarkResults;
+import com.github.rchargel.build.maven.AbstractMavenReportMojo;
+import com.github.rchargel.build.report.ReportBuilder;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.MojoExecutionException;

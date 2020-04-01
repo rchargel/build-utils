@@ -3,7 +3,7 @@ package com.github.rchargel.build.benchmark.results;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.zcarioca.build.common.DistributionStatistics;
+import com.github.rchargel.build.common.DistributionStatistics;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.math3.stat.descriptive.StatisticalSummary;
 import org.openjdk.jmh.results.RunResult;
@@ -87,14 +87,14 @@ public class BenchmarkTestResult implements StatisticalSummary {
 
         final DistributionStatistics stats = rawMeasurements.parallelStream().reduce(new DistributionStatistics(),
                 DistributionStatistics::aggregate, DistributionStatistics::merge);
-        sum = stats.sum;
-        min = stats.minimum;
-        max = stats.maximum;
-        mean = stats.mean;
-        variance = stats.variance;
-        standardDeviation = stats.standardDeviation;
-        skewness = stats.skewness;
-        kurtosis = stats.kurtosis;
+        sum = stats.getSum();
+        min = stats.getMinimum();
+        max = stats.getMaximum();
+        mean = stats.getMean();
+        variance = stats.getVariance();
+        standardDeviation = stats.getStandardDeviation();
+        skewness = stats.getSkewness();
+        kurtosis = stats.getKurtosis();
     }
 
     private BenchmarkTestResult(final RunResult runResult) {
@@ -125,14 +125,14 @@ public class BenchmarkTestResult implements StatisticalSummary {
 
         final DistributionStatistics stats = rawMeasurements.parallelStream().reduce(new DistributionStatistics(),
                 DistributionStatistics::aggregate, DistributionStatistics::merge);
-        sum = stats.sum;
-        min = stats.minimum;
-        max = stats.maximum;
-        mean = stats.mean;
-        variance = stats.variance;
-        standardDeviation = stats.standardDeviation;
-        skewness = stats.skewness;
-        kurtosis = stats.kurtosis;
+        sum = stats.getSum();
+        min = stats.getMinimum();
+        max = stats.getMaximum();
+        mean = stats.getMean();
+        variance = stats.getVariance();
+        standardDeviation = stats.getStandardDeviation();
+        skewness = stats.getSkewness();
+        kurtosis = stats.getKurtosis();
     }
 
     static String stringifyParams(final Set<Entry<String, String>> paramEntries) {

@@ -48,22 +48,22 @@
         <dependencies>
             <!-- BASE dependencies -->
             <dependency>
-                <groupId>net.zcarioca.build</groupId>
+                <groupId>com.github.rchargel.build</groupId>
                 <artifactId>build-utils-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.zcarioca.build</groupId>
+                <groupId>com.github.rchargel.build</groupId>
                 <artifactId>build-reports-common</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.zcarioca.build</groupId>
+                <groupId>com.github.rchargel.build</groupId>
                 <artifactId>base-maven-plugin-harness</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
-                <groupId>net.zcarioca.build</groupId>
+                <groupId>com.github.rchargel.build</groupId>
                 <artifactId>jmh-benchmarking-executor</artifactId>
                 <version>${project.version}</version>
             </dependency>

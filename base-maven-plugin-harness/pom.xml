@@ -11,11 +11,11 @@
     <artifactId>base-maven-plugin-harness</artifactId>
     <dependencies>
         <dependency>
-            <groupId>net.zcarioca.build</groupId>
+            <groupId>com.github.rchargel.build</groupId>
             <artifactId>build-utils-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.zcarioca.build</groupId>
+            <groupId>com.github.rchargel.build</groupId>
             <artifactId>build-reports-common</artifactId>
         </dependency>
 

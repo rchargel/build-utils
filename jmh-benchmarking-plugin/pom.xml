@@ -11,11 +11,11 @@
     <dependencies>
 
         <dependency>
-            <groupId>net.zcarioca.build</groupId>
+            <groupId>com.github.rchargel.build</groupId>
             <artifactId>base-maven-plugin-harness</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.zcarioca.build</groupId>
+            <groupId>com.github.rchargel.build</groupId>
             <artifactId>jmh-benchmarking-executor</artifactId>
         </dependency>
 
