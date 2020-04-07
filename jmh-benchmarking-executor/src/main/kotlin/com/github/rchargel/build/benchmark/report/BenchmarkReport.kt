@@ -59,7 +59,7 @@ class BenchmarkReport {
                     classEntry.value.sortedBy { it.methodName }.forEach { result ->
                         tableBuilder.addRow(mapOf(
                                 testHeading to result.methodName,
-                                perfHeading to "${result.distributionStatistics.mean} ${result.scoreUnits} ± ${result.meanErrorAt999}"
+                                perfHeading to "%.3f %s ± %.3f".format(result.distributionStatistics.mean, result.scoreUnits, result.meanErrorAt999)
                         ))
                     }
                     sectionBuilder.appendContent(tableBuilder.build())

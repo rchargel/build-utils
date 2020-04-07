@@ -13,12 +13,18 @@ import org.apache.maven.shared.dependency.graph.DependencyGraphBuilder;
 import org.apache.maven.shared.dependency.graph.DependencyNode;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static net.dempsy.util.Functional.recheck;
@@ -128,4 +134,18 @@ public abstract class AbstractMavenMojo extends AbstractMojo {
         }
     }
 
+    protected void cleanFile(final File file) throws MojoExecutionException {
+        if (file.exists() && !file.delete())
+            throw new MojoExecutionException("Could not clean file: " + file.getAbsolutePath());
+
+        final File parent = file.getParentFile();
+        if (!parent.exists() && !parent.mkdirs())
+            throw new MojoExecutionException("Could not create directory: " + file.getAbsolutePath());
+        try {
+            if (!file.createNewFile())
+                throw new MojoExecutionException("Could not create file: " + file.getAbsolutePath());
+        } catch (final IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+    }
 }

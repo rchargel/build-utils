@@ -2,15 +2,15 @@ package com.github.rchargel.build.maven;
 
 import com.github.rchargel.build.report.ReportBuilder;
 
-import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -21,7 +21,7 @@ import java.util.ResourceBundle;
 public abstract class AbstractMavenReportMojo extends AbstractMavenMojo {
 
     @Parameter(defaultValue = "${project.reporting.outputDirectory}", readonly = true, required = true)
-    protected File outputDirectory;
+    protected File reportingDirectory;
     @Parameter(property = "outputEncoding", defaultValue = "${project.reporting.outputEncoding}", readonly = true)
     private String outputEncoding;
     @Parameter(defaultValue = "${user.language}")
@@ -38,8 +38,10 @@ public abstract class AbstractMavenReportMojo extends AbstractMavenMojo {
     protected abstract ReportBuilder executeReportMojo() throws MojoExecutionException, MojoFailureException;
 
     protected void generateFinalReport(final ReportBuilder reportBuilder, final String outputFileName) throws MojoExecutionException {
-        final File outputFile = new File(outputDirectory, outputFileName);
-        try (final Writer writer = new BufferedWriter(new FileWriterWithEncoding(outputFile.getAbsolutePath(), getOutputEncoding(), false))) {
+        final File outputFile = new File(reportingDirectory, outputFileName);
+        cleanFile(outputFile);
+        getLog().info("Writing report to " + outputFile.getAbsolutePath());
+        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile.getAbsolutePath()), getOutputEncoding())) {
             reportBuilder.writeReportTo(writer);
         } catch (final IOException e) {
             throw new MojoExecutionException(e.getMessage(), e);
