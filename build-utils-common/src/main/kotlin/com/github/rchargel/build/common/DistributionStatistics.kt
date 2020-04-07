@@ -1,10 +1,10 @@
 package com.github.rchargel.build.common
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.io.Serializable
 import java.lang.Math.pow
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.math.pow
 import kotlin.math.sqrt
 
 data class DistributionStatistics(
@@ -21,6 +21,7 @@ data class DistributionStatistics(
         private val m3: Double = 0.0,
         private val m4: Double = 0.0
 ) : Serializable {
+    @get:JsonIgnore
     val standardDeviation: Double
         get() = sqrt(variance)
 

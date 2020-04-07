@@ -16,7 +16,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.rchargel.build</groupId>
-            <artifactId>build-reports-common</artifactId>
+            <artifactId>build-reports</artifactId>
         </dependency>
 
         <dependency>
@@ -74,4 +74,12 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>
