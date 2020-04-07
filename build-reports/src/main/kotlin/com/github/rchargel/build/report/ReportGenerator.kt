@@ -5,7 +5,6 @@ import groovy.text.markup.MarkupTemplateEngine
 import groovy.text.markup.TemplateConfiguration
 import java.io.InputStreamReader
 import java.io.Writer
-import java.time.LocalDate
 
 /**
  * Utility class used to write HTML reports
@@ -27,13 +26,9 @@ class ReportGenerator {
     }
 
     /**
-     * Writes a [report] with the given [projectVersion] to the provided [output].
+     * Writes a report with the given [model] to the provided [output].
      */
-    fun writeReport(report: Section, projectVersion: String? = null, output: Writer) {
-        template.make(mapOf(
-                "report" to report,
-                "date" to LocalDate.now(),
-                "projectVersion" to projectVersion
-        )).writeTo(output)
+    fun writeReport(model: Map<String, Any?>, output: Writer) {
+        template.make(model).writeTo(output)
     }
 }

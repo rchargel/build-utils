@@ -61,6 +61,11 @@
             </dependency>
             <dependency>
                 <groupId>com.github.rchargel.build</groupId>
+                <artifactId>build-reports</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.rchargel.build</groupId>
                 <artifactId>base-maven-plugin-harness</artifactId>
                 <version>${project.version}</version>
             </dependency>

@@ -16,7 +16,7 @@
         </dependency>
         <dependency>
             <groupId>com.github.rchargel.build</groupId>
-            <artifactId>build-reports-common</artifactId>
+            <artifactId>build-reports</artifactId>
         </dependency>
 
         <dependency>

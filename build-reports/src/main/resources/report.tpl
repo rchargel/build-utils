@@ -76,19 +76,19 @@ writeSection = { section, level ->
         div(class: 'section') {
             switch (level) {
                 case 1:
-                    h2 { a(name: section.anchor) yield(section?.title) }
+                    h2 { a(name: section.anchor, '') yield(section?.title) }
                     break
                 case 2:
-                    h3 { a(name: section.anchor) yield(section?.title) }
+                    h3 { a(name: section.anchor, '') yield(section?.title) }
                     break
                 case 3:
-                    h4 { a(name: section.anchor) yield(section?.title) }
+                    h4 { a(name: section.anchor, '') yield(section?.title) }
                     break
                 case 4:
-                    h5 { a(name: section.anchor) yield(section?.title) }
+                    h5 { a(name: section.anchor, '') yield(section?.title) }
                     break
                 default:
-                    h6 { a(name: section.anchor) yield(section?.title) }
+                    h6 { a(name: section.anchor, '') yield(section?.title) }
                     break
             }
             if (section?.subTitle) {
@@ -108,7 +108,6 @@ html(lang:'en') {
         meta(charset: 'UTF-8')
         title(report.title)
         style(media: 'all', type: 'text/css', """
-//<![CDATA[
 body { margin: 0px; padding: 0px; }
 img { border:none; }
 table {
@@ -264,10 +263,8 @@ ol { counter-reset: item }
 li{ display: block }
 li:before { content: counters(item, ".") " "; counter-increment: item }
 .showInPrintOnly { display: none; }
-//]]>
 """)
         style(media: 'print', type: 'text/css', """
-//<![CDATA[
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -296,7 +293,6 @@ a.toggle.active:before { content: ''; }
 table th, table td { border: 1px solid #666; background-color: transparent; }
 table.bodyTable th { color: #000; font-weight: bold; }
 .pageBreak { page-break-before: always; }
-//]]>
 """)
     }
     body(class: 'composite') {
@@ -320,14 +316,16 @@ table.bodyTable th { color: #000; font-weight: bold; }
         }
         div(id: 'bodyColumn') {
             div(id: 'contextBox') {
-                div(class: 'section') {
-                    div(class: 'hideFromPrint') {
-                        h2 {
-                            a(name: 'Table_of_Contents', '')
-                            yield('Table of Contents')
+                if (includeTOC) {
+                    div(class: 'section') {
+                        div(class: 'hideFromPrint') {
+                            h2 {
+                                a(name: 'Table_of_Contents', '')
+                                yield(tocTitle)
+                            }
                         }
+                        div(id: 'tableofcontents', '')
                     }
-                    div(id: 'tableofcontents', '')
                 }
                 writeSection(report, 1)
             }
