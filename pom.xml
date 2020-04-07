@@ -11,11 +11,10 @@
 
     <modules>
         <module>build-utils-common</module>
-        <module>build-reports-common</module>
+        <module>build-reports</module>
         <module>jmh-benchmarking-executor</module>
         <module>base-maven-plugin-harness</module>
         <module>jmh-benchmarking-plugin</module>
-        <module>build-reports</module>
     </modules>
 
     <properties>
