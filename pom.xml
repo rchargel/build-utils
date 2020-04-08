@@ -137,45 +137,6 @@
                 </exclusions>
             </dependency>
 
-            <!-- DOXIA dependencies -->
-            <dependency>
-                <groupId>org.apache.maven.doxia</groupId>
-                <artifactId>doxia-core</artifactId>
-                <version>${doxiaVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.doxia</groupId>
-                <artifactId>doxia-sink-api</artifactId>
-                <version>${doxiaVersion}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.doxia</groupId>
-                <artifactId>doxia-site-renderer</artifactId>
-                <version>${doxiaVersion}</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>commons-collections</groupId>
-                        <artifactId>commons-collections</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>commons-beanutils</groupId>
-                        <artifactId>commons-beanutils</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.struts</groupId>
-                        <artifactId>struts-core</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.struts</groupId>
-                        <artifactId>struts-tiles</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.apache.struts</groupId>
-                        <artifactId>struts-taglib</artifactId>
-                    </exclusion>
-                </exclusions>
-            </dependency>
-
             <!-- APACHE dependencies -->
             <dependency><!-- required by doxia -->
                 <groupId>commons-collections</groupId>
@@ -192,12 +153,6 @@
                 <artifactId>commons-lang3</artifactId>
                 <version>3.7</version>
             </dependency>
-            <dependency><!-- required by doxia -->
-                <groupId>commons-lang</groupId>
-                <artifactId>commons-lang</artifactId>
-                <version>2.6</version>
-            </dependency>
-
 
             <!-- JACKSON dependencies -->
             <dependency>
