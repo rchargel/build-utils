@@ -36,6 +36,7 @@ public class ReportContentBuilderTest {
                                 .data(new byte[0])
                                 .contentType("image/jpeg")
                                 .title("Image 1")
+                                .thumbnail(true)
                                 .build())
                         .appendContent(Image.builder()
                                 .data(new byte[0])
@@ -89,6 +90,7 @@ public class ReportContentBuilderTest {
         assertEquals("image/jpeg", ((Image) subSection.getContent().get(0)).getContentType());
         assertEquals("Image 1", ((Image) subSection.getContent().get(0)).getTitle());
         assertArrayEquals(new byte[0], ((Image) subSection.getContent().get(0)).getData());
+        assertTrue(((Image) subSection.getContent().get(0)).getThumbnail());
         assertEquals("image/png", ((Image) subSection.getContent().get(1)).getContentType());
         assertNull(((Image) subSection.getContent().get(1)).getTitle());
         assertArrayEquals(new byte[0], ((Image) subSection.getContent().get(1)).getData());
