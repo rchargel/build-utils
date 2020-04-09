@@ -62,8 +62,7 @@ public class ClasspathUtil {
      */
     public static <T extends Object> Stream<Class<?>> findClassesWithMethodAnnotation(final Class<? extends Annotation> annotation) {
         requireNonNull(annotation);
-        return getMethodsAnnotatedInPackage(annotation)
-                .map(m -> (Class<T>) m.getDeclaringClass());
+        return getMethodsAnnotatedInPackage(annotation).map(m -> (Class<T>) m.getDeclaringClass());
     }
 
     /**
@@ -107,13 +106,12 @@ public class ClasspathUtil {
 
         static {
             reflections = new Reflections(new ConfigurationBuilder()
-                    .setUrls(Stream.concat(ClasspathHelper.forClassLoader().stream(), ClasspathHelper
-                            .forClassLoader(ClassLoader.getSystemClassLoader(), Thread.currentThread().getContextClassLoader()).stream())
+                    .setUrls(Stream.concat(ClasspathHelper.forClassLoader().stream(),
+                            ClasspathHelper.forClassLoader(ClassLoader.getSystemClassLoader(),
+                                    Thread.currentThread().getContextClassLoader()).stream())
                             .collect(Collectors.toSet()))
-                    .addClassLoader(ClassLoader.getSystemClassLoader())
-                    .addClassLoader(Thread.currentThread().getContextClassLoader())
-                    .addScanners(new TypeAnnotationsScanner(),
-                            new MethodAnnotationsScanner()));
+                    .addClassLoaders(ClassLoader.getSystemClassLoader(), Thread.currentThread().getContextClassLoader())
+                    .addScanners(new TypeAnnotationsScanner(), new MethodAnnotationsScanner()));
         }
 
     }
