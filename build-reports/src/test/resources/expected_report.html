@@ -159,7 +159,7 @@ ol { counter-reset: item }
 li{ display: block }
 li:before { content: counters(item, ".") " "; counter-increment: item }
 .showInPrintOnly { display: none; }
-
+.thumbnail { cursor: pointer; }
     </style>
     <style media="print" type="text/css">
 /*
@@ -190,6 +190,7 @@ a.toggle.active:before { content: ''; }
 table th, table td { border: 1px solid #666; background-color: transparent; }
 table.bodyTable th { color: #000; font-weight: bold; }
 .pageBreak { page-break-before: always; }
+
 
     </style>
 </head>
@@ -235,7 +236,7 @@ table.bodyTable th { color: #000; font-weight: bold; }
                 <p>Complete report from the benchmark tests and evaluations.</p>
                 <table class="bodyTable" border="0">
                     <tr class="a">
-                        <td><img title="info"
+                        <td><img title="info" class=""
                                  src="data:image/gif;base64,R0lGODlhDwAPAOYAAAAAAP////39/vn6/Pj5+9rg63KDntHZ5tXc6Nfe6dbd6AknU0ddfV15olZwlk9nikxjhUpggUVZeENXdElefkZaeWWBqmiErGeDq2qFrWyHrm2Ir3CKsFhsi3SNsnaPtGR5mHeQtHyUt36VuHeNrYCXuXWKqW6BnoSau4OZuoWbvHqOrIqfv3eJpIugv42hwJCkwoWXspmsx5irxoKSqZKiuoaVq6Gyy6a2zqm50K280qy70Z+swLG/1LC+07XC1rjF2LzI2sHM3cPO3sLN3bK8y8nT4sbQ38vU4s3W5MzV49Pb59La5sjP2ent8+Pn7fX3+vT2+fP1+EBUcEFVcXmOq32OppWpxZ6wyae0xbnG2MDJ1eDm7t/l7eHn7+Xq8eTp8PDz9+/y9t3k7dzj7Nvi6+fs8ubr8ezw9evv9Oru89jf5+Lo7/H09/b4+vv8/fr7/P7+/v///wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAEAAHIALAAAAAAPAA8AAAe7gHKCg4SFgmBmZ2BsXGQFCkxHg15xcQJvcANuUW1iai6HAgKZTR1PYmhOZ6ByXG8DBFA2C1tpZ4wlgmQEm21FNGtfXmVMHoIJUFJhaAYLWWMISEIYggfLamZWCzxKREA+DYJG2GBcLQs1Wj05Nw6CRGBdCkknCzHsMzAPgkBLSUNBQCyoIgMGixQRBOkA+GPHChMkWKAQ8UGCIBg/dODAcuWFihEhOGigMujChgwWHkCgUGHCFAaGYhIKBAA7"/>
                         </td>
                         <td>Number of Tests</td>
@@ -283,19 +284,10 @@ table.bodyTable th { color: #000; font-weight: bold; }
 <script type="text/javascript">
             //<![CDATA[
 var loadTag = function(element, tag) {var i = 0, subElements = element.getElementsByTagName(tag);for (; i < subElements.length; i++) {if (subElements[i]) {return subElements[i];} } return null; };var loadLevel= function(element, level) {var header, a, text, listText = '', i = 0, headers = element.getElementsByTagName("h" + level);if (headers.length > 0) {listText += '<ol>';for (; i < headers.length; i++) {header = headers[i];a = loadTag(header, 'a');text = header.innerText || header.textContent;listText += '<li><a href="#' + a.getAttribute('name') + '">' + text + '</a>';if (level < 5) {listText += loadLevel(header.parentElement, level + 1);} listText += '</li>'; } listText += '</ol>'; } return listText; };(function() {var toc = document.getElementById('tableofcontents');toc.innerHTML = loadLevel(document, 2);})();
+var transitionTime=200;
+var thumbnailMe=function(element){var oh=element.clientHeight; var ow=element.clientWidth;var sh=75;var sw=75;element.style.height=sh+'px';element.style.width=sw+'px'; element.size='thumb';element.addEventListener('click', evt => { let el=evt.target;var start=null;var grow=function(time){if (start==null){start=time;}let prog=(time-start)/transitionTime;let nh=Math.min(oh,(oh-sh)*prog+sh);let nw=Math.min(ow,(ow-sw)*prog+sw);el.style.height=nh+'px';el.style.width=nw+'px';if (nh<oh || nw<ow){requestAnimationFrame(grow);}else{el.size='orig';}};var shrink=function(time){if (start==null){start=time;}let prog=(time-start)/transitionTime;let nh=Math.max(sh,oh-(oh-sh)*prog);let nw=Math.max(sw,ow-(ow-sw)*prog);el.style.height=nh+'px';el.style.width=nw+'px';if (nh > sh || nw > sw){requestAnimationFrame(shrink);}else{el.size = 'thumb';}};if (el.size === 'thumb'){requestAnimationFrame(grow);}else{requestAnimationFrame(shrink);}});};
+document.querySelectorAll('.thumbnail').forEach(thumbnailMe);
 //]]>
-
-
-
-
-
-
-
-
-
-
-
-
 </script>
 </body>
 </html>
