@@ -5,12 +5,16 @@ import org.jfree.chart.ChartFactory
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
+import org.jfree.data.Range
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import java.awt.Color
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import javax.imageio.ImageIO
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 abstract class ChartImageMaker<T : ChartImageMaker<T>>(
         xAxis: String,
@@ -58,6 +62,8 @@ abstract class XYChartImageMaker<T : XYChartImageMaker<T>>(xAxis: String, yAxis:
 }
 
 class RawDataLineChartImageMaker(xAxis: String, units: String, private val maxCount: Int) : XYChartImageMaker<RawDataLineChartImageMaker>(xAxis, units) {
+    private var rangeSet: Boolean = false
+
     override fun addDataset(datasetName: String, color: Color, plotId: Int, xyPlot: XYPlot, data: Any) = when (data) {
         is DoubleArray -> addDataset(datasetName, color, plotId, xyPlot, data as DoubleArray)
         is List<*> -> addDataset(datasetName, color, plotId, xyPlot, data.filterIsInstance(Number::class.java).map { it.toDouble() }.toDoubleArray())
@@ -67,18 +73,24 @@ class RawDataLineChartImageMaker(xAxis: String, units: String, private val maxCo
     private fun addDataset(datasetName: String, color: Color, plotId: Int, xyPlot: XYPlot, data: DoubleArray) = apply {
         val series = XYSeries(datasetName)
         val length = data.size
-        val step = maxCount / length.toDouble();
+        val step = maxCount / length.toDouble()
 
         IntRange(0, length - 1).forEach { i ->
             series.add(i * step, data[i])
         }
 
-        val collection = XYSeriesCollection();
-        collection.addSeries(series);
-        xyPlot.setDataset(plotId, collection);
-        val renderer = XYLineAndShapeRenderer();
-        renderer.setSeriesPaint(0, color);
-        renderer.setSeriesShapesVisible(0, false);
-        xyPlot.setRenderer(plotId, renderer);
+        val collection = XYSeriesCollection()
+        collection.addSeries(series)
+        xyPlot.setDataset(plotId, collection)
+        val range = xyPlot.rangeAxis.range
+        val minY = if (rangeSet) min(range.lowerBound, series.minY) else series.minY
+        val maxY = if (rangeSet) max(range.upperBound, series.maxY) else series.maxY
+
+        val tenPercentOfDiff = abs(maxY - minY) * 0.1
+        xyPlot.rangeAxis.range = Range(minY - tenPercentOfDiff, maxY + tenPercentOfDiff)
+        val renderer = XYLineAndShapeRenderer()
+        renderer.setSeriesPaint(0, color)
+        renderer.setSeriesShapesVisible(0, false)
+        xyPlot.setRenderer(plotId, renderer)
     }
 }
