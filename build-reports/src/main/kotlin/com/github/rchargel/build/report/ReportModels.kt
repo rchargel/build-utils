@@ -230,7 +230,8 @@ data class Table(
 data class Image(
         val contentType: String = "image/png",
         val title: String? = null,
-        val data: ByteArray
+        val data: ByteArray,
+        val thumbnail: Boolean = false
 ) : ReportContent {
     val dataURL: String
         get() = "data:$contentType;base64,${base64Encode(data)}"
@@ -242,6 +243,7 @@ data class Image(
         class Builder internal constructor(
                 private var contentType: String = "image/png",
                 private var title: String? = null,
+                private var thumbnail: Boolean = false,
                 private var data: ByteArray? = null
         ) {
             /**
@@ -255,6 +257,12 @@ data class Image(
              * @return this instance of this builder
              */
             fun title(title: String) = apply { this.title = title }
+
+            /**
+             * Determines whether to render the image as a [thumbnail]
+             * @return this instance of this builder
+             */
+            fun thumbnail(thumbnail: Boolean) = apply { this.thumbnail = thumbnail }
 
             /**
              * Sets the binary [data] for this image
@@ -272,7 +280,7 @@ data class Image(
              * Builds a new [Image]
              * @return an instance of [Image]
              */
-            fun build() = Image(contentType, title, data ?: throw NullPointerException("No image data"))
+            fun build() = Image(contentType, title, data ?: throw NullPointerException("No image data"), thumbnail)
         }
 
         /**
