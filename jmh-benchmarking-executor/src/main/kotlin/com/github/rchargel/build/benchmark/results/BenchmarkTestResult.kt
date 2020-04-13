@@ -3,6 +3,7 @@ package com.github.rchargel.build.benchmark.results
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.rchargel.build.common.DistributionStatistics
 import org.apache.commons.lang3.StringUtils
+import org.apache.commons.lang3.StringUtils.EMPTY
 import org.openjdk.jmh.results.RunResult
 import org.openjdk.jmh.util.ListStatistics
 import java.util.*
@@ -11,21 +12,21 @@ import java.util.stream.Collectors.toMap
 import kotlin.collections.HashMap
 
 data class BenchmarkTestResult(
-        val packageName: String,
-        val className: String,
-        val methodName: String,
-        val mode: String,
-        val numberOfTestThreads: Int,
-        val numberOfTestRepetitions: Int,
-        val numberOfWarmupIterations: Int,
-        val numberOfMeasurementIterations: Int,
-        val measurementTimeInMilliseconds: Long,
-        val warmupTimeInMilliseconds: Long,
-        val scoreUnits: String,
-        val distributionStatistics: DistributionStatistics,
-        val median: Double,
-        val meanErrorAt999: Double,
-        val rawMeasurements: List<Double>
+        val packageName: String = EMPTY,
+        val className: String = EMPTY,
+        val methodName: String = EMPTY,
+        val mode: String = EMPTY,
+        val numberOfTestThreads: Int = 0,
+        val numberOfTestRepetitions: Int = 0,
+        val numberOfWarmupIterations: Int = 0,
+        val numberOfMeasurementIterations: Int = 0,
+        val measurementTimeInMilliseconds: Long = 0,
+        val warmupTimeInMilliseconds: Long = 0,
+        val scoreUnits: String = EMPTY,
+        val distributionStatistics: DistributionStatistics = DistributionStatistics(),
+        val median: Double = 0.0,
+        val meanErrorAt999: Double = 0.0,
+        val rawMeasurements: List<Double> = emptyList()
 ) {
     @get:JsonIgnore
     val key: String

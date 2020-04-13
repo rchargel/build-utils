@@ -1,13 +1,18 @@
 package com.github.rchargel.build.benchmark.results
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Test
+import java.io.ByteArrayOutputStream
 
 class BenchmarkTestResultTest {
 
-    @Test
-    fun validateBuilder() {
-        val result = BenchmarkTestResult.builder("com.fake.package.MyTest.internalMethod")
+    lateinit var result: BenchmarkTestResult
+
+    @Before
+    fun setup() {
+        result = BenchmarkTestResult.builder("com.fake.package.MyTest.internalMethod")
                 .mode("Average")
                 .scoreUnits("ms")
                 .numberOfTestThreads(4)
@@ -36,6 +41,10 @@ class BenchmarkTestResultTest {
                         .addRawMeasurement(0.4)
                         .addRawMeasurement(9.0)
                         .build())
+    }
+
+    @Test
+    fun validateBuilder() {
         assertEquals("com.fake.package", result.packageName)
         assertEquals("MyTest", result.className)
         assertEquals("internalMethod[ first=1, second=2 ]", result.methodName)
@@ -43,5 +52,15 @@ class BenchmarkTestResultTest {
         assertEquals(0.4, result.distributionStatistics.minimum, 0.0)
         assertEquals(100.2, result.distributionStatistics.maximum, 0.0)
         assertEquals(24.04, result.distributionStatistics.mean, 0.0001)
+    }
+
+    @Test
+    fun validateJSONSerialize() {
+        ByteArrayOutputStream().use {
+            val mapper = ObjectMapper()
+            mapper.writeValue(it, result)
+            val newValue = mapper.readValue(it.toByteArray(), BenchmarkTestResult::class.java)
+            assertEquals(result, newValue)
+        }
     }
 }

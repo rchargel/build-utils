@@ -435,8 +435,8 @@ data class Image(
     }
 }
 
-internal inline fun base64Encode(data: ByteArray) =
-        Base64.getEncoder().encodeToString(data).replace(Regex("""\s+"""), "")!!
+internal fun base64Encode(data: ByteArray) =
+        Base64.getEncoder().encodeToString(data).replace(Regex("""\s+"""), "")
 
-internal inline fun base64Decode(data: String) =
-        Base64.getDecoder().decode(data.replace(Regex("""\s+"""), ""))!!
+internal fun base64Decode(data: String) =
+        Base64.getDecoder().decode(data.replace(Regex("""\s+"""), ""))

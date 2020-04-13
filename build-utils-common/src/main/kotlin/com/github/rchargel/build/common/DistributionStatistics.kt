@@ -91,4 +91,38 @@ data class DistributionStatistics(
                     min(r1.minimum, r2.minimum), max(r1.maximum, r2.maximum), m2, m3, m4)
         }
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as DistributionStatistics
+
+        if (count != other.count) return false
+        if (sum != other.sum) return false
+        if (sumOfSquares != other.sumOfSquares) return false
+        if (mean != other.mean) return false
+        if (variance != other.variance) return false
+        if (skewness != other.skewness) return false
+        if (kurtosis != other.kurtosis) return false
+        if (minimum != other.minimum) return false
+        if (maximum != other.maximum) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = count.hashCode()
+        result = 31 * result + sum.hashCode()
+        result = 31 * result + sumOfSquares.hashCode()
+        result = 31 * result + mean.hashCode()
+        result = 31 * result + variance.hashCode()
+        result = 31 * result + skewness.hashCode()
+        result = 31 * result + kurtosis.hashCode()
+        result = 31 * result + minimum.hashCode()
+        result = 31 * result + maximum.hashCode()
+        return result
+    }
+
+
 }

@@ -1,71 +1,84 @@
 package com.github.rchargel.build.maven;
 
+import com.github.rchargel.build.report.Messages;
 import com.github.rchargel.build.report.ReportBuilder;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugin.MojoFailureException;
-import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.reporting.AbstractMavenReport;
+import org.apache.maven.reporting.MavenReportException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.ResourceBundle;
 
-public abstract class AbstractMavenReportMojo extends AbstractMavenMojo {
+public abstract class AbstractMavenReportMojo extends AbstractMavenReport {
 
-    @Parameter(defaultValue = "${project.reporting.outputDirectory}", readonly = true, required = true)
-    protected File reportingDirectory;
-    @Parameter(property = "outputEncoding", defaultValue = "${project.reporting.outputEncoding}", readonly = true)
-    private String outputEncoding;
-    @Parameter(defaultValue = "${user.language}")
-    private String userLanguage;
-    @Parameter(defaultValue = "${user.country}")
-    private String userCountry;
+    private Messages messages;
 
     @Override
-    protected void executeMojo() throws MojoExecutionException, MojoFailureException {
-        final ReportBuilder reportBuilder = executeReportMojo();
-        generateFinalReport(reportBuilder, getOutputFileName());
+    protected void executeReport(final Locale locale) throws MavenReportException {
+        final ReportBuilder builder = executeReportMojo(getMessages(locale))
+                .projectVersion(project.getVersion())
+                .publishDate(LocalDate.now());
+
+        generateFinalReport(builder);
     }
 
-    protected abstract ReportBuilder executeReportMojo() throws MojoExecutionException, MojoFailureException;
+    protected abstract ReportBuilder executeReportMojo(Messages messages) throws MavenReportException;
 
-    protected void generateFinalReport(final ReportBuilder reportBuilder, final String outputFileName) throws MojoExecutionException {
-        final File outputFile = new File(reportingDirectory, outputFileName);
+    protected void generateFinalReport(final ReportBuilder reportBuilder) throws MavenReportException {
+        final File outputFile = new File(getReportOutputDirectory(), getOutputName() + ".html");
         cleanFile(outputFile);
         getLog().info("Writing report to " + outputFile.getAbsolutePath());
         try (final Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile.getAbsolutePath()), getOutputEncoding())) {
             reportBuilder.writeReportTo(writer);
         } catch (final IOException e) {
-            throw new MojoExecutionException(e.getMessage(), e);
+            throw new MavenReportException(e.getMessage(), e);
         }
     }
 
-    protected abstract String getOutputFileName();
-
-    protected Charset getOutputEncoding() {
-        return Optional.ofNullable(outputEncoding)
-                .filter(StringUtils::isNotBlank)
-                .map(Charset::forName)
-                .orElse(StandardCharsets.UTF_8);
+    protected Messages getMessages(final Locale locale) {
+        if (messages == null) {
+            messages = new Messages(ResourceBundle.getBundle(getBundleName(), locale));
+        }
+        return messages;
     }
 
-    protected ResourceBundle getBundle(final String bundleName) {
-        final Locale locale = Optional.ofNullable(userLanguage)
-                .filter(StringUtils::isNotBlank)
-                .map(language -> Optional.ofNullable(userCountry)
-                        .filter(StringUtils::isNotBlank)
-                        .map(country -> new Locale(language, country))
-                        .orElseGet(() -> new Locale(language)))
-                .orElseGet(Locale::getDefault);
-        return ResourceBundle.getBundle(bundleName, locale);
+    protected String getBundleName() {
+        return "messages";
     }
 
+    @Override
+    public String getName(final Locale locale) {
+        return getMessages(locale).text("report.title");
+    }
+
+    @Override
+    public String getDescription(final Locale locale) {
+        return getMessages(locale).text("report.description");
+    }
+
+    protected void cleanFile(final File file) throws MavenReportException {
+        if (file.exists() && !file.delete())
+            throw new MavenReportException("Could not clean file: " + file.getAbsolutePath());
+
+        final File parent = file.getParentFile();
+        if (!parent.exists() && !parent.mkdirs())
+            throw new MavenReportException("Could not create directory: " + file.getAbsolutePath());
+        try {
+            if (!file.createNewFile())
+                throw new MavenReportException("Could not create file: " + file.getAbsolutePath());
+        } catch (final IOException e) {
+            throw new MavenReportException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public boolean isExternalReport() {
+        return true;
+    }
 }
