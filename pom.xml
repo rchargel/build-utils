@@ -29,6 +29,7 @@
         <!-- Dependencies -->
         <mavenPluginVersion>3.6.0</mavenPluginVersion>
         <mavenDependencyTreeVersion>3.0.1</mavenDependencyTreeVersion>
+        <mavenSitePluginVersion>3.9.0</mavenSitePluginVersion>
         <plexusUtilsVersion>3.1.0</plexusUtilsVersion>
         <jmhVersion>1.23</jmhVersion>
         <reflectionsVersion>0.9.12</reflectionsVersion>
@@ -261,6 +262,11 @@
         </resources>
         <pluginManagement>
             <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>${mavenSitePluginVersion}</version>
+                </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
