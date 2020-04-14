@@ -1,0 +1,35 @@
+a.toggle:hover {
+    text-decoration: none;
+}
+
+a.toggle:before {
+    content: '';
+}
+
+a.toggle.active:before {
+    content: '';
+}
+
+#tableofcontents,
+.hideFromPrint {
+    display: none !important;
+}
+
+.showInPrintOnly {
+    display: block !important;
+}
+
+table th,
+table td {
+    border: 1px solid #666;
+    background-color: transparent;
+}
+
+table.bodyTable th {
+    color: #000;
+    font-weight: bold;
+}
+
+.pageBreak {
+    page-break-before: always;
+}

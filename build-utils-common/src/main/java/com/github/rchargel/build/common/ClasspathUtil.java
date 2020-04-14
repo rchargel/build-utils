@@ -7,6 +7,8 @@ import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
 import java.io.File;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URI;
@@ -20,6 +22,17 @@ import java.util.stream.Stream;
 import static java.util.Objects.requireNonNull;
 
 public class ClasspathUtil {
+    /**
+     * Reads a file out of the classpath.
+     *
+     * @param path The path to the file
+     * @return Returns an InputStream
+     */
+    public static Reader readFromClasspath(final String path) {
+        requireNonNull(path);
+        return new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(path));
+    }
+
     /**
      * Finds all of the classes annotated with the given annotation.
      *

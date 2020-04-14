@@ -1,6 +1,9 @@
 package com.github.rchargel.build.report
 
+import com.github.rchargel.build.common.ClasspathUtil
+import com.github.rchargel.build.report.compressors.TextCompressor
 import java.io.IOException
+import java.io.StringWriter
 import java.io.Writer
 import java.time.LocalDate
 
@@ -12,6 +15,7 @@ class Report internal constructor(
         val tableOfContentsTitle: String
 ) {
     private val reportGenerator = ReportGenerator()
+    private val textCompressor = TextCompressor()
 
     @Throws(IOException::class)
     fun writeReportTo(writer: Writer): Unit {
@@ -20,7 +24,12 @@ class Report internal constructor(
                 "date" to publishDate,
                 "projectVersion" to projectVersion,
                 "includeTOC" to includeTOC,
-                "tocTitle" to tableOfContentsTitle
+                "tocTitle" to tableOfContentsTitle,
+                "javascript" to readCompressed("report.js"),
+                "printCSS" to readCompressed("print.css"),
+                "customPrintCSS" to readCompressed("print-site.css"),
+                "reportCSS" to readCompressed("report.css"),
+                "customReportCSS" to readCompressed("site.css")
         ), writer)
     }
 
@@ -49,5 +58,18 @@ class Report internal constructor(
     companion object {
         @JvmStatic
         fun builder(title: String) = ReportBuilder(Section.builder(title))
+
+        @JvmStatic
+        @Throws(IOException::class)
+        fun readCompressed(filename: String): String {
+            val writer = StringWriter()
+            ClasspathUtil.readFromClasspath(filename).use {
+                if (filename.endsWith(".css"))
+                    TextCompressor().compressCSSTo(it, writer)
+                else
+                    TextCompressor().compressJavaScriptTo(it, writer)
+            }
+            return writer.toString()
+        }
     }
 }

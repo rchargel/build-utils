@@ -62,6 +62,9 @@ class ReportGeneratorTest {
         XMLUnit.setIgnoreAttributeOrder(true)
         XMLUnit.setIgnoreComments(true)
         XMLUnit.setNormalizeWhitespace(true)
+        XMLUnit.setIgnoreComments(true)
+        XMLUnit.setIgnoreAttributeOrder(true)
+        XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true)
         XMLAssert.assertXMLEqual(expected, writer.toString())
     }
 }
