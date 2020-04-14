@@ -31,7 +31,7 @@ abstract class ChartImageMaker<T : ChartImageMaker<T>>(
     abstract fun addDataset(datasetName: String, color: Color, plotId: Int, data: Any): T
 
     @Throws(IOException::class)
-    fun toImageBuilder(width: Int, height: Int): Image.Companion.Builder {
+    fun toImageBuilder(width: Int, height: Int): Image.Builder {
         val image = chart.createBufferedImage(width, height)
         val out = ByteArrayOutputStream()
         out.use {

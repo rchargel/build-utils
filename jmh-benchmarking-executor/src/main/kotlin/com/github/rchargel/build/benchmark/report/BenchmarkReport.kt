@@ -8,7 +8,7 @@ import java.awt.Color
 class BenchmarkReport {
     companion object {
         @JvmStatic
-        fun buildReport(testResults: BenchmarkResults, bundle: Messages) = ReportBuilder.newReport(bundle.text("report.title"))
+        fun buildReport(testResults: BenchmarkResults, bundle: Messages) = Report.builder(bundle.text("report.title"))
                 .includeTOC(true)
                 .tableOfContentsTitle(bundle.text("table.of.contents"))
                 .appendContent(Text(bundle.text("report.description")))

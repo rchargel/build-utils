@@ -43,6 +43,7 @@
         <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
         <groovyTemplatesVersion>3.0.2</groovyTemplatesVersion>
         <xmlUnitVersion>2.6.4</xmlUnitVersion>
+        <doxiaVersion>1.9.1</doxiaVersion>
     </properties>
 
     <dependencyManagement>
@@ -110,11 +111,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.maven.reporting</groupId>
-                <artifactId>maven-reporting-impl</artifactId>
-                <version>3.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.reporting</groupId>
                 <artifactId>maven-reporting-exec</artifactId>
                 <version>1.4</version>
                 <exclusions>
@@ -135,6 +131,51 @@
                         <artifactId>aether-spi</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.reporting</groupId>
+                <artifactId>maven-reporting-impl</artifactId>
+                <version>3.0.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-sink-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-decoration-model</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-site-renderer</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- Doxia Dependencies -->
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-core</artifactId>
+                <version>${doxiaVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-site-renderer</artifactId>
+                <version>${doxiaVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-sink-api</artifactId>
+                <version>${doxiaVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-decoration-model</artifactId>
+                <version>${doxiaVersion}</version>
             </dependency>
 
             <!-- APACHE dependencies -->

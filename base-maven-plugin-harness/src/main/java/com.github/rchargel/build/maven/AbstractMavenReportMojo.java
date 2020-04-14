@@ -1,7 +1,7 @@
 package com.github.rchargel.build.maven;
 
 import com.github.rchargel.build.report.Messages;
-import com.github.rchargel.build.report.ReportBuilder;
+import com.github.rchargel.build.report.Report.ReportBuilder;
 
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
@@ -35,7 +35,7 @@ public abstract class AbstractMavenReportMojo extends AbstractMavenReport {
         cleanFile(outputFile);
         getLog().info("Writing report to " + outputFile.getAbsolutePath());
         try (final Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile.getAbsolutePath()), getOutputEncoding())) {
-            reportBuilder.writeReportTo(writer);
+            reportBuilder.build().writeReportTo(writer);
         } catch (final IOException e) {
             throw new MavenReportException(e.getMessage(), e);
         }

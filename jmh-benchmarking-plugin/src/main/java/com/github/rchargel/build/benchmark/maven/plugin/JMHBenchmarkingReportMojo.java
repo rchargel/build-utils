@@ -4,7 +4,7 @@ import com.github.rchargel.build.benchmark.report.BenchmarkReport;
 import com.github.rchargel.build.benchmark.results.BenchmarkResults;
 import com.github.rchargel.build.maven.AbstractMavenReportMojo;
 import com.github.rchargel.build.report.Messages;
-import com.github.rchargel.build.report.ReportBuilder;
+import com.github.rchargel.build.report.Report.ReportBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
