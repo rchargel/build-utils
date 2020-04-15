@@ -35,7 +35,7 @@ public class MessagesTest {
     @BeforeClass
     public static void setup() {
         final ResourceBundle bundle = ResourceBundle.getBundle("testmessages");
-        english = Messages.loadMessages("testMessages", Locale.ENGLISH);
+        english = new Messages(bundle);
 
         portuguese = Messages.loadMessages("testmessages", new Locale("pt", "BR"));
     }
