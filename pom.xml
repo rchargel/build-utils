@@ -43,6 +43,7 @@
         <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
         <groovyTemplatesVersion>3.0.2</groovyTemplatesVersion>
         <xmlUnitVersion>2.6.4</xmlUnitVersion>
+        <doxiaVersion>1.9.1</doxiaVersion>
     </properties>
 
     <dependencyManagement>
@@ -110,11 +111,6 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.maven.reporting</groupId>
-                <artifactId>maven-reporting-impl</artifactId>
-                <version>3.0.0</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.maven.reporting</groupId>
                 <artifactId>maven-reporting-exec</artifactId>
                 <version>1.4</version>
                 <exclusions>
@@ -135,6 +131,51 @@
                         <artifactId>aether-spi</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.reporting</groupId>
+                <artifactId>maven-reporting-impl</artifactId>
+                <version>3.0.0</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-core</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-sink-api</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-decoration-model</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.maven.doxia</groupId>
+                        <artifactId>doxia-site-renderer</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- Doxia Dependencies -->
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-core</artifactId>
+                <version>${doxiaVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-site-renderer</artifactId>
+                <version>${doxiaVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-sink-api</artifactId>
+                <version>${doxiaVersion}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.maven.doxia</groupId>
+                <artifactId>doxia-decoration-model</artifactId>
+                <version>${doxiaVersion}</version>
             </dependency>
 
             <!-- APACHE dependencies -->
@@ -197,6 +238,11 @@
                 <groupId>org.jfree</groupId>
                 <artifactId>jfreechart</artifactId>
                 <version>1.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>com.yahoo.platform.yui</groupId>
+                <artifactId>yuicompressor</artifactId>
+                <version>2.4.8</version>
             </dependency>
 
             <!-- Language Dependencies -->
@@ -276,13 +322,18 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-invoker-plugin</artifactId>
                     <version>3.1.0</version>
+                    <configuration>
+                        <goals>
+                            <goal>package</goal>
+                            <goal>site</goal>
+                        </goals>
+                    </configuration>
                     <executions>
                         <execution>
                             <id>integration-test</id>
                             <goals>
                                 <goal>install</goal>
-                                <goal>integration-test</goal>
-                                <goal>verify</goal>
+                                <goal>run</goal>
                             </goals>
                         </execution>
                     </executions>

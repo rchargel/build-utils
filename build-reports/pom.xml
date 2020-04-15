@@ -13,6 +13,10 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.rchargel.build</groupId>
+            <artifactId>build-utils-common</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
         </dependency>
@@ -23,6 +27,10 @@
         <dependency>
             <groupId>org.jfree</groupId>
             <artifactId>jfreechart</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.yahoo.platform.yui</groupId>
+            <artifactId>yuicompressor</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>

@@ -28,34 +28,34 @@ data class Section(
     val anchor: String
         get() = this.title.replace(Regex("""[^a-zA-Z]+"""), "_")
 
-    companion object {
+    /**
+     * Builder for the [Section] object
+     */
+    class Builder internal constructor(
+            private var title: String,
+            private var subTitle: String? = null,
+            private var content: ArrayList<ReportContent> = ArrayList()
+    ) {
         /**
-         * Builder for the [Section] object
+         * Adds a [subTitle] to this section
+         * @return an instance of this builder
          */
-        class Builder internal constructor(
-                private var title: String,
-                private var subTitle: String? = null,
-                private var content: ArrayList<ReportContent> = ArrayList()
-        ) {
-            /**
-             * Adds a [subTitle] to this section
-             * @return an instance of this builder
-             */
-            fun subTitle(subTitle: String) = apply { this.subTitle = subTitle }
+        fun subTitle(subTitle: String) = apply { this.subTitle = subTitle }
 
-            /**
-             * Appends [content] to this section
-             * @return an instance of this builder
-             */
-            fun appendContent(content: ReportContent) = apply { this.content.add(content) }
+        /**
+         * Appends [content] to this section
+         * @return an instance of this builder
+         */
+        fun appendContent(content: ReportContent) = apply { this.content.add(content) }
 
-            /**
-             * Builds a [Section] instance
-             * @return a new [Section] instance
-             */
-            fun build() = Section(title, subTitle, content.toList())
-        }
+        /**
+         * Builds a [Section] instance
+         * @return a new [Section] instance
+         */
+        fun build() = Section(title, subTitle, content.toList())
+    }
 
+    companion object {
         /**
          * Uses a [title] to create a new [Builder] instance
          * @return a new instance of [Builder]
@@ -77,27 +77,27 @@ data class Text(
         val content: String,
         val title: String? = null
 ) : ReportContent {
-    companion object {
+    /**
+     * Builder for the [Text] object
+     */
+    class Builder internal constructor(
+            private var content: String,
+            private var title: String? = null
+    ) {
         /**
-         * Builder for the [Text] object
+         * Adds a [title] to the text
+         * @return an instance of this builder
          */
-        class Builder internal constructor(
-                private var content: String,
-                private var title: String? = null
-        ) {
-            /**
-             * Adds a [title] to the text
-             * @return an instance of this builder
-             */
-            fun title(title: String) = apply { this.title = title }
+        fun title(title: String) = apply { this.title = title }
 
-            /**
-             * Builds a [Text] instance.
-             * @return a new instance of [Text]
-             */
-            fun build() = Text(content, title)
-        }
+        /**
+         * Builds a [Text] instance.
+         * @return a new instance of [Text]
+         */
+        fun build() = Text(content, title)
+    }
 
+    companion object {
         /**
          * Uses the [content] to create a new [Builder] instance.
          * @return an instance of [Builder]
@@ -127,87 +127,87 @@ data class Table(
         val tableName: String? = null,
         val caption: String? = null
 ) : ReportContent {
-    companion object {
+    /**
+     * Builds instances of [Table]
+     */
+    class Builder internal constructor(
+            private var headings: ArrayList<String> = ArrayList(),
+            private var rows: ArrayList<HashMap<String, Any?>> = ArrayList(),
+            private var renderHeadings: Boolean = true,
+            private var headingsOnLeft: Boolean = false,
+            private var tableName: String? = null,
+            private var caption: String? = null,
+            private var rowIndex: Int = 0
+    ) {
         /**
-         * Builds instances of [Table]
+         * Sets the [headings] for the table
+         * @return this instance of this builder
          */
-        class Builder internal constructor(
-                private var headings: ArrayList<String> = ArrayList(),
-                private var rows: ArrayList<HashMap<String, Any?>> = ArrayList(),
-                private var renderHeadings: Boolean = true,
-                private var headingsOnLeft: Boolean = false,
-                private var tableName: String? = null,
-                private var caption: String? = null,
-                private var rowIndex: Int = 0
-        ) {
-            /**
-             * Sets the [headings] for the table
-             * @return this instance of this builder
-             */
-            fun headings(headings: List<String>) = apply { this.headings = ArrayList(headings) }
+        fun headings(headings: List<String>) = apply { this.headings = ArrayList(headings) }
 
-            /**
-             * Adds a new [heading] for this table
-             * @return this instance of this builder
-             */
-            fun addHeading(heading: String) = apply { this.headings.add(heading) }
+        /**
+         * Adds a new [heading] for this table
+         * @return this instance of this builder
+         */
+        fun addHeading(heading: String) = apply { this.headings.add(heading) }
 
-            /**
-             * Adds a new [row] for this table
-             * @return this instance of this builder
-             */
-            fun addRow(row: Map<String, Any?>) = apply {
-                this.rows.add(HashMap(row))
-                this.rowIndex++
-            }
-
-            /**
-             * Determines the [renderHeadings] behavior
-             * @return this instance of this builder
-             */
-            fun renderHeadings(renderHeadings: Boolean) = apply { this.renderHeadings = renderHeadings }
-
-            /**
-             * Deterines the [headingsOnLeft] behavior
-             * @return this instance of this builder
-             */
-            fun headingsOnLeft(headingsOnLeft: Boolean) = apply { this.headingsOnLeft = headingsOnLeft }
-
-            /**
-             * Adds a new [value] to the [heading] of the current row
-             * @return this instance of this builder
-             */
-            fun addCellValue(heading: String, value: Any?) = apply {
-                while (this.rows.size <= rowIndex)
-                    this.rows.add(HashMap())
-                this.rows[rowIndex][heading] = value
-            }
-
-            /**
-             * Ends the current row, and starts a new one
-             * @return this instance of this builder
-             */
-            fun endRow() = apply { this.rowIndex++ }
-
-            /**
-             * Adds a [tableName] to this table
-             * @return this instance of this builder
-             */
-            fun tableName(tableName: String) = apply { this.tableName = tableName }
-
-            /**
-             * Adds a [caption] to this table
-             * @return this instance of this builder
-             */
-            fun caption(caption: String) = apply { this.caption = caption }
-
-            /**
-             * Builds a [Table] instance
-             * @return a new instance of [Table]
-             */
-            fun build() = Table(headings.toList(), rows.toList(), renderHeadings, headingsOnLeft, tableName, caption)
+        /**
+         * Adds a new [row] for this table
+         * @return this instance of this builder
+         */
+        fun addRow(row: Map<String, Any?>) = apply {
+            this.rows.add(HashMap(row))
+            this.rowIndex++
         }
 
+        /**
+         * Determines the [renderHeadings] behavior
+         * @return this instance of this builder
+         */
+        fun renderHeadings(renderHeadings: Boolean) = apply { this.renderHeadings = renderHeadings }
+
+        /**
+         * Deterines the [headingsOnLeft] behavior
+         * @return this instance of this builder
+         */
+        fun headingsOnLeft(headingsOnLeft: Boolean) = apply { this.headingsOnLeft = headingsOnLeft }
+
+        /**
+         * Adds a new [value] to the [heading] of the current row
+         * @return this instance of this builder
+         */
+        fun addCellValue(heading: String, value: Any?) = apply {
+            while (this.rows.size <= rowIndex)
+                this.rows.add(HashMap())
+            this.rows[rowIndex][heading] = value
+        }
+
+        /**
+         * Ends the current row, and starts a new one
+         * @return this instance of this builder
+         */
+        fun endRow() = apply { this.rowIndex++ }
+
+        /**
+         * Adds a [tableName] to this table
+         * @return this instance of this builder
+         */
+        fun tableName(tableName: String) = apply { this.tableName = tableName }
+
+        /**
+         * Adds a [caption] to this table
+         * @return this instance of this builder
+         */
+        fun caption(caption: String) = apply { this.caption = caption }
+
+        /**
+         * Builds a [Table] instance
+         * @return a new instance of [Table]
+         */
+        fun build() = Table(headings.toList(), rows.toList(), renderHeadings, headingsOnLeft, tableName, caption)
+    }
+
+    companion object {
         /**
          * Creates a [Builder] for new tables
          * @return a new instance of [Builder]
@@ -236,53 +236,53 @@ data class Image(
     val dataURL: String
         get() = "data:$contentType;base64,${base64Encode(data)}"
 
-    companion object {
+    /**
+     * Builds instances of [Image]
+     */
+    class Builder internal constructor(
+            private var contentType: String = "image/png",
+            private var title: String? = null,
+            private var thumbnail: Boolean = false,
+            private var data: ByteArray? = null
+    ) {
         /**
-         * Builds instances of [Image]
+         * Adds a [contentType] to the image, defaults to 'image/png'
+         * @return this instance of this builder
          */
-        class Builder internal constructor(
-                private var contentType: String = "image/png",
-                private var title: String? = null,
-                private var thumbnail: Boolean = false,
-                private var data: ByteArray? = null
-        ) {
-            /**
-             * Adds a [contentType] to the image, defaults to 'image/png'
-             * @return this instance of this builder
-             */
-            fun contentType(contentType: String) = apply { this.contentType = contentType }
+        fun contentType(contentType: String) = apply { this.contentType = contentType }
 
-            /**
-             * Adds a [title] to the image
-             * @return this instance of this builder
-             */
-            fun title(title: String) = apply { this.title = title }
+        /**
+         * Adds a [title] to the image
+         * @return this instance of this builder
+         */
+        fun title(title: String) = apply { this.title = title }
 
-            /**
-             * Determines whether to render the image as a [thumbnail]
-             * @return this instance of this builder
-             */
-            fun thumbnail(thumbnail: Boolean) = apply { this.thumbnail = thumbnail }
+        /**
+         * Determines whether to render the image as a [thumbnail]
+         * @return this instance of this builder
+         */
+        fun thumbnail(thumbnail: Boolean) = apply { this.thumbnail = thumbnail }
 
-            /**
-             * Sets the binary [data] for this image
-             * @return this instance of this builder
-             */
-            fun data(data: ByteArray) = apply { this.data = data }
+        /**
+         * Sets the binary [data] for this image
+         * @return this instance of this builder
+         */
+        fun data(data: ByteArray) = apply { this.data = data }
 
-            /**
-             * Sets the binary [data] for this image using a Base64 encoded string
-             * @return this instance of this builder
-             */
-            fun base64Data(data: String) = apply { this.data = base64Decode(data) }
+        /**
+         * Sets the binary [data] for this image using a Base64 encoded string
+         * @return this instance of this builder
+         */
+        fun base64Data(data: String) = apply { this.data = base64Decode(data) }
 
-            /**
-             * Builds a new [Image]
-             * @return an instance of [Image]
-             */
-            fun build() = Image(contentType, title, data ?: throw NullPointerException("No image data"), thumbnail)
-        }
+        /**
+         * Builds a new [Image]
+         * @return an instance of [Image]
+         */
+        fun build() = Image(contentType, title, data ?: throw NullPointerException("No image data"), thumbnail)
+    }
 
+    companion object {
         /**
          * Creates a builder for an image
          * @return an instance of [Builder]
@@ -435,8 +435,8 @@ data class Image(
     }
 }
 
-internal inline fun base64Encode(data: ByteArray) =
-        Base64.getEncoder().encodeToString(data).replace(Regex("""\s+"""), "")!!
+internal fun base64Encode(data: ByteArray) =
+        Base64.getEncoder().encodeToString(data).replace(Regex("""\s+"""), "")
 
-internal inline fun base64Decode(data: String) =
-        Base64.getDecoder().decode(data.replace(Regex("""\s+"""), ""))!!
+internal fun base64Decode(data: String) =
+        Base64.getDecoder().decode(data.replace(Regex("""\s+"""), ""))

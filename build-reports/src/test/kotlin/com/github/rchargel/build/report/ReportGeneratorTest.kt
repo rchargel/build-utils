@@ -13,7 +13,7 @@ class ReportGeneratorTest {
     fun testReportGeneration() {
         val writer = StringWriter()
         writer.use {
-            ReportBuilder.newReport("Report!!")
+            Report.builder("Report!!")
                     .subReportTitle("Report sub title")
                     .projectVersion("1.0-SNAPSHOT")
                     .publishDate(LocalDate.of(2020, 4, 1))
@@ -54,7 +54,7 @@ class ReportGeneratorTest {
                                             .build())
                                     .build())
                             .build())
-                    .writeReportTo(it)
+                    .build().writeReportTo(it)
         }
 
         val expected = Thread.currentThread().contextClassLoader.getResource("expected_report.html").readText(StandardCharsets.UTF_8)
@@ -62,6 +62,9 @@ class ReportGeneratorTest {
         XMLUnit.setIgnoreAttributeOrder(true)
         XMLUnit.setIgnoreComments(true)
         XMLUnit.setNormalizeWhitespace(true)
+        XMLUnit.setIgnoreComments(true)
+        XMLUnit.setIgnoreAttributeOrder(true)
+        XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true)
         XMLAssert.assertXMLEqual(expected, writer.toString())
     }
 }

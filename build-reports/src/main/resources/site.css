@@ -1,0 +1,29 @@
+a.toggle {
+    color: #ffffff;
+    cursor: pointer;
+}
+
+a.toggle:hover {
+    text-decoration: underline;
+}
+
+#tableofcontents ol {
+    counter-reset: item
+}
+
+#tableofcontents li {
+    display: block
+}
+
+#tableofcontents li:before {
+    content: counters(item, ".") " ";
+    counter-increment: item
+}
+
+.showInPrintOnly {
+    display: none;
+}
+
+.thumbnail {
+    cursor: pointer;
+}

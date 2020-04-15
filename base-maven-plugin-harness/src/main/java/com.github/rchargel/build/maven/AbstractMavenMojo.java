@@ -1,5 +1,8 @@
 package com.github.rchargel.build.maven;
 
+import com.github.rchargel.build.report.Messages;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
@@ -21,9 +24,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,6 +37,9 @@ import static net.dempsy.util.Functional.uncheck;
 
 public abstract class AbstractMavenMojo extends AbstractMojo {
     private static final String JAVA_CLASS_PATH = "java.class.path";
+
+    private Messages messages;
+    private Locale locale;
 
     @Parameter(defaultValue = "${project}", readonly = true)
     protected MavenProject project;
@@ -63,6 +71,12 @@ public abstract class AbstractMavenMojo extends AbstractMojo {
     @Parameter(property = "project.artifactMap", readonly = true, required = true)
     protected Map<String, Artifact> projectArtifactMap;
 
+    @Parameter(defaultValue = "${user.language}")
+    private String userLanguage;
+
+    @Parameter(defaultValue = "${user.country}")
+    private String userCountry;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         final String originalClasspath = System.getProperty(JAVA_CLASS_PATH);
@@ -87,6 +101,29 @@ public abstract class AbstractMavenMojo extends AbstractMojo {
     }
 
     protected abstract void executeMojo() throws MojoExecutionException, MojoFailureException;
+
+    protected Messages getMessages(final Locale locale) {
+        if (messages == null)
+            messages = new Messages(ResourceBundle.getBundle(getBundleName(), locale));
+
+        return messages;
+    }
+
+    protected String getBundleName() {
+        return "messages";
+    }
+
+    protected Locale getLocale() {
+        if (locale == null)
+            locale = Optional.ofNullable(userLanguage)
+                    .filter(StringUtils::isNotBlank)
+                    .map(lang -> Optional.ofNullable(userCountry)
+                            .filter(StringUtils::isNotBlank)
+                            .map(country -> new Locale(lang, country))
+                            .orElseGet(() -> new Locale(lang)))
+                    .orElseGet(Locale::getDefault);
+        return locale;
+    }
 
     protected URL[] scanClasses() throws MojoExecutionException {
         final Set<Artifact> dependencySet = new HashSet<>();
