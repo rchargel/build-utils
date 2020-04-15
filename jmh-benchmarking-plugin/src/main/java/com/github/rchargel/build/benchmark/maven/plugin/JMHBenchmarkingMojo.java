@@ -1,6 +1,7 @@
 package com.github.rchargel.build.benchmark.maven.plugin;
 
 import com.github.rchargel.build.benchmark.BenchmarkExecutor;
+import com.github.rchargel.build.benchmark.report.BenchmarkReport;
 import com.github.rchargel.build.benchmark.results.BenchmarkResults;
 import com.github.rchargel.build.maven.AbstractMavenMojo;
 
@@ -12,7 +13,12 @@ import org.apache.maven.plugins.annotations.Parameter;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 
 @Mojo(name = "run", defaultPhase = LifecyclePhase.TEST)
 public class JMHBenchmarkingMojo extends AbstractMavenMojo {
@@ -36,12 +42,19 @@ public class JMHBenchmarkingMojo extends AbstractMavenMojo {
             throw new MojoExecutionException(e.getMessage(), e);
         }
 
-//        final ResourceBundle bundle = getBundle("messages");
-//
-//        getLog().info("Generating HTML report");
-//        return BenchmarkReport.buildReport(results, new Messages(bundle))
-//                .projectVersion(project.getVersion())
-//                .publishDate(LocalDate.now());
+        final File htmlFile = new File(outputDirectory, JMHConstants.HTML_FILE_NAME);
+        cleanFile(htmlFile);
+        getLog().info("Writing HTML to " + htmlFile.getAbsolutePath());
+
+        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(htmlFile), StandardCharsets.UTF_8)) {
+            BenchmarkReport.buildReport(results, getMessages(getLocale()))
+                    .projectVersion(project.getVersion())
+                    .publishDate(LocalDate.now())
+                    .build()
+                    .writeReportTo(writer);
+        } catch (final IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
     }
 
 }

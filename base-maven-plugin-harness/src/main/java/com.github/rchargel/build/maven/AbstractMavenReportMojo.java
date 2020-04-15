@@ -1,16 +1,14 @@
 package com.github.rchargel.build.maven;
 
 import com.github.rchargel.build.report.Messages;
+import com.github.rchargel.build.report.Report;
 import com.github.rchargel.build.report.Report.ReportBuilder;
 
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.time.LocalDate;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -25,20 +23,13 @@ public abstract class AbstractMavenReportMojo extends AbstractMavenReport {
                 .projectVersion(project.getVersion())
                 .publishDate(LocalDate.now());
 
-        generateFinalReport(builder);
+        generateFinalReport(builder.build());
     }
 
     protected abstract ReportBuilder executeReportMojo(Messages messages) throws MavenReportException;
 
-    protected void generateFinalReport(final ReportBuilder reportBuilder) throws MavenReportException {
-        final File outputFile = new File(getReportOutputDirectory(), getOutputName() + ".html");
-        cleanFile(outputFile);
-        getLog().info("Writing report to " + outputFile.getAbsolutePath());
-        try (final Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile.getAbsolutePath()), getOutputEncoding())) {
-            reportBuilder.build().writeReportTo(writer);
-        } catch (final IOException e) {
-            throw new MavenReportException(e.getMessage(), e);
-        }
+    protected void generateFinalReport(final Report report) throws MavenReportException {
+        new ReportSiteGenerator(getSink()).generateReport(report);
     }
 
     protected Messages getMessages(final Locale locale) {
@@ -77,8 +68,8 @@ public abstract class AbstractMavenReportMojo extends AbstractMavenReport {
         }
     }
 
-    @Override
-    public boolean isExternalReport() {
-        return true;
-    }
+//    @Override
+//    public boolean isExternalReport() {
+//        return true;
+//    }
 }

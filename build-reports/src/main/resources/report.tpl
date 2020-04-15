@@ -33,7 +33,7 @@ def writeTableValue = { element, level ->
                 writeContent(element, level)
                 break
             default:
-                yield(element)
+                yieldUnescaped(element)
                 break
         }
     }

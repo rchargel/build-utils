@@ -7,15 +7,15 @@ a.toggle:hover {
     text-decoration: underline;
 }
 
-ol {
+#tableofcontents ol {
     counter-reset: item
 }
 
-li {
+#tableofcontents li {
     display: block
 }
 
-li:before {
+#tableofcontents li:before {
     content: counters(item, ".") " ";
     counter-increment: item
 }
