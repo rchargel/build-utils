@@ -161,6 +161,12 @@ data class Table(
         }
 
         /**
+         * Adds a new set of [rows] for this table
+         * @return this instance of this builder
+         */
+        fun addRows(rows: List<Map<String, Any?>>) = apply { rows.forEach { addRow(it) } }
+
+        /**
          * Determines the [renderHeadings] behavior
          * @return this instance of this builder
          */
