@@ -1,6 +1,8 @@
 package com.github.rchargel.build.benchmark.report
 
 import com.github.rchargel.build.benchmark.results.BenchmarkResults
+import com.github.rchargel.build.common.StringUtils.Companion.normalizeMemoryString
+import com.github.rchargel.build.common.StringUtils.Companion.normalizeMetricString
 import com.github.rchargel.build.report.*
 import com.github.rchargel.build.report.chart.RawDataLineChartImageMaker
 import java.awt.Color
@@ -32,19 +34,40 @@ class BenchmarkReport {
                                 .addCellValue(bundle.text("hardware.section.cpu"), testResults.cpu)
                                 .addHeading(bundle.text("hardware.section.cpu.architecture"))
                                 .addCellValue(bundle.text("hardware.section.cpu.architecture"), testResults.architecture)
+                                .addHeading(bundle.text("hardware.section.cpu.speed"))
+                                .addCellValue(bundle.text("hardware.section.cpu.speed"), normalizeMetricString(testResults.cpuSpeedInHertz, "Hz"))
                                 .addHeading(bundle.text("hardware.section.cpu.physical"))
                                 .addCellValue(bundle.text("hardware.section.cpu.physical"), testResults.physicalProcessors)
                                 .addHeading(bundle.text("hardware.section.cpu.logical"))
                                 .addCellValue(bundle.text("hardware.section.cpu.logical"), testResults.logicalProcessors)
                                 .addHeading(bundle.text("hardware.section.memory"))
-                                .addCellValue(bundle.text("hardware.section.memory"), testResults.totalMemoryInBytes)
+                                .addCellValue(bundle.text("hardware.section.memory"), normalizeMemoryString(testResults.totalMemoryInBytes))
                                 .addHeading(bundle.text("hardware.section.swap"))
-                                .addCellValue(bundle.text("hardware.section.swap"), testResults.swapTotalInBytes)
+                                .addCellValue(bundle.text("hardware.section.swap"), normalizeMemoryString(testResults.swapTotalInBytes))
+                                .addHeading(bundle.text("hardware.section.memory.pagesize"))
+                                .addCellValue(bundle.text("hardware.section.memory.pagesize"), normalizeMemoryString(testResults.memoryPageSizeInBytes))
+                                .build())
+                        .appendContent(Table.builder()
+                                .tableName(bundle.text("hardware.section.memory.banks"))
+                                .headings(listOf(
+                                        bundle.text("hardware.section.memory.bank.label"),
+                                        bundle.text("hardware.section.memory.bank.type"),
+                                        bundle.text("hardware.section.memory.bank.capacity"),
+                                        bundle.text("hardware.section.memory.bank.clockspeed")
+                                ))
+                                .addRows(testResults.memoryBanks.map {
+                                    mapOf(
+                                            bundle.text("hardware.section.memory.bank.label") to it.label,
+                                            bundle.text("hardware.section.memory.bank.type") to it.type,
+                                            bundle.text("hardware.section.memory.bank.capacity") to normalizeMemoryString(it.capacityInBytes),
+                                            bundle.text("hardware.section.memory.bank.clockspeed") to normalizeMetricString(it.clockSpeed, "Hz")
+                                    )
+                                })
                                 .build())
                         .build())
                 .appendContent(createEvaluations(testResults, bundle))
 
-        private inline fun createEvaluations(testResults: BenchmarkResults, bundle: Messages): ReportContent {
+        private fun createEvaluations(testResults: BenchmarkResults, bundle: Messages): ReportContent {
             val builder = Section.builder(bundle.text("summary.section.title"))
 
             val testHeading = bundle.text("message.test")

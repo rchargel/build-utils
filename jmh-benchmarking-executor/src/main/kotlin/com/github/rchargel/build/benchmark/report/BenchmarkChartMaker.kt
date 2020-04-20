@@ -13,7 +13,7 @@ import java.awt.Color
 
 class ECDFChartMaker(scoreUnits: String, cumulativeText: String) : XYChartImageMaker<ECDFChartMaker>(scoreUnits, cumulativeText) {
     override fun addDataset(datasetName: String, color: Color, plotId: Int, xyPlot: XYPlot, data: Any) = when (data) {
-        is DoubleArray -> addDataset(datasetName, color, plotId, xyPlot, data as DoubleArray)
+        is DoubleArray -> addDataset(datasetName, color, plotId, xyPlot, data)
         is List<*> -> addDataset(datasetName, color, plotId, xyPlot, data.filterIsInstance(Number::class.java).map { it.toDouble() }.toDoubleArray())
         is BenchmarkTestResult -> addDataset(datasetName, color, plotId, xyPlot, data.rawMeasurements.toDoubleArray())
         else -> throw IllegalArgumentException("Unable to process data type ${data.javaClass}")
