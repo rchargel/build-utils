@@ -8,6 +8,7 @@
     <packaging>pom</packaging>
     <name>Maven Build Utilities</name>
     <description>A collection of Maven Plugins and Build utilities</description>
+    <url>https://github.com/rchargel/build-utils</url>
 
     <modules>
         <module>build-utils-common</module>
