@@ -56,7 +56,8 @@ The code replacing the `...` is the code which is being evaluated. There are man
 options and complex configurations available for benchmarking through JMH. The full 
 scope of which is too large for this document. More information on writing more complex 
 benchmark evaluations can be found at the 
-[Open JDK](https://openjdk.java.net/projects/code-tools/jmh/) site.
+[Open JDK](https://openjdk.java.net/projects/code-tools/jmh/) site. You can also find 
+additional examples in the [integration tests](src/it) section of this build.
 
 ## Using the plugin
 
