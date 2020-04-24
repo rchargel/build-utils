@@ -18,10 +18,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.github.rchargel.build.common.ClasspathUtil.findClassesContainingAnnotation;
 import static com.github.rchargel.build.common.ClasspathUtil.getResourceAsFile;
+import static com.github.rchargel.build.common.RuntimeUtils.getOptimizedThreads;
 
 import static net.dempsy.util.Functional.recheck;
 import static net.dempsy.util.Functional.uncheck;
@@ -61,16 +63,17 @@ public class BenchmarkExecutor {
         return resultMap;
     }
 
-    public BenchmarkResults executeBenchmarks() throws RunnerException {
+    public BenchmarkResults executeBenchmarks(final double minAllowedPValue, final int numberOfTestRepetitions) throws RunnerException {
+
         final Collection<BenchmarkTestResult> results = recheck(() -> findClassesContainingAnnotation(Benchmark.class)
                 .map(this::createOptions)
                 .map(this::createRunner)
-                .map(r -> uncheck(() -> executeRunner(r)))
+                .flatMap(r -> IntStream.range(0, numberOfTestRepetitions).mapToObj(i -> uncheck(() -> executeRunner(r))))
                 .flatMap(r -> r.stream().map(BenchmarkTestResult::fromRunResult))
                 .reduce(null, BenchmarkExecutor::addResultToSet, BenchmarkExecutor::merge)
                 .values(), RunnerException.class);
 
-        return BenchmarkResults.buildFromResults(results);
+        return BenchmarkResults.buildFromResults(results, minAllowedPValue);
     }
 
     private Collection<RunResult> executeRunner(final Runner runner) throws RunnerException {
@@ -78,7 +81,11 @@ public class BenchmarkExecutor {
     }
 
     private Options createOptions(final Class<?> benchmarkClass) {
-        return new OptionsBuilder().forks(1).include(benchmarkClass.getCanonicalName()).build();
+        return new OptionsBuilder()
+                .forks(getOptimizedThreads())
+                .threads(1)
+                .include(benchmarkClass.getCanonicalName())
+                .build();
     }
 
     private Runner createRunner(final Options opts) {

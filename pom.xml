@@ -15,7 +15,7 @@
         <module>build-reports</module>
         <module>jmh-benchmarking-executor</module>
         <module>base-maven-plugin-harness</module>
-        <module>jmh-benchmarking-plugin</module>
+        <module>jmh-benchmarking-maven-plugin</module>
     </modules>
 
     <properties>
@@ -184,6 +184,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-lang3</artifactId>
                 <version>3.7</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-math3</artifactId>
+                <version>3.6.1</version>
             </dependency>
 
             <!-- JACKSON dependencies -->

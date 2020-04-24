@@ -76,7 +76,7 @@ class RawDataLineChartImageMaker(xAxis: String, units: String, private val maxCo
         val step = maxCount / length.toDouble()
 
         IntRange(0, length - 1).forEach { i ->
-            series.add(i * step, data[i])
+            series.add(i * step + 1, data[i])
         }
 
         val collection = XYSeriesCollection()
@@ -85,6 +85,7 @@ class RawDataLineChartImageMaker(xAxis: String, units: String, private val maxCo
         val range = xyPlot.rangeAxis.range
         val minY = if (rangeSet) min(range.lowerBound, series.minY) else series.minY
         val maxY = if (rangeSet) max(range.upperBound, series.maxY) else series.maxY
+        rangeSet = true
 
         val tenPercentOfDiff = abs(maxY - minY) * 0.1
         xyPlot.rangeAxis.range = Range(minY - tenPercentOfDiff, maxY + tenPercentOfDiff)
