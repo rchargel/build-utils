@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.rchargel.build.common.DistributionStatistics
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.StringUtils.EMPTY
+import org.apache.commons.math3.stat.inference.KolmogorovSmirnovTest
 import org.openjdk.jmh.results.RunResult
 import org.openjdk.jmh.util.ListStatistics
 import java.util.*
@@ -26,11 +27,19 @@ data class BenchmarkTestResult(
         val distributionStatistics: DistributionStatistics = DistributionStatistics(),
         val median: Double = 0.0,
         val meanErrorAt999: Double = 0.0,
-        val rawMeasurements: List<Double> = emptyList()
+        val rawMeasurements: List<Double> = emptyList(),
+        val pvalue: Double? = null,
+        val baselineDistributionStatistics: DistributionStatistics? = null,
+        val baselineMedian: Double? = null,
+        val baselineMeasurements: List<Double>? = null
 ) {
     @get:JsonIgnore
     val key: String
         get() = "$packageName.$className.$methodName - $mode"
+
+    @get:JsonIgnore
+    val hasBaselineComparison: Boolean
+        get() = baselineMeasurements?.isEmpty() == false
 
     fun merge(other: BenchmarkTestResult): BenchmarkTestResult {
         val rawData = rawMeasurements.toMutableList()
@@ -55,6 +64,31 @@ data class BenchmarkTestResult(
                 .build()
     }
 
+    fun compareWithBaseline(baseline: BenchmarkTestResult?) = if (baseline == null || baseline.key == key)
+        BenchmarkTestResult(
+                packageName,
+                className,
+                methodName,
+                mode,
+                numberOfTestThreads,
+                numberOfTestRepetitions,
+                numberOfWarmupIterations,
+                numberOfMeasurementIterations,
+                measurementTimeInMilliseconds,
+                warmupTimeInMilliseconds,
+                scoreUnits,
+                distributionStatistics,
+                median,
+                meanErrorAt999,
+                rawMeasurements,
+                if (baseline?.rawMeasurements?.isEmpty() == false) KolmogorovSmirnovTest()
+                        .kolmogorovSmirnovTest(rawMeasurements.toDoubleArray(), baseline?.rawMeasurements?.toDoubleArray()) else Double.NaN,
+                baseline?.distributionStatistics ?: DistributionStatistics(),
+                baseline?.median ?: Double.NaN,
+                baseline?.rawMeasurements.orEmpty()
+        )
+    else throw RuntimeException("Measurements don't belong to same test: $key != ${baseline.key}")
+
     companion object {
         internal fun stringifyParams(paramEntries: Set<Map.Entry<String, String>>?) =
                 paramEntries?.sortedBy { entry -> entry.key }?.joinToString(", ", "[ ", " ]") { entry -> "${entry.key}=${entry.value}" }.orEmpty()
@@ -75,9 +109,7 @@ data class BenchmarkTestResult(
                 .scoreUnits(runResult.aggregatedResult.scoreUnit)
                 .medianMeasurement(runResult.aggregatedResult.primaryResult.getStatistics().getPercentile(50.0))
                 .meanErrorAt999(runResult.aggregatedResult.primaryResult.getStatistics().getMeanErrorAt(0.999))
-                .rawMeasurements(runResult.aggregatedResult
-                        .iterationResults
-                        .map { it.primaryResult.getScore() })
+                .rawMeasurements(runResult.aggregatedResult.iterationResults.map { it.primaryResult.getScore() })
                 .build()
 
         class Builder internal constructor(

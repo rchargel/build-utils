@@ -1,113 +1,166 @@
 package com.github.rchargel.build.benchmark.report
 
 import com.github.rchargel.build.benchmark.results.BenchmarkResults
+import com.github.rchargel.build.benchmark.results.BenchmarkTestResult
 import com.github.rchargel.build.common.StringUtils.Companion.normalizeMemoryString
 import com.github.rchargel.build.common.StringUtils.Companion.normalizeMetricString
 import com.github.rchargel.build.report.*
 import com.github.rchargel.build.report.chart.RawDataLineChartImageMaker
 import java.awt.Color
+import kotlin.math.max
+import kotlin.math.min
 
 class BenchmarkReport {
     companion object {
+        private const val REPORT_TITLE = "report.title"
+        private const val TABLE_OF_CONTENTS = "table.of.contents"
+        private const val REPORT_DESCRIPTION = "report.description"
+        private const val HARDWARE_SECTION_TITLE = "hardware.section.title"
+        private const val HARDWARE_SECTION_HW_MODEL = "hardware.section.hardware.model"
+        private const val HARDWARE_SECTION_OS = "hardware.section.operating.system"
+        private const val HARDWARE_SECTION_CPU = "hardware.section.cpu"
+        private const val HARDWARE_SECTION_CPU_ARCH = "hardware.section.cpu.architecture"
+        private const val HARDWARE_SECTION_CPU_SPEED = "hardware.section.cpu.speed"
+        private const val HARDWARE_SECTION_CPU_PHYSICAL = "hardware.section.cpu.physical"
+        private const val HARDWARE_SECTION_CPU_LOGICAL = "hardware.section.cpu.logical"
+        private const val HARDWARE_SECTION_MEMORY = "hardware.section.memory"
+        private const val HARDWARE_SECTION_SWAP = "hardware.section.swap"
+        private const val HARDWARE_SECTION_MEM_PAGESIZE = "hardware.section.memory.pagesize"
+        private const val HARDWARE_SECTION_MEM_BANKS = "hardware.section.memory.banks"
+        private const val HARDWARE_SECTION_MEM_BANK_LABEL = "hardware.section.memory.bank.label"
+        private const val HARDWARE_SECTION_MEM_BANK_TYPE = "hardware.section.memory.bank.type"
+        private const val HARDWARE_SECTION_MEM_BANK_CAPACITY = "hardware.section.memory.bank.capacity"
+        private const val HARDWARE_SECTION_MEM_BANK_SPEED = "hardware.section.memory.bank.clockspeed"
+        private const val ICON_TITLE = "icon.title"
+        private const val MODE_TITLE = "mode.title"
+        private const val TEST_TITLE = "test.title"
+        private const val PVALUE_TITLE = "pvalue"
+        private const val SUMMARY_SECTION_TITLE = "summary.section.title"
+        private const val SUMMARY_SECTION_MODE_HEADING = "summary.section.mode.heading"
+        private const val SUMMARY_SECTION_CLASS_HEADING = "summary.section.class.heading"
+        private const val MESSAGE_TEST = "message.test"
+        private const val MESSAGE_PERFORMANCE = "message.performance"
+        private const val MESSAGE_CHART_DISTRIBUTION = "message.chart.distribution"
+        private const val MESSAGE_CHART_ECDF = "message.chart.ecdf"
+        private const val MESSAGE_CHART_RAW = "message.chart.raw"
+        private const val MESSAGE_CHART_BASELINE_NAME = "message.chart.baseline.name"
+        private const val MESSAGE_CHART_NAME = "message.chart.name"
+        private const val MESSAGE_CHART_DISTRIBUTION_AXIS = "message.chart.distribution.axis"
+        private const val MESSAGE_CHART_ECDF_AXIS = "message.chart.ecdf.axis"
+        private const val MESSAGE_CHART_RAW_AXIS = "message.chart.raw.axis"
+
         @JvmStatic
-        fun buildReport(testResults: BenchmarkResults, bundle: Messages) = Report.builder(bundle.text("report.title"))
+        fun buildReport(testResults: BenchmarkResults, bundle: Messages) = Report.builder(bundle.text(REPORT_TITLE))
                 .includeTOC(true)
-                .tableOfContentsTitle(bundle.text("table.of.contents"))
-                .appendContent(Text(bundle.text("report.description")))
-                .appendContent(Table.builder()
-                        .renderHeadings(false)
-                        .headings(listOf("icon", "name", "value"))
-                        .addRow(mapOf(
-                                "icon" to Image.INFO_ICON,
-                                "name" to bundle.text("number.tests"),
-                                "value" to (testResults.results?.size ?: 0)
-                        ))
-                        .build())
-                .appendContent(Section.builder(bundle.text("hardware.section.title"))
+                .tableOfContentsTitle(bundle.text(TABLE_OF_CONTENTS))
+                .appendContent(Text(bundle.text(REPORT_DESCRIPTION)))
+                .appendContent(createInfoTable(bundle, testResults))
+                .appendContent(Section.builder(bundle.text(HARDWARE_SECTION_TITLE))
                         .appendContent(Table.builder()
                                 .headingsOnLeft(true)
-                                .addHeading(bundle.text("hardware.section.hardware.model"))
-                                .addCellValue(bundle.text("hardware.section.hardware.model"), testResults.systemModel)
-                                .addHeading(bundle.text("hardware.section.operating.system"))
-                                .addCellValue(bundle.text("hardware.section.operating.system"), testResults.operatingSystem)
-                                .addHeading(bundle.text("hardware.section.cpu"))
-                                .addCellValue(bundle.text("hardware.section.cpu"), testResults.cpu)
-                                .addHeading(bundle.text("hardware.section.cpu.architecture"))
-                                .addCellValue(bundle.text("hardware.section.cpu.architecture"), testResults.architecture)
-                                .addHeading(bundle.text("hardware.section.cpu.speed"))
-                                .addCellValue(bundle.text("hardware.section.cpu.speed"), normalizeMetricString(testResults.cpuSpeedInHertz, "Hz"))
-                                .addHeading(bundle.text("hardware.section.cpu.physical"))
-                                .addCellValue(bundle.text("hardware.section.cpu.physical"), testResults.physicalProcessors)
-                                .addHeading(bundle.text("hardware.section.cpu.logical"))
-                                .addCellValue(bundle.text("hardware.section.cpu.logical"), testResults.logicalProcessors)
-                                .addHeading(bundle.text("hardware.section.memory"))
-                                .addCellValue(bundle.text("hardware.section.memory"), normalizeMemoryString(testResults.totalMemoryInBytes))
-                                .addHeading(bundle.text("hardware.section.swap"))
-                                .addCellValue(bundle.text("hardware.section.swap"), normalizeMemoryString(testResults.swapTotalInBytes))
-                                .addHeading(bundle.text("hardware.section.memory.pagesize"))
-                                .addCellValue(bundle.text("hardware.section.memory.pagesize"), normalizeMemoryString(testResults.memoryPageSizeInBytes))
+                                .addHeading(bundle.text(HARDWARE_SECTION_HW_MODEL))
+                                .addCellValue(bundle.text(HARDWARE_SECTION_HW_MODEL), testResults.systemModel)
+                                .addHeading(bundle.text(HARDWARE_SECTION_OS))
+                                .addCellValue(bundle.text(HARDWARE_SECTION_OS), testResults.operatingSystem)
+                                .addHeading(bundle.text(HARDWARE_SECTION_CPU))
+                                .addCellValue(bundle.text(HARDWARE_SECTION_CPU), testResults.cpu)
+                                .addHeading(bundle.text(HARDWARE_SECTION_CPU_ARCH))
+                                .addCellValue(bundle.text(HARDWARE_SECTION_CPU_ARCH), testResults.architecture)
+                                .addHeading(bundle.text(HARDWARE_SECTION_CPU_SPEED))
+                                .addCellValue(bundle.text(HARDWARE_SECTION_CPU_SPEED), normalizeMetricString(testResults.cpuSpeedInHertz, "Hz"))
+                                .addHeading(bundle.text(HARDWARE_SECTION_CPU_PHYSICAL))
+                                .addCellValue(bundle.text(HARDWARE_SECTION_CPU_PHYSICAL), testResults.physicalProcessors)
+                                .addHeading(bundle.text(HARDWARE_SECTION_CPU_LOGICAL))
+                                .addCellValue(bundle.text(HARDWARE_SECTION_CPU_LOGICAL), testResults.logicalProcessors)
+                                .addHeading(bundle.text(HARDWARE_SECTION_MEMORY))
+                                .addCellValue(bundle.text(HARDWARE_SECTION_MEMORY), normalizeMemoryString(testResults.totalMemoryInBytes))
+                                .addHeading(bundle.text(HARDWARE_SECTION_SWAP))
+                                .addCellValue(bundle.text(HARDWARE_SECTION_SWAP), normalizeMemoryString(testResults.swapTotalInBytes))
+                                .addHeading(bundle.text(HARDWARE_SECTION_MEM_PAGESIZE))
+                                .addCellValue(bundle.text(HARDWARE_SECTION_MEM_PAGESIZE), normalizeMemoryString(testResults.memoryPageSizeInBytes))
                                 .build())
                         .appendContent(Table.builder()
-                                .tableName(bundle.text("hardware.section.memory.banks"))
+                                .tableName(bundle.text(HARDWARE_SECTION_MEM_BANKS))
                                 .headings(listOf(
-                                        bundle.text("hardware.section.memory.bank.label"),
-                                        bundle.text("hardware.section.memory.bank.type"),
-                                        bundle.text("hardware.section.memory.bank.capacity"),
-                                        bundle.text("hardware.section.memory.bank.clockspeed")
+                                        bundle.text(HARDWARE_SECTION_MEM_BANK_LABEL),
+                                        bundle.text(HARDWARE_SECTION_MEM_BANK_TYPE),
+                                        bundle.text(HARDWARE_SECTION_MEM_BANK_CAPACITY),
+                                        bundle.text(HARDWARE_SECTION_MEM_BANK_SPEED)
                                 ))
                                 .addRows(testResults.memoryBanks.map {
                                     mapOf(
-                                            bundle.text("hardware.section.memory.bank.label") to it.label,
-                                            bundle.text("hardware.section.memory.bank.type") to it.type,
-                                            bundle.text("hardware.section.memory.bank.capacity") to normalizeMemoryString(it.capacityInBytes),
-                                            bundle.text("hardware.section.memory.bank.clockspeed") to normalizeMetricString(it.clockSpeed, "Hz")
+                                            bundle.text(HARDWARE_SECTION_MEM_BANK_LABEL) to it.label,
+                                            bundle.text(HARDWARE_SECTION_MEM_BANK_TYPE) to it.type,
+                                            bundle.text(HARDWARE_SECTION_MEM_BANK_CAPACITY) to normalizeMemoryString(it.capacityInBytes),
+                                            bundle.text(HARDWARE_SECTION_MEM_BANK_SPEED) to normalizeMetricString(it.clockSpeed, "Hz")
                                     )
                                 })
                                 .build())
                         .build())
                 .appendContent(createEvaluations(testResults, bundle))
 
+        private fun createInfoTable(bundle: Messages, testResults: BenchmarkResults): Table {
+            val iconTitle = bundle.text(ICON_TITLE)
+            val modeTitle = bundle.text(MODE_TITLE)
+            val testTitle = bundle.text(TEST_TITLE)
+            val pValueTitle = bundle.text(PVALUE_TITLE)
+            val hasPValue = testResults.hasPValueResults
+
+            val builder = Table.builder().headings(
+                    if (hasPValue) listOf(iconTitle, modeTitle, testTitle, pValueTitle)
+                    else listOf(iconTitle, modeTitle, testTitle)
+            )
+            groupByMode(testResults.results) { mode, results ->
+                groupByClass(results) { className, classResults ->
+                    classResults.sortedBy { it.methodName }.forEach {
+                        val icon = if (it.pvalue == null) Image.INFO_ICON else if (it.pvalue >= testResults.minAllowedPValue) Image.SUCCESS_ICON else Image.ERROR_ICON
+                        val test = "${className}.${it.key}"
+                        val pValue = "%.4f".format(it.pvalue)
+                        builder.addRow(if (hasPValue) mapOf(
+                                iconTitle to icon,
+                                modeTitle to mode,
+                                testTitle to test,
+                                pValueTitle to pValue
+                        ) else mapOf(
+                                iconTitle to icon,
+                                modeTitle to mode,
+                                testTitle to test
+                        ))
+                    }
+                }
+            }
+            return builder.build()
+        }
+
+        private fun groupByMode(results: Collection<BenchmarkTestResult>?, modeConsumer: (mode: String, results: Collection<BenchmarkTestResult>) -> Unit) =
+                results?.groupBy { it.mode }?.entries?.sortedBy { it.key }?.forEach { modeConsumer.invoke(it.key, it.value) }
+
+        private fun groupByClass(results: Collection<BenchmarkTestResult>?, classConsumer: (className: String, results: Collection<BenchmarkTestResult>) -> Unit) =
+                results?.groupBy { "${it.packageName}.${it.className}" }?.entries?.sortedBy { it.key }?.forEach { classConsumer.invoke(it.key, it.value) }
+
+
         private fun createEvaluations(testResults: BenchmarkResults, bundle: Messages): ReportContent {
-            val builder = Section.builder(bundle.text("summary.section.title"))
+            val builder = Section.builder(bundle.text(SUMMARY_SECTION_TITLE))
 
-            val testHeading = bundle.text("message.test")
-            val perfHeading = bundle.text("message.performance")
-            val distHeading = bundle.text("message.chart.distribution")
-            val ecdfHeading = bundle.text("message.chart.ecdf")
-            val rawHeading = bundle.text("message.chart.raw")
+            val testHeading = bundle.text(MESSAGE_TEST)
+            val perfHeading = bundle.text(MESSAGE_PERFORMANCE)
+            val distHeading = bundle.text(MESSAGE_CHART_DISTRIBUTION)
+            val ecdfHeading = bundle.text(MESSAGE_CHART_ECDF)
+            val rawHeading = bundle.text(MESSAGE_CHART_RAW)
 
-            val chartName = bundle.text("message.chart.name")
-            val distAxis = bundle.text("message.chart.distribution.axis")
-            val ecdfAxis = bundle.text("message.chart.ecdf.axis")
-            val rawAxis = bundle.text("message.chart.raw.axis")
-
-            testResults.results?.groupBy { it.mode }?.entries?.sortedBy { it.key }?.forEach { modeEntry ->
-                val mode = modeEntry.key
-                val sectionBuilder = Section.builder(bundle.text("summary.section.mode.heading", mode))
-                modeEntry.value.groupBy { "${it.packageName}.${it.className}" }.entries.sortedBy { it.key }.forEach { classEntry ->
-                    val className = classEntry.key
+            groupByMode(testResults.results) { mode, modeValues ->
+                val sectionBuilder = Section.builder(bundle.text(SUMMARY_SECTION_MODE_HEADING, mode))
+                groupByClass(modeValues) { className, classValues ->
                     val tableBuilder = Table.builder()
-                            .tableName(bundle.text("summary.section.class.heading", mode, className))
+                            .tableName(bundle.text(SUMMARY_SECTION_CLASS_HEADING, mode, className))
                             .headings(listOf(testHeading, perfHeading, distHeading, ecdfHeading, rawHeading))
-                    classEntry.value.sortedBy { it.methodName }.forEach { result ->
+                    classValues.sortedBy { it.methodName }.forEach { result ->
                         tableBuilder.addRow(mapOf(
                                 testHeading to result.methodName,
                                 perfHeading to "%.3f %s ± %.3f".format(result.distributionStatistics.mean, result.scoreUnits, result.meanErrorAt999),
-                                distHeading to NormalDistributionChartMaker(result.scoreUnits, distAxis, result.distributionStatistics.minimum, result.distributionStatistics.maximum)
-                                        .addDataset(chartName, Color.blue, 1, result.distributionStatistics)
-                                        .toImageBuilder(500, 300)
-                                        .title(distHeading)
-                                        .thumbnail(true).build(),
-                                ecdfHeading to ECDFChartMaker(result.scoreUnits, ecdfAxis)
-                                        .addDataset(chartName, Color.blue, 1, result.rawMeasurements.toDoubleArray())
-                                        .toImageBuilder(500, 300)
-                                        .title(ecdfHeading)
-                                        .thumbnail(true).build(),
-                                rawHeading to RawDataLineChartImageMaker(rawAxis, result.scoreUnits, result.distributionStatistics.count.toInt())
-                                        .addDataset(chartName, Color.blue, 1, result.rawMeasurements)
-                                        .toImageBuilder(600, 300)
-                                        .title(rawHeading)
-                                        .thumbnail(true).build()
+                                distHeading to normalDistributionChart(result, bundle),
+                                ecdfHeading to ecdfChart(result, bundle),
+                                rawHeading to rawChart(result, bundle)
                         ))
                     }
                     sectionBuilder.appendContent(tableBuilder.build())
@@ -115,6 +168,60 @@ class BenchmarkReport {
                 builder.appendContent(sectionBuilder.build())
             }
             return builder.build()
+        }
+
+        private fun ecdfChart(result: BenchmarkTestResult, bundle: Messages): Image {
+            val chart = ECDFChartMaker(result.scoreUnits, bundle.text(MESSAGE_CHART_ECDF_AXIS))
+                    .addDataset(bundle.text(MESSAGE_CHART_NAME), Color.blue, 2, result.rawMeasurements.toDoubleArray())
+
+            if (result.baselineMeasurements != null)
+                chart.addDataset(bundle.text(MESSAGE_CHART_BASELINE_NAME), Color.red, 1, result.baselineMeasurements.toDoubleArray())
+
+            return chart.toImageBuilder(500, 300)
+                    .title(bundle.text(MESSAGE_CHART_ECDF))
+                    .thumbnail(true).build()
+        }
+
+        private fun rawChart(result: BenchmarkTestResult, bundle: Messages): Image {
+
+            val chart = RawDataLineChartImageMaker(
+                    bundle.text(MESSAGE_CHART_RAW_AXIS),
+                    result.scoreUnits,
+                    max(result.distributionStatistics.count.toInt(), result.baselineDistributionStatistics?.count?.toInt()
+                            ?: -1)
+            ).addDataset(bundle.text(MESSAGE_CHART_NAME), Color.blue, 2, result.rawMeasurements)
+
+            if (result.baselineMeasurements != null)
+                chart.addDataset(bundle.text(MESSAGE_CHART_BASELINE_NAME), Color.red, 1, result.baselineMeasurements)
+
+            return chart.toImageBuilder(600, 300)
+                    .title(bundle.text(MESSAGE_CHART_RAW))
+                    .thumbnail(true).build()
+        }
+
+        private fun normalDistributionChart(result: BenchmarkTestResult, bundle: Messages): Image {
+            val distHeading = bundle.text(MESSAGE_CHART_DISTRIBUTION)
+            val distAxis = bundle.text(MESSAGE_CHART_DISTRIBUTION_AXIS)
+            val chartName = bundle.text(MESSAGE_CHART_NAME)
+            val baselineName = bundle.text(MESSAGE_CHART_BASELINE_NAME)
+
+            val chart = NormalDistributionChartMaker(
+                    result.scoreUnits,
+                    distAxis,
+                    min(result.distributionStatistics.minimum, result.baselineDistributionStatistics?.minimum
+                            ?: Double.POSITIVE_INFINITY),
+                    max(result.distributionStatistics.maximum, result.baselineDistributionStatistics?.maximum
+                            ?: Double.NEGATIVE_INFINITY)
+            ).addDataset(chartName, Color.blue, 2, result.distributionStatistics)
+
+
+            if (result.baselineDistributionStatistics != null)
+                chart.addDataset(baselineName, Color.red, 1, result.baselineDistributionStatistics)
+
+            return chart.toImageBuilder(500, 300)
+                    .title(distHeading)
+                    .thumbnail(true)
+                    .build()
         }
     }
 }
