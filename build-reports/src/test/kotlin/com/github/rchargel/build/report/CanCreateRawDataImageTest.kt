@@ -27,6 +27,6 @@ class CanCreateRawDataImageTest(private val rawData: DoubleArray) {
                 .build()
 
         assert("image/gif" == image.contentType)
-        assert(image.dataURL.startsWith("data:image/gif;base64,R0lGODlhkAHIAPcAAEBAQEFBQUJCQk"))
+        assert(image.dataURL.startsWith("data:image/gif;base64,R0lGODlhkAHIAPcAAEBAQE"))
     }
 }

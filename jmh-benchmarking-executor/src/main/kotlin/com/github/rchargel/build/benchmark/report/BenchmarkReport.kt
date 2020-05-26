@@ -6,7 +6,9 @@ import com.github.rchargel.build.common.StringUtils.Companion.normalizeMemoryStr
 import com.github.rchargel.build.common.StringUtils.Companion.normalizeMetricString
 import com.github.rchargel.build.report.*
 import com.github.rchargel.build.report.chart.RawDataLineChartImageMaker
+import org.jfree.data.statistics.BoxAndWhiskerItem
 import java.awt.Color
+import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
@@ -41,11 +43,11 @@ class BenchmarkReport {
         private const val MESSAGE_TEST = "message.test"
         private const val MESSAGE_PERFORMANCE = "message.performance"
         private const val MESSAGE_CHART_DISTRIBUTION = "message.chart.distribution"
+        private const val MESSAGE_CHART_EXECUTION = "message.chart.execution"
         private const val MESSAGE_CHART_ECDF = "message.chart.ecdf"
         private const val MESSAGE_CHART_RAW = "message.chart.raw"
         private const val MESSAGE_CHART_BASELINE_NAME = "message.chart.baseline.name"
         private const val MESSAGE_CHART_NAME = "message.chart.name"
-        private const val MESSAGE_CHART_DISTRIBUTION_AXIS = "message.chart.distribution.axis"
         private const val MESSAGE_CHART_ECDF_AXIS = "message.chart.ecdf.axis"
         private const val MESSAGE_CHART_RAW_AXIS = "message.chart.raw.axis"
 
@@ -172,10 +174,10 @@ class BenchmarkReport {
 
         private fun ecdfChart(result: BenchmarkTestResult, bundle: Messages): Image {
             val chart = ECDFChartMaker(result.scoreUnits, bundle.text(MESSAGE_CHART_ECDF_AXIS))
-                    .addDataset(bundle.text(MESSAGE_CHART_NAME), Color.blue, 2, result.rawMeasurements.toDoubleArray())
+                    .addDataset(bundle.text(MESSAGE_CHART_NAME), Color.blue, 2, result.stripOutliers.toDoubleArray())
 
             if (result.baselineMeasurements != null)
-                chart.addDataset(bundle.text(MESSAGE_CHART_BASELINE_NAME), Color.red, 1, result.baselineMeasurements.toDoubleArray())
+                chart.addDataset(bundle.text(MESSAGE_CHART_BASELINE_NAME), Color.red, 1, result.baselineStripOutliers?.toDoubleArray()!!)
 
             return chart.toImageBuilder(500, 300)
                     .title(bundle.text(MESSAGE_CHART_ECDF))
@@ -189,10 +191,10 @@ class BenchmarkReport {
                     result.scoreUnits,
                     max(result.distributionStatistics.count.toInt(), result.baselineDistributionStatistics?.count?.toInt()
                             ?: -1)
-            ).addDataset(bundle.text(MESSAGE_CHART_NAME), Color.blue, 2, result.rawMeasurements)
+            ).addDataset(bundle.text(MESSAGE_CHART_NAME), Color.blue, 2, result.aggregatedMeasurements)
 
             if (result.baselineMeasurements != null)
-                chart.addDataset(bundle.text(MESSAGE_CHART_BASELINE_NAME), Color.red, 1, result.baselineMeasurements)
+                chart.addDataset(bundle.text(MESSAGE_CHART_BASELINE_NAME), Color.red, 1, result.baselineAggregatedMeasurements.orEmpty())
 
             return chart.toImageBuilder(600, 300)
                     .title(bundle.text(MESSAGE_CHART_RAW))
@@ -201,27 +203,55 @@ class BenchmarkReport {
 
         private fun normalDistributionChart(result: BenchmarkTestResult, bundle: Messages): Image {
             val distHeading = bundle.text(MESSAGE_CHART_DISTRIBUTION)
-            val distAxis = bundle.text(MESSAGE_CHART_DISTRIBUTION_AXIS)
             val chartName = bundle.text(MESSAGE_CHART_NAME)
             val baselineName = bundle.text(MESSAGE_CHART_BASELINE_NAME)
 
-            val chart = NormalDistributionChartMaker(
-                    result.scoreUnits,
-                    distAxis,
-                    min(result.distributionStatistics.minimum, result.baselineDistributionStatistics?.minimum
-                            ?: Double.POSITIVE_INFINITY),
-                    max(result.distributionStatistics.maximum, result.baselineDistributionStatistics?.maximum
-                            ?: Double.NEGATIVE_INFINITY)
-            ).addDataset(chartName, Color.blue, 2, result.distributionStatistics)
-
+            val chart = BoxPlotChartImageMaker(bundle.text(MESSAGE_CHART_EXECUTION), result.scoreUnits)
+                    .addDataset(chartName, Color.blue, 2, toBoxAndWhiskerItem(
+                            result.mean,
+                            result.median,
+                            result.firstQuarter,
+                            result.thirdQuarter,
+                            result.min,
+                            result.max,
+                            result.aggregatedMeasurements
+                    ))
 
             if (result.baselineDistributionStatistics != null)
-                chart.addDataset(baselineName, Color.red, 1, result.baselineDistributionStatistics)
+                chart.addDataset(baselineName, Color.red, 1, toBoxAndWhiskerItem(
+                        result.baselineMean ?: 0.0,
+                        result.baselineMedian ?: 0.0,
+                        result.baselineFirstQuarter ?: 0.0,
+                        result.baselineThirdQuarter ?: 0.0,
+                        result.baselineMin ?: 0.0,
+                        result.baselineMax ?: 0.0,
+                        result.baselineAggregatedMeasurements.orEmpty()
+                ))
 
             return chart.toImageBuilder(500, 300)
                     .title(distHeading)
                     .thumbnail(true)
                     .build()
+        }
+
+        private fun toBoxAndWhiskerItem(mean: Double, median: Double, q1: Double, q3: Double, min: Double, max: Double, values: List<Double>): BoxAndWhiskerItem {
+            val qdiff = abs(q3 - q1)
+            val m = qdiff * 1.5
+            val rmin = max(q1 - m, min)
+            val rmax = min(q3 + m, max)
+            val outliers = values.filter { it < rmin || it > rmax }.sorted()
+
+            return BoxAndWhiskerItem(
+                    mean,
+                    median,
+                    q1,
+                    q3,
+                    rmin,
+                    rmax,
+                    outliers.firstOrNull() ?: rmin,
+                    outliers.lastOrNull() ?: rmax,
+                    outliers
+            )
         }
     }
 }

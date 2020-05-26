@@ -21,12 +21,12 @@
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>
-            <version>1.21</version>
+            <version>1.23</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-generator-annprocess</artifactId>
-            <version>1.21</version>
+            <version>1.23</version>
         </dependency>
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -65,9 +65,10 @@
                 <artifactId>@project.artifactId@</artifactId>
                 <version>@project.version@</version>
                 <configuration>
-                    <minPValue>0.01</minPValue>
-                    <baselineRun>${project.basedir}/src/main/resources/baseline-results.json</baselineRun>
-                    <ignoreHardwareChanges>true</ignoreHardwareChanges>
+                    <numberOfTestRepetitions>15</numberOfTestRepetitions>
+<!--                    <minPValue>0.01</minPValue>-->
+<!--                    <baselineRun>${project.basedir}/src/main/resources/baseline-results.json</baselineRun>-->
+<!--                    <ignoreHardwareChanges>true</ignoreHardwareChanges>-->
                 </configuration>
                 <executions>
                     <execution>

@@ -5,6 +5,7 @@ import org.jfree.chart.ChartFactory
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
+import org.jfree.chart.ui.RectangleInsets
 import org.jfree.data.Range
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
@@ -31,7 +32,7 @@ abstract class ChartImageMaker<T : ChartImageMaker<T>>(
     abstract fun addDataset(datasetName: String, color: Color, plotId: Int, data: Any): T
 
     @Throws(IOException::class)
-    fun toImageBuilder(width: Int, height: Int): Image.Builder {
+    open fun toImageBuilder(width: Int, height: Int): Image.Builder {
         val image = chart.createBufferedImage(width, height)
         val out = ByteArrayOutputStream()
         out.use {
@@ -50,9 +51,11 @@ abstract class XYChartImageMaker<T : XYChartImageMaker<T>>(xAxis: String, yAxis:
 
     init {
         xyPlot.backgroundPaint = Color.white
+        xyPlot.rangeGridlinePaint = Color.lightGray
         xyPlot.isDomainGridlinesVisible = false
-        xyPlot.isRangeGridlinesVisible = false
-        xyPlot.isOutlineVisible = false
+        xyPlot.isRangeGridlinesVisible = true
+        xyPlot.isOutlineVisible = true
+        xyPlot.axisOffset = RectangleInsets(0.0, 0.0, 0.0, 0.0)
     }
 
     override fun addDataset(datasetName: String, color: Color, plotId: Int, data: Any): T =
