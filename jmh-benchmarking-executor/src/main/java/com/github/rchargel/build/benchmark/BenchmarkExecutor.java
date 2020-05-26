@@ -2,6 +2,7 @@ package com.github.rchargel.build.benchmark;
 
 import com.github.rchargel.build.benchmark.results.BenchmarkResults;
 import com.github.rchargel.build.benchmark.results.BenchmarkTestResult;
+import com.github.rchargel.build.common.RuntimeUtils;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.results.RunResult;
@@ -23,7 +24,6 @@ import java.util.stream.Stream;
 
 import static com.github.rchargel.build.common.ClasspathUtil.findClassesContainingAnnotation;
 import static com.github.rchargel.build.common.ClasspathUtil.getResourceAsFile;
-import static com.github.rchargel.build.common.RuntimeUtils.getOptimizedThreads;
 
 import static net.dempsy.util.Functional.recheck;
 import static net.dempsy.util.Functional.uncheck;
@@ -82,9 +82,10 @@ public class BenchmarkExecutor {
 
     private Options createOptions(final Class<?> benchmarkClass) {
         return new OptionsBuilder()
-                .forks(getOptimizedThreads())
+                .forks(RuntimeUtils.getOptimizedThreads())
                 .threads(1)
                 .include(benchmarkClass.getCanonicalName())
+                .jvmArgs("-server", "-disablesystemassertions")
                 .build();
     }
 

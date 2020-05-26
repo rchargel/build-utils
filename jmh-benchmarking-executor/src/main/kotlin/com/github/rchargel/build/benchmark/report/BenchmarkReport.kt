@@ -8,7 +8,6 @@ import com.github.rchargel.build.report.*
 import com.github.rchargel.build.report.chart.RawDataLineChartImageMaker
 import java.awt.Color
 import kotlin.math.max
-import kotlin.math.min
 
 class BenchmarkReport {
     companion object {
@@ -41,11 +40,11 @@ class BenchmarkReport {
         private const val MESSAGE_TEST = "message.test"
         private const val MESSAGE_PERFORMANCE = "message.performance"
         private const val MESSAGE_CHART_DISTRIBUTION = "message.chart.distribution"
+        private const val MESSAGE_CHART_EXECUTION = "message.chart.execution"
         private const val MESSAGE_CHART_ECDF = "message.chart.ecdf"
         private const val MESSAGE_CHART_RAW = "message.chart.raw"
         private const val MESSAGE_CHART_BASELINE_NAME = "message.chart.baseline.name"
         private const val MESSAGE_CHART_NAME = "message.chart.name"
-        private const val MESSAGE_CHART_DISTRIBUTION_AXIS = "message.chart.distribution.axis"
         private const val MESSAGE_CHART_ECDF_AXIS = "message.chart.ecdf.axis"
         private const val MESSAGE_CHART_RAW_AXIS = "message.chart.raw.axis"
 
@@ -172,10 +171,10 @@ class BenchmarkReport {
 
         private fun ecdfChart(result: BenchmarkTestResult, bundle: Messages): Image {
             val chart = ECDFChartMaker(result.scoreUnits, bundle.text(MESSAGE_CHART_ECDF_AXIS))
-                    .addDataset(bundle.text(MESSAGE_CHART_NAME), Color.blue, 2, result.rawMeasurements.toDoubleArray())
+                    .addDataset(bundle.text(MESSAGE_CHART_NAME), Color.blue, 2, result.rawMeasurementsWithoutOutliers.toDoubleArray())
 
             if (result.baselineMeasurements != null)
-                chart.addDataset(bundle.text(MESSAGE_CHART_BASELINE_NAME), Color.red, 1, result.baselineMeasurements.toDoubleArray())
+                chart.addDataset(bundle.text(MESSAGE_CHART_BASELINE_NAME), Color.red, 1, result.baselineMeasurementsWithoutOutliers?.toDoubleArray()!!)
 
             return chart.toImageBuilder(500, 300)
                     .title(bundle.text(MESSAGE_CHART_ECDF))
@@ -201,22 +200,14 @@ class BenchmarkReport {
 
         private fun normalDistributionChart(result: BenchmarkTestResult, bundle: Messages): Image {
             val distHeading = bundle.text(MESSAGE_CHART_DISTRIBUTION)
-            val distAxis = bundle.text(MESSAGE_CHART_DISTRIBUTION_AXIS)
             val chartName = bundle.text(MESSAGE_CHART_NAME)
             val baselineName = bundle.text(MESSAGE_CHART_BASELINE_NAME)
 
-            val chart = NormalDistributionChartMaker(
-                    result.scoreUnits,
-                    distAxis,
-                    min(result.distributionStatistics.minimum, result.baselineDistributionStatistics?.minimum
-                            ?: Double.POSITIVE_INFINITY),
-                    max(result.distributionStatistics.maximum, result.baselineDistributionStatistics?.maximum
-                            ?: Double.NEGATIVE_INFINITY)
-            ).addDataset(chartName, Color.blue, 2, result.distributionStatistics)
-
+            val chart = BoxPlotChartImageMaker(bundle.text(MESSAGE_CHART_EXECUTION), result.scoreUnits)
+                    .addDataset(chartName, Color.blue, 2, result.rawMeasurements)
 
             if (result.baselineDistributionStatistics != null)
-                chart.addDataset(baselineName, Color.red, 1, result.baselineDistributionStatistics)
+                chart.addDataset(baselineName, Color.red, 1, result.baselineMeasurements!!)
 
             return chart.toImageBuilder(500, 300)
                     .title(distHeading)

@@ -11,6 +11,7 @@ import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors.toMap
 import kotlin.collections.HashMap
+import kotlin.math.abs
 
 data class BenchmarkTestResult(
         val packageName: String = EMPTY,
@@ -27,15 +28,37 @@ data class BenchmarkTestResult(
         val distributionStatistics: DistributionStatistics = DistributionStatistics(),
         val median: Double = 0.0,
         val meanErrorAt999: Double = 0.0,
+        val firstQuarter: Double = 0.0,
+        val thirdQuarter: Double = 0.0,
         val rawMeasurements: List<Double> = emptyList(),
         val pvalue: Double? = null,
         val baselineDistributionStatistics: DistributionStatistics? = null,
         val baselineMedian: Double? = null,
+        val baselineFirstQuarter: Double? = null,
+        val baselineThirdQuarter: Double? = null,
         val baselineMeasurements: List<Double>? = null
 ) {
     @get:JsonIgnore
     val key: String
         get() = "$packageName.$className.$methodName - $mode"
+
+    @get:JsonIgnore
+    val rawMeasurementsWithoutOutliers: List<Double>
+        get() {
+            val interQuartileRange = abs(thirdQuarter - firstQuarter)
+            val allowedLow = firstQuarter - interQuartileRange * 1.5
+            val allowedHigh = thirdQuarter + interQuartileRange * 1.5
+            return rawMeasurements.filter { it in allowedLow..allowedHigh }
+        }
+
+    @get:JsonIgnore
+    val baselineMeasurementsWithoutOutliers: List<Double>?
+        get() {
+            val interQuartileRange = abs((baselineThirdQuarter ?: 0.0) - (baselineFirstQuarter ?: 0.0))
+            val allowedLow = (baselineFirstQuarter ?: 0.0) - interQuartileRange * 1.5
+            val allowedHigh = (baselineThirdQuarter ?: 0.0) + interQuartileRange * 1.5
+            return baselineMeasurements?.filter { it in allowedLow..allowedHigh }
+        }
 
     @get:JsonIgnore
     val hasBaselineComparison: Boolean
@@ -59,6 +82,8 @@ data class BenchmarkTestResult(
                 .mode(mode)
                 .scoreUnits(scoreUnits)
                 .medianMeasurement(stats.getPercentile(50.0))
+                .firstQuarterMeasurement(stats.getPercentile(25.0))
+                .thirdQuarterMeasurement(stats.getPercentile(75.0))
                 .meanErrorAt999(stats.getMeanErrorAt(0.999))
                 .rawMeasurements(rawData)
                 .build()
@@ -79,12 +104,16 @@ data class BenchmarkTestResult(
                 scoreUnits,
                 distributionStatistics,
                 median,
+                firstQuarter,
+                thirdQuarter,
                 meanErrorAt999,
                 rawMeasurements,
                 if (baseline?.rawMeasurements?.isEmpty() == false) KolmogorovSmirnovTest()
-                        .kolmogorovSmirnovTest(rawMeasurements.toDoubleArray(), baseline?.rawMeasurements?.toDoubleArray()) else Double.NaN,
+                        .kolmogorovSmirnovTest(rawMeasurementsWithoutOutliers.toDoubleArray(), baseline?.rawMeasurementsWithoutOutliers?.toDoubleArray()) else Double.NaN,
                 baseline?.distributionStatistics ?: DistributionStatistics(),
                 baseline?.median ?: Double.NaN,
+                baseline?.firstQuarter,
+                baseline?.thirdQuarter,
                 baseline?.rawMeasurements.orEmpty()
         )
     else throw RuntimeException("Measurements don't belong to same test: $key != ${baseline.key}")
@@ -108,6 +137,8 @@ data class BenchmarkTestResult(
                 .mode(runResult.params.mode.toString())
                 .scoreUnits(runResult.aggregatedResult.scoreUnit)
                 .medianMeasurement(runResult.aggregatedResult.primaryResult.getStatistics().getPercentile(50.0))
+                .firstQuarterMeasurement(runResult.aggregatedResult.primaryResult.getStatistics().getPercentile(25.0))
+                .thirdQuarterMeasurement(runResult.aggregatedResult.primaryResult.getStatistics().getPercentile(75.0))
                 .meanErrorAt999(runResult.aggregatedResult.primaryResult.getStatistics().getMeanErrorAt(0.999))
                 .rawMeasurements(runResult.aggregatedResult.iterationResults.map { it.primaryResult.getScore() })
                 .build()
@@ -126,6 +157,8 @@ data class BenchmarkTestResult(
                 private var warmupTimeInMilliseconds: Long = 0,
                 private var scoreUnits: String? = null,
                 private var medianMeasurement: Double = 0.0,
+                private var firstQuarterMeasurement: Double = 0.0,
+                private var thirdQuarterMeasurement: Double = 0.0,
                 private var meanErrorAt999: Double = 0.0,
                 private var rawMeasurements: ArrayList<Double> = ArrayList<Double>(),
                 private var params: HashMap<String, String> = HashMap()
@@ -142,6 +175,8 @@ data class BenchmarkTestResult(
             fun warmupTimeInMilliseconds(warmupTimeInMilliseconds: Long) = apply { this.warmupTimeInMilliseconds = warmupTimeInMilliseconds }
             fun scoreUnits(scoreUnits: String) = apply { this.scoreUnits = scoreUnits }
             fun medianMeasurement(medianMeasurement: Double) = apply { this.medianMeasurement = medianMeasurement }
+            fun firstQuarterMeasurement(firstQuarterMeasurement: Double) = apply { this.firstQuarterMeasurement = firstQuarterMeasurement }
+            fun thirdQuarterMeasurement(thirdQuarterMeasurement: Double) = apply { this.thirdQuarterMeasurement = thirdQuarterMeasurement }
             fun meanErrorAt999(meanErrorAt999: Double) = apply { this.meanErrorAt999 = meanErrorAt999 }
             fun addRawMeasurement(rawMeasurement: Double) = apply { this.rawMeasurements.add(rawMeasurement) }
             fun rawMeasurements(rawMeasurements: List<Double>) = apply { this.rawMeasurements = ArrayList(rawMeasurements) }
@@ -170,6 +205,8 @@ data class BenchmarkTestResult(
                         measurementTimeInMilliseconds = measurementTimeInMilliseconds,
                         scoreUnits = scoreUnits ?: "",
                         median = medianMeasurement,
+                        firstQuarter = firstQuarterMeasurement,
+                        thirdQuarter = thirdQuarterMeasurement,
                         meanErrorAt999 = meanErrorAt999,
                         distributionStatistics = stats,
                         rawMeasurements = rawMeasurements
