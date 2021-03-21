@@ -2,6 +2,7 @@ package com.github.rchargel.build.benchmark;
 
 import com.github.rchargel.build.benchmark.results.BenchmarkResults;
 import com.github.rchargel.build.benchmark.results.BenchmarkTestResult;
+import com.github.rchargel.build.common.RuntimeUtils;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;

@@ -16,8 +16,13 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode({Mode.Throughput})
+<<<<<<< HEAD
 @Warmup(iterations = 5, time = 500, timeUnit = TimeUnit.MILLISECONDS)
 @Measurement(iterations = 10, time = 1000, timeUnit = TimeUnit.MILLISECONDS)
+=======
+@Warmup(iterations = 3, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 20, time = 500, timeUnit = TimeUnit.MILLISECONDS)
+>>>>>>> db6a0fec6615c6cc9fc31205616f977574f4a797
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 public class ExampleBenchmark {
 

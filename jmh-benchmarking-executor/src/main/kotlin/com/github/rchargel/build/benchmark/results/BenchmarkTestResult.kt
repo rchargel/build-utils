@@ -9,6 +9,7 @@ import org.openjdk.jmh.results.RunResult
 import org.openjdk.jmh.util.ListStatistics
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors.toMap
+import kotlin.collections.HashMap
 import kotlin.math.abs
 
 data class BenchmarkTestResult(
