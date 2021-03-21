@@ -36,7 +36,7 @@
         <reflectionsVersion>0.9.12</reflectionsVersion>
         <oshiVersion>4.6.0</oshiVersion>
         <jacksonVersion>2.12.1</jacksonVersion>
-        <junitVersion>4.12</junitVersion>
+        <junitVersion>4.13.1</junitVersion>
 
         <!-- Plugins -->
         <mavenGpgPluginVersion>1.6</mavenGpgPluginVersion>
