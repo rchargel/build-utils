@@ -17,7 +17,7 @@ class CanCreateImagesTest {
                 .toImageBuilder(300, 200).build()
 
         assert("image/gif" == image.contentType)
-        val imagePrefix = "data:image/gif;base64,R0lGODlhLAHIAPcAAEBAQEFBQUJCQkNDQ0REREZGRkhISEpKSkx"
+        val imagePrefix = "data:image/gif;base64,R0lGODlhLA"
         val dataURL = image.dataURL
         assert(dataURL.startsWith(imagePrefix)) {
             "Should have started with $imagePrefix, but was $dataURL"
@@ -31,7 +31,7 @@ class CanCreateImagesTest {
                 .toImageBuilder(300, 200).build()
 
         assert("image/gif" == image.contentType)
-        val imagePrefix = "data:image/gif;base64,R0lGODlhLAHIAPcAAEBAQEFBQUJCQkREREZGRkhISEp"
+        val imagePrefix = "data:image/gif;base64,R0lGODlhLA"
         val dataURL = image.dataURL
         assert(dataURL.startsWith(imagePrefix)) {
             "Should have started with $imagePrefix, but was $dataURL"
@@ -55,7 +55,7 @@ class CanCreateImagesTest {
                 .addDataset("Results", Color.blue, 1, result)
                 .toImageBuilder(300, 200).build()
         assert("image/gif" == image.contentType)
-        val imagePrefix = "data:image/gif;base64,R0lGODlhLAHIAPcAAAAAAAICAgQEBAYGBgg"
+        val imagePrefix = "data:image/gif;base64,R0lGODlhLA"
         val dataURL = image.dataURL
         assert(dataURL.startsWith(imagePrefix)) {
             "Should have started with $imagePrefix, but was $dataURL"
