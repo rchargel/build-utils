@@ -36,7 +36,8 @@ class BenchmarkReport {
         private const val ICON_TITLE = "icon.title"
         private const val MODE_TITLE = "mode.title"
         private const val TEST_TITLE = "test.title"
-        private const val PVALUE_TITLE = "pvalue"
+        private const val ZSCORE_TITLE = "zscore.title"
+        private const val MAX_ZSCORE_TITLE = "max.zscore.title"
         private const val SUMMARY_SECTION_TITLE = "summary.section.title"
         private const val SUMMARY_SECTION_MODE_HEADING = "summary.section.mode.heading"
         private const val SUMMARY_SECTION_CLASS_HEADING = "summary.section.class.heading"
@@ -105,24 +106,30 @@ class BenchmarkReport {
             val iconTitle = bundle.text(ICON_TITLE)
             val modeTitle = bundle.text(MODE_TITLE)
             val testTitle = bundle.text(TEST_TITLE)
-            val pValueTitle = bundle.text(PVALUE_TITLE)
-            val hasPValue = testResults.hasPValueResults
+            val hasZScore = testResults.hasZScore
+            val zScoreTitle = bundle.text(ZSCORE_TITLE)
+            val maxZScoreTitle = bundle.text(MAX_ZSCORE_TITLE)
 
             val builder = Table.builder().headings(
-                    if (hasPValue) listOf(iconTitle, modeTitle, testTitle, pValueTitle)
+                    if (hasZScore) listOf(iconTitle, modeTitle, testTitle, zScoreTitle, maxZScoreTitle)
                     else listOf(iconTitle, modeTitle, testTitle)
             )
             groupByMode(testResults.results) { mode, results ->
                 groupByClass(results) { className, classResults ->
                     classResults.sortedBy { it.methodName }.forEach {
-                        val icon = if (it.pvalue == null) Image.INFO_ICON else if (it.pvalue >= testResults.minAllowedPValue) Image.SUCCESS_ICON else Image.ERROR_ICON
+                        val icon = when {
+                            it.zScore == null -> Image.INFO_ICON
+                            it.failsZScore(testResults.maxAbsoluteZScore) -> Image.ERROR_ICON
+                            else -> Image.SUCCESS_ICON
+                        }
                         val test = "${className}.${it.key}"
-                        val pValue = "%.4f".format(it.pvalue)
-                        builder.addRow(if (hasPValue) mapOf(
+                        val zScore = "%.4f".format(it.zScore)
+                        builder.addRow(if (hasZScore) mapOf(
                                 iconTitle to icon,
                                 modeTitle to mode,
                                 testTitle to test,
-                                pValueTitle to pValue
+                                zScoreTitle to zScore,
+                                maxZScoreTitle to "± %.4f".format(testResults.maxAbsoluteZScore)
                         ) else mapOf(
                                 iconTitle to icon,
                                 modeTitle to mode,
@@ -159,7 +166,7 @@ class BenchmarkReport {
                     classValues.sortedBy { it.methodName }.forEach { result ->
                         tableBuilder.addRow(mapOf(
                                 testHeading to result.methodName,
-                                perfHeading to "%.3f %s ± %.3f".format(result.distributionStatistics.mean, result.scoreUnits, result.meanErrorAt999),
+                                perfHeading to "%.3f %s ± %.3f".format(result.mean, result.scoreUnits, result.meanErrorAt999),
                                 distHeading to normalDistributionChart(result, bundle),
                                 ecdfHeading to ecdfChart(result, bundle),
                                 rawHeading to rawChart(result, bundle)
@@ -207,25 +214,25 @@ class BenchmarkReport {
             val baselineName = bundle.text(MESSAGE_CHART_BASELINE_NAME)
 
             val chart = BoxPlotChartImageMaker(bundle.text(MESSAGE_CHART_EXECUTION), result.scoreUnits)
-                    .addDataset(chartName, Color.blue, 2, toBoxAndWhiskerItem(
+                    .addDataset(chartName, Color.blue, 1, toBoxAndWhiskerItem(
                             result.mean,
                             result.median,
                             result.firstQuarter,
                             result.thirdQuarter,
                             result.min,
                             result.max,
-                            result.aggregatedMeasurements
+                            result.stripOutliers
                     ))
 
             if (result.baselineDistributionStatistics != null)
-                chart.addDataset(baselineName, Color.red, 1, toBoxAndWhiskerItem(
+                chart.addDataset(baselineName, Color.red, 2, toBoxAndWhiskerItem(
                         result.baselineMean ?: 0.0,
                         result.baselineMedian ?: 0.0,
                         result.baselineFirstQuarter ?: 0.0,
                         result.baselineThirdQuarter ?: 0.0,
                         result.baselineMin ?: 0.0,
                         result.baselineMax ?: 0.0,
-                        result.baselineAggregatedMeasurements.orEmpty()
+                        result.stripOutliers.orEmpty()
                 ))
 
             return chart.toImageBuilder(500, 300)

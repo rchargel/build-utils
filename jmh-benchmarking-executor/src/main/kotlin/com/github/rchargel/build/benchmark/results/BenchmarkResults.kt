@@ -16,27 +16,27 @@ data class BenchmarkResults(
         val swapTotalInBytes: Long? = null,
         val memoryPageSizeInBytes: Long? = null,
         val memoryBanks: List<MemoryBank> = emptyList(),
-        val minAllowedPValue: Double = 0.05
+        val maxAbsoluteZScore: Double = 1.5
 ) {
     @get:JsonIgnore
     val size: Long
         get() = results?.size?.toLong() ?: 0
 
     @get:JsonIgnore
-    val hasPValueResults: Boolean
-        get() = results?.mapNotNull { it.pvalue }?.count()?.or(0) != 0
+    val hasZScore: Boolean
+        get() = results?.mapNotNull { it.zScore }?.count()?.or(0) != 0
 
     @get:JsonIgnore
-    val passesPValueTest: Boolean
-        get() = results?.mapNotNull { it.pvalue }?.filter { it < minAllowedPValue }?.count()?.or(0) == 0
+    val failsMaxAbsZScore: Boolean
+        get() = (results?.filter { it.failsZScore(maxAbsoluteZScore) }?.count() ?: 0) > 0
 
     fun compareToBaseline(baseline: BenchmarkResults, validateSystemSpec: Boolean): BenchmarkResults {
-        if (!validateSystemSpec ||
-                architecture != baseline.architecture ||
-                cpuSpeedInHertz != baseline.cpuSpeedInHertz ||
-                logicalProcessors != baseline.logicalProcessors ||
-                totalMemoryInBytes != baseline.totalMemoryInBytes ||
-                swapTotalInBytes != baseline.swapTotalInBytes) {
+        if (!validateSystemSpec &&
+                (architecture != baseline.architecture ||
+                        cpuSpeedInHertz != baseline.cpuSpeedInHertz ||
+                        logicalProcessors != baseline.logicalProcessors ||
+                        totalMemoryInBytes != baseline.totalMemoryInBytes ||
+                        swapTotalInBytes != baseline.swapTotalInBytes)) {
             throw RuntimeException("System specifications have deviated from baseline")
         }
         val baselineMap = baseline.results?.map { it.key to it }?.toMap().orEmpty().toMutableMap()
@@ -53,7 +53,7 @@ data class BenchmarkResults(
                 swapTotalInBytes,
                 memoryPageSizeInBytes,
                 memoryBanks,
-                minAllowedPValue
+                maxAbsoluteZScore
         )
     }
 
@@ -65,7 +65,7 @@ data class BenchmarkResults(
         }
 
         @JvmStatic
-        fun buildFromResults(results: Collection<BenchmarkTestResult>, minAllowedPValue: Double): BenchmarkResults {
+        fun buildFromResults(results: Collection<BenchmarkTestResult>, maxAbsoluteZScore: Double): BenchmarkResults {
             val sysInfo = SystemInfo()
             return BenchmarkResults(
                     results.toList(),
@@ -87,7 +87,7 @@ data class BenchmarkResults(
                                 it.clockSpeed
                         )
                     }.orEmpty(),
-                    minAllowedPValue
+                    maxAbsoluteZScore
             )
         }
     }

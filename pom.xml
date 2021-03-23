@@ -32,7 +32,7 @@
         <mavenDependencyTreeVersion>3.0.1</mavenDependencyTreeVersion>
         <mavenSitePluginVersion>3.9.0</mavenSitePluginVersion>
         <plexusUtilsVersion>3.1.0</plexusUtilsVersion>
-        <jmhVersion>1.23</jmhVersion>
+        <jmhVersion>1.28</jmhVersion>
         <reflectionsVersion>0.9.12</reflectionsVersion>
         <oshiVersion>4.6.0</oshiVersion>
         <jacksonVersion>2.12.1</jacksonVersion>

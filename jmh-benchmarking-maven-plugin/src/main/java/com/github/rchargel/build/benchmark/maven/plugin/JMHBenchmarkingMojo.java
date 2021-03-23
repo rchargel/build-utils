@@ -32,8 +32,8 @@ public class JMHBenchmarkingMojo extends AbstractMavenMojo {
     @Parameter(name = "baselineRun", required = false)
     private String baselineRun;
 
-    @Parameter(name = "minPValue", defaultValue = "0.05")
-    private double minPValue;
+    @Parameter(name = "maxAbsZScore", defaultValue = "1.5")
+    private double maxAbsZScore;
 
     @Parameter(name = "ignoreHardwareChanges", defaultValue = "false")
     private boolean ignoreHardwareChanges;
@@ -54,7 +54,7 @@ public class JMHBenchmarkingMojo extends AbstractMavenMojo {
         final File file = new File(outputDirectory, JMHConstants.JSON_FILE_NAME);
         cleanFile(file);
         try (final OutputStream outputStream = new FileOutputStream(file)) {
-            results = compareToBaseline(new BenchmarkExecutor().executeBenchmarks(minPValue, numberOfTestRepetitions));
+            results = compareToBaseline(new BenchmarkExecutor().executeBenchmarks(maxAbsZScore, numberOfTestRepetitions));
             getLog().info("Writing JSON to " + file.getAbsolutePath());
             objectMapper().writerWithDefaultPrettyPrinter().writeValue(outputStream, results);
         } catch (final Exception e) {
@@ -76,7 +76,7 @@ public class JMHBenchmarkingMojo extends AbstractMavenMojo {
             throw new MojoExecutionException(e.getMessage(), e);
         }
 
-        if (failBuildOnErrors && !results.getPassesPValueTest()) {
+        if (failBuildOnErrors && results.getFailsMaxAbsZScore()) {
             throw new MojoFailureException("Some evaluations did not meet the minimum p-value requirement");
         }
     }

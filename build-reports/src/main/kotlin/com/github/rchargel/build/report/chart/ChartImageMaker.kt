@@ -68,7 +68,7 @@ class RawDataLineChartImageMaker(xAxis: String, units: String, private val maxCo
     private var rangeSet: Boolean = false
 
     override fun addDataset(datasetName: String, color: Color, plotId: Int, xyPlot: XYPlot, data: Any) = when (data) {
-        is DoubleArray -> addDataset(datasetName, color, plotId, xyPlot, data as DoubleArray)
+        is DoubleArray -> addDataset(datasetName, color, plotId, xyPlot, data)
         is List<*> -> addDataset(datasetName, color, plotId, xyPlot, data.filterIsInstance(Number::class.java).map { it.toDouble() }.toDoubleArray())
         else -> throw IllegalArgumentException("Unable to create raw data chart for type ${data.javaClass}")
     }

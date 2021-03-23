@@ -11,21 +11,22 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.infra.Blackhole;
 
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @BenchmarkMode({Mode.Throughput})
-@Warmup(iterations = 5, time = 500, timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(iterations = 10, time = 1000, timeUnit = TimeUnit.MILLISECONDS)
+@Warmup(iterations = 10, time = 100, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 50, time = 100, timeUnit = TimeUnit.MILLISECONDS)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 public class ExampleBenchmark {
 
     @Benchmark
-    public double benchmarkDistance(final Data data) {
+    public void benchmarkDistance(final Data data, final Blackhole bh) {
         final double dx = Math.abs(data.x2 - data.x1);
         final double dy = Math.abs(data.y2 - data.y1);
-        return Math.sqrt((dx * dx) + (dy * dy));
+        bh.consume(Math.sqrt((dx * dx) + (dy * dy)));
     }
 
     @State(Scope.Thread)

@@ -21,12 +21,12 @@
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-core</artifactId>
-            <version>1.23</version>
+            <version>1.28</version>
         </dependency>
         <dependency>
             <groupId>org.openjdk.jmh</groupId>
             <artifactId>jmh-generator-annprocess</artifactId>
-            <version>1.23</version>
+            <version>1.28</version>
         </dependency>
         <dependency>
             <groupId>org.mindrot</groupId>
@@ -54,7 +54,6 @@
                     <configuration>
                         <inputEncoding>UTF-8</inputEncoding>
                         <outputEncoding>UTF-8</outputEncoding>
-                        <locales>es</locales>
                     </configuration>
                 </plugin>
             </plugins>
@@ -65,10 +64,12 @@
                 <artifactId>@project.artifactId@</artifactId>
                 <version>@project.version@</version>
                 <configuration>
-                    <numberOfTestRepetitions>15</numberOfTestRepetitions>
-<!--                    <minPValue>0.01</minPValue>-->
-<!--                    <baselineRun>${project.basedir}/src/main/resources/baseline-results.json</baselineRun>-->
-<!--                    <ignoreHardwareChanges>true</ignoreHardwareChanges>-->
+                    <numberOfTestRepetitions>5</numberOfTestRepetitions>
+                    <maxAbsZScore>1.2</maxAbsZScore>
+                    <baselineRun>${project.basedir}/src/main/resources/baseline-results.json</baselineRun>
+                    <failBuildOnErrors>false</failBuildOnErrors>
+                    <ignoreHardwareChanges>true</ignoreHardwareChanges>
+                    <userLanguage>pt</userLanguage>
                 </configuration>
                 <executions>
                     <execution>

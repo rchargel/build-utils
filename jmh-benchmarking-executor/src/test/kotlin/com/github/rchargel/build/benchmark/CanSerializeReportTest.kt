@@ -19,7 +19,7 @@ class CanSerializeReportTest {
 
     @Test
     fun canSerializeReport() {
-        val result = BenchmarkExecutor().executeBenchmarks(0.2, 1,
+        val result = BenchmarkExecutor().executeBenchmarks(2.0, 1,
                 listOf(SimpleBenchmark::class.java).stream() as Stream<Class<*>>)
 
         val file = temporaryFolder.newFile()

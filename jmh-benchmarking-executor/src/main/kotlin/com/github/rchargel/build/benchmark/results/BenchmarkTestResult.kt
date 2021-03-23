@@ -4,12 +4,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.github.rchargel.build.common.DistributionStatistics
 import org.apache.commons.lang3.StringUtils
 import org.apache.commons.lang3.StringUtils.EMPTY
-import org.apache.commons.math3.stat.inference.KolmogorovSmirnovTest
 import org.openjdk.jmh.results.RunResult
 import org.openjdk.jmh.util.ListStatistics
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors.toMap
-import kotlin.collections.HashMap
 import kotlin.math.abs
 
 data class BenchmarkTestResult(
@@ -33,7 +31,6 @@ data class BenchmarkTestResult(
         val firstQuarter: Double = 0.0,
         val thirdQuarter: Double = 0.0,
         val rawMeasurements: List<List<Double>> = emptyList(),
-        val pvalue: Double? = null,
         val baselineDistributionStatistics: DistributionStatistics? = null,
         val baselineMedian: Double? = null,
         val baselineMean: Double? = null,
@@ -84,13 +81,29 @@ data class BenchmarkTestResult(
         get() = baselineAggregatedMeasurements?.filter { it in baselineOutlierMinimum..baselineOutlierMaximum }
 
     @get:JsonIgnore
+    val zScore: Double?
+        get() = if (baselineMean != null && baselineDistributionStatistics != null)
+            (mean - baselineMean) / baselineDistributionStatistics.standardDeviation
+        else null
+
+    @get:JsonIgnore
     val hasBaselineComparison: Boolean
         get() = baselineMeasurements?.isEmpty() == false
 
-    fun merge(other: BenchmarkTestResult): BenchmarkTestResult {
-        val rawData = rawMeasurements.toMutableList()
-        rawData.addAll(other.rawMeasurements)
+    fun shortString() = mapOf(
+            "min" to min,
+            "out-min" to outlierMinimum,
+            "1qtr" to firstQuarter,
+            "media" to median,
+            "3qtr" to thirdQuarter,
+            "out-max" to outlierMaximum,
+            "max" to max
+    ).toString()
 
+    fun failsZScore(maxAbsoluteZScore: Double) = if (zScore != null) abs(zScore ?: 0.0) > maxAbsoluteZScore else false
+
+    fun merge(other: BenchmarkTestResult): BenchmarkTestResult {
+        val rawData = this.rawMeasurements + other.rawMeasurements
         val stats = ListStatistics(rawData.flatten().toDoubleArray())
         return builder("$packageName.$className.$methodName")
                 .packageName(packageName)
@@ -117,36 +130,34 @@ data class BenchmarkTestResult(
 
     fun compareWithBaseline(baseline: BenchmarkTestResult?) = if (baseline == null || baseline.key == key)
         BenchmarkTestResult(
-                packageName,
-                className,
-                methodName,
-                mode,
-                numberOfTestThreads,
-                numberOfTestRepetitions,
-                numberOfWarmupIterations,
-                numberOfMeasurementIterations,
-                measurementTimeInMilliseconds,
-                warmupTimeInMilliseconds,
-                scoreUnits,
-                distributionStatistics,
-                median,
-                mean,
-                min,
-                max,
-                firstQuarter,
-                thirdQuarter,
-                meanErrorAt999,
-                rawMeasurements,
-                if (baseline?.rawMeasurements?.isEmpty() == false) KolmogorovSmirnovTest()
-                        .kolmogorovSmirnovTest(stripOutliers.toDoubleArray(), baseline?.stripOutliers?.toDoubleArray()) else Double.NaN,
-                baseline?.distributionStatistics ?: DistributionStatistics(),
-                baseline?.median ?: Double.NaN,
-                baseline?.mean ?: Double.NaN,
-                baseline?.min,
-                baseline?.max,
-                baseline?.firstQuarter,
-                baseline?.thirdQuarter,
-                baseline?.rawMeasurements.orEmpty()
+                packageName = packageName,
+                className = className,
+                methodName = methodName,
+                mode = mode,
+                numberOfTestThreads = numberOfTestThreads,
+                numberOfTestRepetitions = numberOfTestRepetitions,
+                numberOfWarmupIterations = numberOfWarmupIterations,
+                numberOfMeasurementIterations = numberOfMeasurementIterations,
+                measurementTimeInMilliseconds = measurementTimeInMilliseconds,
+                warmupTimeInMilliseconds = warmupTimeInMilliseconds,
+                scoreUnits = scoreUnits,
+                distributionStatistics = distributionStatistics,
+                median = median,
+                mean = mean,
+                min = min,
+                max = max,
+                firstQuarter = firstQuarter,
+                thirdQuarter = thirdQuarter,
+                meanErrorAt999 = meanErrorAt999,
+                rawMeasurements = rawMeasurements,
+                baselineDistributionStatistics = baseline?.distributionStatistics ?: DistributionStatistics(),
+                baselineMedian = baseline?.median ?: Double.NaN,
+                baselineMean = baseline?.mean ?: Double.NaN,
+                baselineMin = baseline?.min,
+                baselineMax = baseline?.max,
+                baselineFirstQuarter = baseline?.firstQuarter,
+                baselineThirdQuarter = baseline?.thirdQuarter,
+                baselineMeasurements = baseline?.rawMeasurements.orEmpty()
         )
     else throw RuntimeException("Measurements don't belong to same test: $key != ${baseline.key}")
 

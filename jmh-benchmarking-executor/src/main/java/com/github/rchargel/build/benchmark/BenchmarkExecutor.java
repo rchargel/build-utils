@@ -2,7 +2,6 @@ package com.github.rchargel.build.benchmark;
 
 import com.github.rchargel.build.benchmark.results.BenchmarkResults;
 import com.github.rchargel.build.benchmark.results.BenchmarkTestResult;
-import com.github.rchargel.build.common.RuntimeUtils;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
@@ -65,7 +64,7 @@ public class BenchmarkExecutor {
         return resultMap;
     }
 
-    BenchmarkResults executeBenchmarks(final double minAllowedPValue, final int numberOfTestRepetitions, final Stream<Class<?>> classesToTest) throws RunnerException {
+    BenchmarkResults executeBenchmarks(final double maxAbsZScore, final int numberOfTestRepetitions, final Stream<Class<?>> classesToTest) throws RunnerException {
         final Map<String, BenchmarkTestResult> testResultMap = recheck(() -> classesToTest
                 .map(this::createOptions)
                 .map(this::createRunner)
@@ -76,12 +75,12 @@ public class BenchmarkExecutor {
         if (testResultMap == null || testResultMap.isEmpty())
             throw new RunnerException("No test results were produced");
 
-        return BenchmarkResults.buildFromResults(testResultMap.values(), minAllowedPValue);
+        return BenchmarkResults.buildFromResults(testResultMap.values(), maxAbsZScore);
     }
 
-    public BenchmarkResults executeBenchmarks(final double minAllowedPValue, final int numberOfTestRepetitions) throws RunnerException {
+    public BenchmarkResults executeBenchmarks(final double maxAbsZScore, final int numberOfTestRepetitions) throws RunnerException {
         final Stream<Class<?>> annotatedClasses = findClassesContainingAnnotation(Benchmark.class);
-        return executeBenchmarks(minAllowedPValue, numberOfTestRepetitions, annotatedClasses);
+        return executeBenchmarks(maxAbsZScore, numberOfTestRepetitions, annotatedClasses);
     }
 
     private Collection<RunResult> executeRunner(final Runner runner) throws RunnerException {
@@ -94,7 +93,7 @@ public class BenchmarkExecutor {
                 .warmupForks(getWarmupForks(benchmarkClass))
                 .threads(getThreads(benchmarkClass))
                 .include(benchmarkClass.getCanonicalName())
-                .jvmArgs("-server", "-disablesystemassertions")
+                .jvmArgs("-server", "-disablesystemassertions", "-XX:-TieredCompilation")
                 .build();
     }
 
