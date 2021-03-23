@@ -63,6 +63,7 @@
                 <artifactId>maven-invoker-plugin</artifactId>
                 <configuration>
                     <showErrors>true</showErrors>
+                    <streamLogsOnFailures>true</streamLogsOnFailures>
                 </configuration>
             </plugin>
         </plugins>
