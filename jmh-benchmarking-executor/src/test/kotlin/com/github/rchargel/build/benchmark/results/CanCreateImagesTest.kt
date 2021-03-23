@@ -17,7 +17,11 @@ class CanCreateImagesTest {
                 .toImageBuilder(300, 200).build()
 
         assert("image/gif" == image.contentType)
-        assert(image.dataURL.startsWith("data:image/gif;base64,R0lGODlhLAHIAPcAAEBAQEFBQUJCQkNDQ0REREZGRkhISEpKSkx"))
+        val imagePrefix = "data:image/gif;base64,R0lGODlhLAHIAPcAAEBAQEFBQUJCQkNDQ0REREZGRkhISEpKSkx"
+        val dataURL = image.dataURL
+        assert(dataURL.startsWith(imagePrefix)) {
+            "Should have started with $imagePrefix, but was ${dataURL.substring(0, imagePrefix.length)}"
+        }
     }
 
     @Test
@@ -27,7 +31,11 @@ class CanCreateImagesTest {
                 .toImageBuilder(300, 200).build()
 
         assert("image/gif" == image.contentType)
-        assert(image.dataURL.startsWith("data:image/gif;base64,R0lGODlhLAHIAPcAAEBAQEFBQUJCQkREREZGRkhISEp"))
+        val imagePrefix = "data:image/gif;base64,R0lGODlhLAHIAPcAAEBAQEFBQUJCQkREREZGRkhISEp"
+        val dataURL = image.dataURL
+        assert(dataURL.startsWith(imagePrefix)) {
+            "Should have started with $imagePrefix, but was ${dataURL.substring(0, imagePrefix.length)}"
+        }
     }
 
     @Test
@@ -47,6 +55,10 @@ class CanCreateImagesTest {
                 .addDataset("Results", Color.blue, 1, result)
                 .toImageBuilder(300, 200).build()
         assert("image/gif" == image.contentType)
-        assert(image.dataURL.startsWith("data:image/gif;base64,R0lGODlhLAHIAPcAAAAAAAICAgQEBAYGBgg"))
+        val imagePrefix = "data:image/gif;base64,R0lGODlhLAHIAPcAAAAAAAICAgQEBAYGBgg"
+        val dataURL = image.dataURL
+        assert(dataURL.startsWith(imagePrefix)) {
+            "Should have started with $imagePrefix, but was ${dataURL.substring(0, imagePrefix.length)}"
+        }
     }
 }
