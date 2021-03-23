@@ -57,15 +57,16 @@ private class CompressionErrorReporter(private val warnConsumer: (str: String) -
     }
 
     override fun runtimeError(message: String?, sourceName: String?, line: Int, lineSource: String?, lineOffset: Int): EvaluatorException {
-        val message = toMessage(message.orEmpty(), sourceName.orEmpty(), line, lineSource.orEmpty(), lineOffset)
-        errorConsumer.invoke(message)
-        return EvaluatorException(message)
+        val errorMessage = toMessage(message.orEmpty(), sourceName.orEmpty(), line, lineSource.orEmpty(), lineOffset)
+        errorConsumer.invoke(errorMessage)
+        return EvaluatorException(errorMessage)
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun toMessage(message: String, sourceName: String, line: Int, lineSource: String, lineOffset: Int) = if (line < 0) {
-        "${sourceName}: ${message}"
+        "$sourceName: $message"
     } else {
-        "${sourceName}[${line}:${lineOffset}]: ${message}"
+        "$sourceName[$line:$lineOffset]: $message"
     }
 }
 

@@ -14,6 +14,9 @@ def writeContent = { element, level ->
         case com.github.rchargel.build.report.Table:
             writeTable(element, level)
             break
+        case com.github.rchargel.build.report.Division:
+            writeDivision(element, level)
+            break
         case com.github.rchargel.build.report.Section:
             writeSection(element, level+1)
             break
@@ -30,6 +33,7 @@ def writeTableValue = { element, level ->
             case com.github.rchargel.build.report.Image:
             case com.github.rchargel.build.report.Text:
             case com.github.rchargel.build.report.Table:
+            case com.github.rchargel.build.report.Division:
                 writeContent(element, level)
                 break
             default:
@@ -68,6 +72,17 @@ writeTable = { reportTable, level ->
         }
         if (reportTable.caption) {
             caption(reportTable.caption)
+        }
+    }
+}
+writeDivision = { division, level ->
+    if (division) {
+        div {
+            division.content?.each { element ->
+                if (element != null) {
+                    writeContent(element, level)
+                }
+            }
         }
     }
 }

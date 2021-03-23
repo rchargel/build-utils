@@ -25,9 +25,7 @@ class BenchmarkTestResultTest {
                 .meanErrorAt999(0.5)
                 .addParam("first", "1")
                 .addParam("second", "2")
-                .addRawMeasurement(0.5)
-                .addRawMeasurement(10.1)
-                .addRawMeasurement(100.2)
+                .addRawMeasurement(listOf(0.5, 10.1, 100.2))
                 .build()
                 .merge(BenchmarkTestResult.builder("com.fake.package.MyTest.internalMethod")
                         .mode("Average")
@@ -38,8 +36,7 @@ class BenchmarkTestResultTest {
                         .numberOfMeasurementIterations(10)
                         .medianMeasurement(10.1)
                         .meanErrorAt999(0.5)
-                        .addRawMeasurement(0.4)
-                        .addRawMeasurement(9.0)
+                        .addRawMeasurement(listOf(0.4, 9.0))
                         .build())
     }
 

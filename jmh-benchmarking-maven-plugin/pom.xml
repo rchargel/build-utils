@@ -61,6 +61,9 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-invoker-plugin</artifactId>
+                <configuration>
+                    <showErrors>true</showErrors>
+                </configuration>
             </plugin>
         </plugins>
     </build>

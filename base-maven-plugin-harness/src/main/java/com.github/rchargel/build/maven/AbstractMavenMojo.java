@@ -104,7 +104,7 @@ public abstract class AbstractMavenMojo extends AbstractMojo {
 
     protected Messages getMessages(final Locale locale) {
         if (messages == null)
-            messages = new Messages(ResourceBundle.getBundle(getBundleName(), locale));
+            messages = Messages.loadMessages(getBundleName(), locale);
 
         return messages;
     }

@@ -17,7 +17,6 @@ class ReportSiteGenerator(private val sink: Sink) {
         sink.body()
         if (report.includeTOC) {
             sink.section1()
-            val attrs = SinkEventAttributeSet()
             sink.unknown(DIV, arrayOf(HtmlMarkup.TAG_TYPE_START), attrs(CLASS, "hideFromPrint"))
             sink.sectionTitle1()
             sink.text(report.tableOfContentsTitle)
@@ -36,8 +35,8 @@ class ReportSiteGenerator(private val sink: Sink) {
         if (content != null) {
             when (content) {
                 is Section -> renderSection(content, level)
-                is Image -> renderImage(content, level)
-                is Text -> renderText(content, level)
+                is Image -> renderImage(content)
+                is Text -> renderText(content)
                 is Table -> renderTable(content, level)
                 else -> sink.rawText(content.toString())
             }
@@ -95,14 +94,14 @@ class ReportSiteGenerator(private val sink: Sink) {
         }
     }
 
-    private fun renderImage(content: Image, level: Int) {
+    private fun renderImage(content: Image) {
         if (content.thumbnail)
             sink.figureGraphics(content.dataURL, attrs(arrayOf(CLASS, "thumbnail", TITLE, content.title.orEmpty())))
         else
             sink.figureGraphics(content.dataURL, attrs(TITLE, content.title.orEmpty()))
     }
 
-    private fun renderText(content: Text, level: Int) {
+    private fun renderText(content: Text) {
         boldText(content.title)
         sink.paragraph()
         sink.rawText(content.content)

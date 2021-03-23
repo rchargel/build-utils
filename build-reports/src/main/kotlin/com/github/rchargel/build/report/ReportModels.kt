@@ -66,6 +66,33 @@ data class Section(
 }
 
 /**
+ * An HTML div.
+ *
+ * @property content The content within the div
+ *
+ * @constructor Creates a new instance of [Division]
+ */
+data class Division(
+        val content: List<ReportContent>
+) : ReportContent {
+    /**
+     * Builder for the [Division] object
+     */
+    class Builder internal constructor(
+            private var content: ArrayList<ReportContent> = ArrayList()
+    ) {
+        fun appendContent(content: ReportContent) = apply { this.content.add(content) }
+
+        fun build() = Division(this.content.toList())
+    }
+
+    companion object {
+        @JvmStatic
+        fun builder() = Builder()
+    }
+}
+
+/**
  * An HTML paragraph, with an optional "bold" paragraph title.
  *
  * @property content The paragraph content

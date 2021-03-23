@@ -15,11 +15,47 @@ data class BenchmarkResults(
         val totalMemoryInBytes: Long? = null,
         val swapTotalInBytes: Long? = null,
         val memoryPageSizeInBytes: Long? = null,
-        val memoryBanks: List<MemoryBank> = emptyList()
+        val memoryBanks: List<MemoryBank> = emptyList(),
+        val maxAbsoluteZScore: Double = 1.5
 ) {
     @get:JsonIgnore
     val size: Long
         get() = results?.size?.toLong() ?: 0
+
+    @get:JsonIgnore
+    val hasZScore: Boolean
+        get() = results?.mapNotNull { it.zScore }?.count()?.or(0) != 0
+
+    @get:JsonIgnore
+    val failsMaxAbsZScore: Boolean
+        get() = (results?.filter { it.failsZScore(maxAbsoluteZScore) }?.count() ?: 0) > 0
+
+    fun compareToBaseline(baseline: BenchmarkResults, validateSystemSpec: Boolean): BenchmarkResults {
+        if (!validateSystemSpec &&
+                (architecture != baseline.architecture ||
+                        cpuSpeedInHertz != baseline.cpuSpeedInHertz ||
+                        logicalProcessors != baseline.logicalProcessors ||
+                        totalMemoryInBytes != baseline.totalMemoryInBytes ||
+                        swapTotalInBytes != baseline.swapTotalInBytes)) {
+            throw RuntimeException("System specifications have deviated from baseline")
+        }
+        val baselineMap = baseline.results?.map { it.key to it }?.toMap().orEmpty().toMutableMap()
+        return BenchmarkResults(
+                results?.map { it.compareWithBaseline(baselineMap.remove(it.key)) }.orEmpty(),
+                systemModel,
+                operatingSystem,
+                cpu,
+                cpuSpeedInHertz,
+                architecture,
+                physicalProcessors,
+                logicalProcessors,
+                totalMemoryInBytes,
+                swapTotalInBytes,
+                memoryPageSizeInBytes,
+                memoryBanks,
+                maxAbsoluteZScore
+        )
+    }
 
     companion object {
         private fun architecture(is64: Boolean?): String? {
@@ -29,28 +65,29 @@ data class BenchmarkResults(
         }
 
         @JvmStatic
-        fun buildFromResults(results: Collection<BenchmarkTestResult>): BenchmarkResults {
+        fun buildFromResults(results: Collection<BenchmarkTestResult>, maxAbsoluteZScore: Double): BenchmarkResults {
             val sysInfo = SystemInfo()
             return BenchmarkResults(
                     results.toList(),
-                    sysInfo?.hardware?.computerSystem?.model,
-                    sysInfo?.operatingSystem?.toString(),
-                    sysInfo?.hardware?.processor?.processorIdentifier?.name,
-                    sysInfo?.hardware?.processor?.maxFreq,
-                    architecture(sysInfo?.hardware?.processor?.processorIdentifier?.isCpu64bit),
-                    sysInfo?.hardware?.processor?.physicalProcessorCount,
-                    sysInfo?.hardware?.processor?.logicalProcessorCount,
-                    sysInfo?.hardware?.memory?.total,
-                    sysInfo?.hardware?.memory?.virtualMemory?.swapTotal,
-                    sysInfo?.hardware?.memory?.pageSize,
-                    sysInfo?.hardware?.memory?.physicalMemory?.map {
+                    sysInfo.hardware?.computerSystem?.model,
+                    sysInfo.operatingSystem?.toString(),
+                    sysInfo.hardware?.processor?.processorIdentifier?.name,
+                    sysInfo.hardware?.processor?.maxFreq,
+                    architecture(sysInfo.hardware?.processor?.processorIdentifier?.isCpu64bit),
+                    sysInfo.hardware?.processor?.physicalProcessorCount,
+                    sysInfo.hardware?.processor?.logicalProcessorCount,
+                    sysInfo.hardware?.memory?.total,
+                    sysInfo.hardware?.memory?.virtualMemory?.swapTotal,
+                    sysInfo.hardware?.memory?.pageSize,
+                    sysInfo.hardware?.memory?.physicalMemory?.map {
                         MemoryBank(
                                 it.memoryType,
                                 it.bankLabel,
                                 it.capacity,
                                 it.clockSpeed
                         )
-                    }.orEmpty()
+                    }.orEmpty(),
+                    maxAbsoluteZScore
             )
         }
     }

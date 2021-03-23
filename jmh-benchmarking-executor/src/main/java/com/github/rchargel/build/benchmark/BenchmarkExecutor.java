@@ -4,6 +4,8 @@ import com.github.rchargel.build.benchmark.results.BenchmarkResults;
 import com.github.rchargel.build.benchmark.results.BenchmarkTestResult;
 
 import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Threads;
 import org.openjdk.jmh.results.RunResult;
 import org.openjdk.jmh.runner.BenchmarkList;
 import org.openjdk.jmh.runner.CompilerHints;
@@ -18,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.github.rchargel.build.common.ClasspathUtil.findClassesContainingAnnotation;
@@ -61,16 +64,23 @@ public class BenchmarkExecutor {
         return resultMap;
     }
 
-    public BenchmarkResults executeBenchmarks() throws RunnerException {
-        final Collection<BenchmarkTestResult> results = recheck(() -> findClassesContainingAnnotation(Benchmark.class)
+    BenchmarkResults executeBenchmarks(final double maxAbsZScore, final int numberOfTestRepetitions, final Stream<Class<?>> classesToTest) throws RunnerException {
+        final Map<String, BenchmarkTestResult> testResultMap = recheck(() -> classesToTest
                 .map(this::createOptions)
                 .map(this::createRunner)
-                .map(r -> uncheck(() -> executeRunner(r)))
+                .flatMap(r -> IntStream.range(0, numberOfTestRepetitions).mapToObj(i -> uncheck(() -> executeRunner(r))))
                 .flatMap(r -> r.stream().map(BenchmarkTestResult::fromRunResult))
-                .reduce(null, BenchmarkExecutor::addResultToSet, BenchmarkExecutor::merge)
-                .values(), RunnerException.class);
+                .reduce(null, BenchmarkExecutor::addResultToSet, BenchmarkExecutor::merge), RunnerException.class);
 
-        return BenchmarkResults.buildFromResults(results);
+        if (testResultMap == null || testResultMap.isEmpty())
+            throw new RunnerException("No test results were produced");
+
+        return BenchmarkResults.buildFromResults(testResultMap.values(), maxAbsZScore);
+    }
+
+    public BenchmarkResults executeBenchmarks(final double maxAbsZScore, final int numberOfTestRepetitions) throws RunnerException {
+        final Stream<Class<?>> annotatedClasses = findClassesContainingAnnotation(Benchmark.class);
+        return executeBenchmarks(maxAbsZScore, numberOfTestRepetitions, annotatedClasses);
     }
 
     private Collection<RunResult> executeRunner(final Runner runner) throws RunnerException {
@@ -78,7 +88,34 @@ public class BenchmarkExecutor {
     }
 
     private Options createOptions(final Class<?> benchmarkClass) {
-        return new OptionsBuilder().forks(1).include(benchmarkClass.getCanonicalName()).build();
+        return new OptionsBuilder()
+                .forks(getForks(benchmarkClass))
+                .warmupForks(getWarmupForks(benchmarkClass))
+                .threads(getThreads(benchmarkClass))
+                .include(benchmarkClass.getCanonicalName())
+                .jvmArgs("-server", "-disablesystemassertions", "-XX:-TieredCompilation")
+                .build();
+    }
+
+    private int getForks(final Class<?> benchmarkClass) {
+        final Fork fork = benchmarkClass.getAnnotation(Fork.class);
+        if (fork != null)
+            return Math.max(1, fork.value());
+        return 1;
+    }
+
+    private int getWarmupForks(final Class<?> benchmarkClass) {
+        final Fork fork = benchmarkClass.getAnnotation(Fork.class);
+        if (fork != null)
+            return Math.max(0, fork.warmups());
+        return 0;
+    }
+
+    private int getThreads(final Class<?> benchmarkClass) {
+        final Threads threads = benchmarkClass.getAnnotation(Threads.class);
+        if (threads != null)
+            return threads.value();
+        return 1;
     }
 
     private Runner createRunner(final Options opts) {

@@ -5,6 +5,7 @@ import org.jfree.chart.ChartFactory
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
+import org.jfree.chart.ui.RectangleInsets
 import org.jfree.data.Range
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
@@ -31,7 +32,7 @@ abstract class ChartImageMaker<T : ChartImageMaker<T>>(
     abstract fun addDataset(datasetName: String, color: Color, plotId: Int, data: Any): T
 
     @Throws(IOException::class)
-    fun toImageBuilder(width: Int, height: Int): Image.Builder {
+    open fun toImageBuilder(width: Int, height: Int): Image.Builder {
         val image = chart.createBufferedImage(width, height)
         val out = ByteArrayOutputStream()
         out.use {
@@ -50,9 +51,11 @@ abstract class XYChartImageMaker<T : XYChartImageMaker<T>>(xAxis: String, yAxis:
 
     init {
         xyPlot.backgroundPaint = Color.white
+        xyPlot.rangeGridlinePaint = Color.lightGray
         xyPlot.isDomainGridlinesVisible = false
-        xyPlot.isRangeGridlinesVisible = false
-        xyPlot.isOutlineVisible = false
+        xyPlot.isRangeGridlinesVisible = true
+        xyPlot.isOutlineVisible = true
+        xyPlot.axisOffset = RectangleInsets(0.0, 0.0, 0.0, 0.0)
     }
 
     override fun addDataset(datasetName: String, color: Color, plotId: Int, data: Any): T =
@@ -65,7 +68,7 @@ class RawDataLineChartImageMaker(xAxis: String, units: String, private val maxCo
     private var rangeSet: Boolean = false
 
     override fun addDataset(datasetName: String, color: Color, plotId: Int, xyPlot: XYPlot, data: Any) = when (data) {
-        is DoubleArray -> addDataset(datasetName, color, plotId, xyPlot, data as DoubleArray)
+        is DoubleArray -> addDataset(datasetName, color, plotId, xyPlot, data)
         is List<*> -> addDataset(datasetName, color, plotId, xyPlot, data.filterIsInstance(Number::class.java).map { it.toDouble() }.toDoubleArray())
         else -> throw IllegalArgumentException("Unable to create raw data chart for type ${data.javaClass}")
     }
@@ -76,7 +79,7 @@ class RawDataLineChartImageMaker(xAxis: String, units: String, private val maxCo
         val step = maxCount / length.toDouble()
 
         IntRange(0, length - 1).forEach { i ->
-            series.add(i * step, data[i])
+            series.add(i * step + 1, data[i])
         }
 
         val collection = XYSeriesCollection()
@@ -85,6 +88,7 @@ class RawDataLineChartImageMaker(xAxis: String, units: String, private val maxCo
         val range = xyPlot.rangeAxis.range
         val minY = if (rangeSet) min(range.lowerBound, series.minY) else series.minY
         val maxY = if (rangeSet) max(range.upperBound, series.maxY) else series.maxY
+        rangeSet = true
 
         val tenPercentOfDiff = abs(maxY - minY) * 0.1
         xyPlot.rangeAxis.range = Range(minY - tenPercentOfDiff, maxY + tenPercentOfDiff)
