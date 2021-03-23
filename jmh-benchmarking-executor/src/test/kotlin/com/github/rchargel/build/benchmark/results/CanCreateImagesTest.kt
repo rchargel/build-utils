@@ -20,7 +20,7 @@ class CanCreateImagesTest {
         val imagePrefix = "data:image/gif;base64,R0lGODlhLAHIAPcAAEBAQEFBQUJCQkNDQ0REREZGRkhISEpKSkx"
         val dataURL = image.dataURL
         assert(dataURL.startsWith(imagePrefix)) {
-            "Should have started with $imagePrefix, but was ${dataURL.substring(0, imagePrefix.length)}"
+            "Should have started with $imagePrefix, but was $dataURL"
         }
     }
 
@@ -34,7 +34,7 @@ class CanCreateImagesTest {
         val imagePrefix = "data:image/gif;base64,R0lGODlhLAHIAPcAAEBAQEFBQUJCQkREREZGRkhISEp"
         val dataURL = image.dataURL
         assert(dataURL.startsWith(imagePrefix)) {
-            "Should have started with $imagePrefix, but was ${dataURL.substring(0, imagePrefix.length)}"
+            "Should have started with $imagePrefix, but was $dataURL"
         }
     }
 
@@ -58,7 +58,7 @@ class CanCreateImagesTest {
         val imagePrefix = "data:image/gif;base64,R0lGODlhLAHIAPcAAAAAAAICAgQEBAYGBgg"
         val dataURL = image.dataURL
         assert(dataURL.startsWith(imagePrefix)) {
-            "Should have started with $imagePrefix, but was ${dataURL.substring(0, imagePrefix.length)}"
+            "Should have started with $imagePrefix, but was $dataURL"
         }
     }
 }
