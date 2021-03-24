@@ -70,7 +70,7 @@ To run your benchmark evaluations as part of your build, add the plugin into you
             <plugin>
                 <groupId>com.github.rchargel.maven</groupId>
                 <artifactId>jmh-benchmarking-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>0.9</version>
                 <executions>
                     <execution>
                         <id>run</id>
@@ -101,6 +101,8 @@ To run your benchmark evaluations as part of your build, add the plugin into you
 | ignoreHardwareChanges   | Normally it won't be valid to compare benchmark runs if the hardware profile has changed. Set to `true` to ignore those changes. Defaults to `false` (only used if `baselineRun` is provided) |
 | numberOfTestRepetitions | The number of times to repeat tests. This is in addition to setting the number of Iterations. Defaults to 1.                                                                                  |
 | failBuildOnErrors       | Only used with `baselineRun`, this will fail the build if the absolute value of the Z-Score is greater than the `maxAbsZScore` value.                                                         |
+| userLanguage            | Overrides the `user.language` system property                                                                                                                                                 |
+| userCountry             | Overrides the `user.country` system property                                                                                                                                                  |
 
 **Note**: It's worth stating that if comparing the current run to a baseline run, an increase in performance above the z-score will also
 be considered a failure. This is because the developer should be able to explain changes in performance of any system. If you are intentionally 
@@ -116,7 +118,7 @@ To include benchmark results output into the normal maven site goal, add a repor
             <plugin>
                 <groupId>com.github.rchargel.maven</groupId>
                 <artifactId>jmh-benchmarking-maven-plugin</artifactId>
-                <version>1.0.0</version>
+                <version>0.9</version>
             </plugin>
         </plugins>
     </reporting>
