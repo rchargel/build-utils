@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.rchargel.build</groupId>
     <artifactId>build-utils</artifactId>
-    <version>0.9</version>
+    <version>0.9-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Maven Build Utilities</name>
     <description>A collection of Maven Plugins and Build utilities</description>
