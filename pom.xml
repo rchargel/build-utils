@@ -45,9 +45,9 @@
         <groovyTemplatesVersion>3.0.2</groovyTemplatesVersion>
         <xmlUnitVersion>2.6.4</xmlUnitVersion>
         <doxiaVersion>1.9.1</doxiaVersion>
-        <mavenJavadocPluginVersion>2.10.4</mavenJavadocPluginVersion>
-        <mavenSourcePluginVersion>2.4</mavenSourcePluginVersion>
+        <mavenSourcePluginVersion>3.2.1</mavenSourcePluginVersion>
         <nexusStagingMavenPluginVersion>1.6.8</nexusStagingMavenPluginVersion>
+        <dokkaVersion>1.4.10.2</dokkaVersion>
     </properties>
 
     <dependencyManagement>
@@ -439,19 +439,37 @@
                             <goals>
                                 <goal>jar-no-fork</goal>
                             </goals>
+                            <configuration>
+
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
                 <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>${mavenJavadocPluginVersion}</version>
+                    <groupId>org.jetbrains.dokka</groupId>
+                    <artifactId>dokka-maven-plugin</artifactId>
+                    <version>${dokkaVersion}</version>
                     <executions>
                         <execution>
                             <id>attach-javadocs</id>
+                            <phase>package</phase>
                             <goals>
-                                <goal>jar</goal>
+                                <goal>dokka</goal>
+                                <goal>javadocJar</goal>
                             </goals>
+                            <configuration>
+                                <sourceDirectories>
+                                    <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
+                                    <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+                                </sourceDirectories>
+                                <dokkaPlugins>
+                                    <plugin>
+                                        <groupId>org.jetbrains.dokka</groupId>
+                                        <artifactId>kotlin-as-java-plugin</artifactId>
+                                        <version>${dokkaVersion}</version>
+                                    </plugin>
+                                </dokkaPlugins>
+                            </configuration>
                         </execution>
                     </executions>
                 </plugin>
@@ -507,6 +525,13 @@
             <url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
     </distributionManagement>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>jcenter</id>
+            <name>JCenter</name>
+            <url>https://jcenter.bintray.com/</url>
+        </pluginRepository>
+    </pluginRepositories>
     <licenses>
         <license>
             <name>MIT</name>
@@ -537,8 +562,8 @@
                         <artifactId>maven-source-plugin</artifactId>
                     </plugin>
                     <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <groupId>org.jetbrains.dokka</groupId>
+                        <artifactId>dokka-maven-plugin</artifactId>
                     </plugin>
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>

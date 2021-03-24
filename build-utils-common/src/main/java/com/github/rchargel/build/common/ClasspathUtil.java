@@ -53,6 +53,7 @@ public class ClasspathUtil {
      * Finds all of the classes which have either been annotated with, or have a method annotated with, the given annotation.
      *
      * @param annotation The annotation to scan for.
+     * @param <T>        Any {@link Object} type.
      * @return Returns a stream of methods.
      */
     public static <T extends Object> Stream<Class<?>> findClassesContainingAnnotation(final Class<? extends Annotation> annotation) {
@@ -71,6 +72,7 @@ public class ClasspathUtil {
      * Finds all of the classes where there is a method with the given annotation.
      *
      * @param annotation The annotation to scan for.
+     * @param <T>        Any {@link Object} type.
      * @return Returns a stream of methods.
      */
     public static <T extends Object> Stream<Class<?>> findClassesWithMethodAnnotation(final Class<? extends Annotation> annotation) {
