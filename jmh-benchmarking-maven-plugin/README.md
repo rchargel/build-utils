@@ -1,3 +1,5 @@
+![Maven-Central](https://img.shields.io/maven-central/v/com.github.rchargel.maven/jmh-benchmarking-maven-plugin.svg)
+
 # JMH Benchmarking Plugin
 
 This plugin is a maven wrapper around the 
