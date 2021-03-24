@@ -21,12 +21,12 @@ whether they are in `src/test/java` or `src/main/java`.
     <dependency>
         <groupId>org.openjdk.jmh</groupId>
         <artifactId>jmh-core</artifactId>
-        <version>1.19</version>
+        <version>1.28</version>
     </dependency>
     <dependency>
         <groupId>org.openjdk.jmh</groupId>
         <artifactId>jmh-generator-annprocess</artifactId>
-        <version>1.19</version>
+        <version>1.28</version>
     </dependency>
 
 #### Writing Evaluations
