@@ -7,4 +7,4 @@ and which I thought could be re-packaged and re-designed for open source work as
 
 Here is the current list of utilities packaged herein:
 
-* **[JMH Benchmarking Plugin](./jmh-benchmarking-plugin)** - A wrapper around the [Java Microbenchmarking Harness](http://tutorials.jenkov.com/java-performance/jmh.html)
+* **[JMH Benchmarking Maven Plugin](./jmh-benchmarking-maven-plugin)** - A wrapper around the [Java Microbenchmarking Harness](http://tutorials.jenkov.com/java-performance/jmh.html)
