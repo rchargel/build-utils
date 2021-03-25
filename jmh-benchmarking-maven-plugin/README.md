@@ -1,4 +1,4 @@
-![Maven-Central](https://img.shields.io/maven-central/v/com.github.rchargel.maven/jmh-benchmarking-maven-plugin.svg)
+[![Maven-Central](https://img.shields.io/maven-central/v/com.github.rchargel.maven/jmh-benchmarking-maven-plugin.svg)](https://search.maven.org/search?q=g%3Acom.github.rchargel.maven)
 
 # JMH Benchmarking Plugin
 
