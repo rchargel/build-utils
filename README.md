@@ -1,6 +1,6 @@
 # Build Utils
 
-![Build Utils CI](https://github.com/rchargel/build-utils/workflows/Build%20Utils%20CI/badge.svg?branch=main)
+[![Build Utils CI](https://github.com/rchargel/build-utils/workflows/Build%20Utils%20CI/badge.svg?branch=main)](https://github.com/rchargel/build-utils/actions)
 
 This project contains project build utilities which have employed on my corporate work, 
 and which I thought could be re-packaged and re-designed for open source work as well.
