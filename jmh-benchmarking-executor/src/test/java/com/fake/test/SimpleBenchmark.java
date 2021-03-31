@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit;
 @Fork(1)
 @Threads(1)
 @BenchmarkMode(Mode.Throughput)
-@Warmup(iterations = 2, time = 100, timeUnit = TimeUnit.MILLISECONDS)
-@Measurement(iterations = 5, time = 100, timeUnit = TimeUnit.MILLISECONDS)
+@Warmup(iterations = 2, time = 50, timeUnit = TimeUnit.MILLISECONDS)
+@Measurement(iterations = 5, time = 50, timeUnit = TimeUnit.MILLISECONDS)
 @OutputTimeUnit(TimeUnit.MICROSECONDS)
 public class SimpleBenchmark {
     @Benchmark

@@ -17,5 +17,10 @@ public class CanExecuteBenchmarkTest {
         assertEquals(1, benchmarkResults.getResults().size());
         assertEquals(2, benchmarkResults.getResults().iterator().next().getRawMeasurements().size());
         assertEquals(10, benchmarkResults.getResults().iterator().next().getAggregatedMeasurements().size());
+
+        final BenchmarkResults compare = benchmarkResults.compareToBaseline(benchmarkResults, true);
+
+        assertEquals(1, compare.getResults().size());
+        assertEquals(10, compare.getResults().iterator().next().getBaselineAggregatedMeasurements().size());
     }
 }

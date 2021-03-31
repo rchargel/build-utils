@@ -11,6 +11,7 @@
     <url>https://github.com/rchargel/build-utils</url>
 
     <modules>
+        <module>build-test-utils</module>
         <module>build-utils-common</module>
         <module>build-reports</module>
         <module>jmh-benchmarking-executor</module>
@@ -56,6 +57,12 @@
     <dependencyManagement>
         <dependencies>
             <!-- BASE dependencies -->
+            <dependency>
+                <groupId>com.github.rchargel.build</groupId>
+                <artifactId>build-test-utils</artifactId>
+                <version>${project.version}</version>
+                <scope>test</scope>
+            </dependency>
             <dependency>
                 <groupId>com.github.rchargel.build</groupId>
                 <artifactId>build-utils-common</artifactId>
