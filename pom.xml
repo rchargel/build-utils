@@ -17,6 +17,7 @@
         <module>jmh-benchmarking-executor</module>
         <module>base-maven-plugin-harness</module>
         <module>jmh-benchmarking-maven-plugin</module>
+        <module>api-modeling</module>
     </modules>
 
     <properties>
@@ -442,6 +443,7 @@
                                     <sourceDir>${project.basedir}/src/main/java</sourceDir>
                                     <sourceDir>${project.basedir}/src/main/kotlin</sourceDir>
                                 </sourceDirs>
+                                <jvmTarget>${javaTargetVersion}</jvmTarget>
                             </configuration>
                         </execution>
                         <execution>
