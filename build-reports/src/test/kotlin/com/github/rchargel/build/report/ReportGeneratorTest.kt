@@ -66,8 +66,6 @@ class ReportGeneratorTest {
         XMLUnit.setIgnoreComments(true)
         XMLUnit.setIgnoreAttributeOrder(true)
         XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true)
-
-        println(actual)
         XMLAssert.assertXMLEqual(expected, actual)
     }
 }
