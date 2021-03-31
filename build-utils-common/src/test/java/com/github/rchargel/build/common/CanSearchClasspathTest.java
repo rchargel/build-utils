@@ -1,23 +1,30 @@
 package com.github.rchargel.build.common;
 
+import com.github.rchargel.build.test.ClassLoaderHelper;
+
 import com.fake.classes.classes.FakeAnnotation;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
-import java.net.URL;
-import java.net.URLClassLoader;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class CanSearchClasspathTest {
     @BeforeClass
     public static void setup() {
-        final ClassLoader classLoader = URLClassLoader.newInstance(new URL[]{
-                ClasspathUtil.class.getProtectionDomain().getCodeSource().getLocation(),
-                CanSearchClasspathTest.class.getProtectionDomain().getCodeSource().getLocation()
-        }, Thread.currentThread().getContextClassLoader());
-        Thread.currentThread().setContextClassLoader(classLoader);
+        ClassLoaderHelper.addClassToClassLoader(CanSearchClasspathTest.class);
+    }
+
+    @Test
+    public void findAllClassesInPackage() {
+        final Set<Class<?>> classes = ClasspathUtil.findClassesInPackage("com.fake")
+                .collect(Collectors.toSet());
+
+        assertEquals(3, classes.size());
     }
 
     @Test

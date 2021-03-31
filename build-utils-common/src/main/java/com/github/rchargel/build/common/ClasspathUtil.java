@@ -1,10 +1,15 @@
 package com.github.rchargel.build.common;
 
+import org.jetbrains.annotations.NotNull;
 import org.reflections.Reflections;
+import org.reflections.Store;
+import org.reflections.scanners.AbstractScanner;
 import org.reflections.scanners.MethodAnnotationsScanner;
+import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
+import org.reflections.util.FilterBuilder;
 
 import java.io.File;
 import java.io.InputStreamReader;
@@ -15,7 +20,9 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,6 +38,39 @@ public class ClasspathUtil {
     public static Reader readFromClasspath(final String path) {
         requireNonNull(path);
         return new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(path));
+    }
+
+    /**
+     * Finds all classes which extend/implement the provided type.
+     *
+     * @param parentType The parent type
+     * @param <T>        The "type" of the parent class
+     * @return Returns a stream of classes
+     */
+    public static <T> Stream<Class<? extends T>> findSubTypes(final Class<T> parentType) {
+        requireNonNull(parentType);
+        return new Reflections(createConfigurationBuilder().addScanners(new SubTypesScanner())).getSubTypesOf(parentType).stream();
+    }
+
+    /**
+     * Finds all of the classes within a given package.
+     *
+     * @param basePackage The package to search in
+     * @return Returns a stream of classes
+     */
+    public static Stream<Class<?>> findClassesInPackage(final String basePackage) {
+        requireNonNull(basePackage);
+
+        return new Reflections(createConfigurationBuilder()
+                .addScanners(new CustomTypesScanner())
+                .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(basePackage))))
+                .getStore()
+                .getAll(CustomTypesScanner.class, Object.class.getCanonicalName())
+                .stream()
+                .map(s -> tryToLoadClass(s))
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(c -> (Class<?>) c);
     }
 
     /**
@@ -72,12 +112,11 @@ public class ClasspathUtil {
      * Finds all of the classes where there is a method with the given annotation.
      *
      * @param annotation The annotation to scan for.
-     * @param <T>        Any {@link Object} type.
      * @return Returns a stream of methods.
      */
-    public static <T extends Object> Stream<Class<?>> findClassesWithMethodAnnotation(final Class<? extends Annotation> annotation) {
+    public static Stream<Class<?>> findClassesWithMethodAnnotation(final Class<? extends Annotation> annotation) {
         requireNonNull(annotation);
-        return getMethodsAnnotatedInPackage(annotation).map(m -> (Class<T>) m.getDeclaringClass());
+        return getMethodsAnnotatedInPackage(annotation).map(m -> m.getDeclaringClass());
     }
 
     /**
@@ -121,13 +160,48 @@ public class ClasspathUtil {
 
         static {
             reflections = new Reflections(new ConfigurationBuilder()
-                    .setUrls(Stream.concat(ClasspathHelper.forClassLoader().stream(),
-                            ClasspathHelper.forClassLoader(ClassLoader.getSystemClassLoader(),
-                                    Thread.currentThread().getContextClassLoader()).stream())
-                            .collect(Collectors.toSet()))
+                    .setUrls(loadClassURLs())
                     .addClassLoaders(ClassLoader.getSystemClassLoader(), Thread.currentThread().getContextClassLoader())
                     .addScanners(new TypeAnnotationsScanner(), new MethodAnnotationsScanner()));
         }
 
     }
+
+    @NotNull
+    private static Set<URL> loadClassURLs() {
+        final Set<URL> urls = Stream.concat(Stream.concat(ClasspathHelper.forClassLoader().stream(),
+                ClasspathHelper.forClassLoader(ClassLoader.getSystemClassLoader(),
+                        Thread.currentThread().getContextClassLoader()).stream()),
+                Stream.of(ClasspathUtil.class.getProtectionDomain().getCodeSource().getLocation()))
+                .collect(Collectors.toSet());
+
+        urls.forEach(System.out::println);
+
+        return urls;
+    }
+
+    private static Class<?> tryToLoadClass(final String className) {
+        try {
+            return Class.forName(className);
+        } catch (final Exception e) {
+            return null;
+        }
+    }
+
+    private static ConfigurationBuilder createConfigurationBuilder() {
+        return new ConfigurationBuilder()
+                .setUrls(loadClassURLs())
+                .addClassLoaders(ClassLoader.getSystemClassLoader(), Thread.currentThread().getContextClassLoader());
+    }
+
+    private static class CustomTypesScanner extends AbstractScanner {
+
+        @Override
+        public void scan(final Object o, final Store store) {
+            final String className = getMetadataAdapter().getClassName(o);
+            if (acceptResult(className))
+                put(store, Object.class.getCanonicalName(), className);
+        }
+    }
+
 }
