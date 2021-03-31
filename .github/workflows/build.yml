@@ -30,7 +30,7 @@ jobs:
       - name: Coverage Report
         uses: codecov/codecov-action@v1.3.1
         with:
-          files: ./build-reports/target/site/jacoco/jacoco.xml,./build-utils-common/target/site/jacoco/jacoco.xml,./jmh-benchmarking-executor/target/site/jacoco/jacoco.xml,./jmh-benchmarking-maven-plugin/target/site/jacoco/jacoco.xml
+          files: ./**/target/site/jacoco/jacoco.xml
           token: ${{ secrets.coverage_token }}
 
 
