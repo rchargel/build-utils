@@ -19,7 +19,7 @@ class ReportGeneratorTest {
                     .publishDate(LocalDate.of(2020, 4, 1))
                     .includeTOC(true)
                     .tableOfContentsTitle("Table of Contents")
-                    .appendContent(Text(content = "This is my first report", title = "Title"))
+                    .appendContent(Division.builder().appendContent(Text(content = "This is my first report", title = "Title")).build())
                     .appendContent(Section.builder("Part 1")
                             .appendContent(Text("dolor sit amet", "Lorem ipsum"))
                             .appendContent(Text("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."))
@@ -58,6 +58,7 @@ class ReportGeneratorTest {
         }
 
         val expected = Thread.currentThread().contextClassLoader.getResource("expected_report.html").readText(StandardCharsets.UTF_8)
+        val actual = writer.toString()
         XMLUnit.setIgnoreWhitespace(true)
         XMLUnit.setIgnoreAttributeOrder(true)
         XMLUnit.setIgnoreComments(true)
@@ -65,6 +66,8 @@ class ReportGeneratorTest {
         XMLUnit.setIgnoreComments(true)
         XMLUnit.setIgnoreAttributeOrder(true)
         XMLUnit.setIgnoreDiffBetweenTextAndCDATA(true)
-        XMLAssert.assertXMLEqual(expected, writer.toString())
+
+        println(actual)
+        XMLAssert.assertXMLEqual(expected, actual)
     }
 }

@@ -325,7 +325,7 @@ data class Image(
 
         /** A collapsed image */
         @JvmField
-        val COLLAPSED_ICON = Image.builder()
+        val COLLAPSED_ICON = builder()
                 .contentType("image/gif")
                 .base64Data("R0lGODlhBwAHAIAAAAAAAAAAACH5BAEKAAEALAAAAAAHAAcAAAIMRI5gGLrnnmOKNRsKADs=")
                 .title("collapsed")
@@ -333,7 +333,7 @@ data class Image(
 
         /** A expanded image */
         @JvmField
-        val EXPANDED_ICON = Image.builder()
+        val EXPANDED_ICON = builder()
                 .contentType("image/gif")
                 .base64Data("R0lGODlhBwAHAIAAAAAAAAAAACH5BAEKAAEALAAAAAAHAAcAAAILhA+BGWoNGZy0zgIAOw==")
                 .title("expanded")
@@ -341,7 +341,7 @@ data class Image(
 
         /** An external link icon */
         @JvmField
-        val EXTERNAL_ICON = Image.builder()
+        val EXTERNAL_ICON = builder()
                 .base64Data("""iVBORw0KGgoAAAANSUhEUgAAAAsAAAAJCAMAAADTuiYfAAAABGdBTUEAAK/INwWK6QAAABl0RVh0
                             U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAAAMUExURXV1df///5kAAP///9HwUBsAAAAE
                             dFJOU////wBAKqn0AAAAUElEQVR42mJgBgMmJiABEEAMUDYjkAMQQAxgwMTECOQABBADA1gUBJgA
@@ -352,7 +352,7 @@ data class Image(
 
         /** An error icon */
         @JvmField
-        val ERROR_ICON = Image.builder()
+        val ERROR_ICON = builder()
                 .contentType("image/gif")
                 .base64Data("""R0lGODlhDwAPAPcAAAAAAP///40LEbIOFbEOFasOFaMNFHEJDXgKD3YKD20XG7g7QJJHSmY0NunS
                             018HDMEPGLcOFp0MFJwME5sME4IKEGkIDVsHDL4PGL0PGLkPGLcPGKsOFqYNFZgME5cME5YME5MM
@@ -377,7 +377,7 @@ data class Image(
 
         /** An info icon */
         @JvmField
-        val INFO_ICON = Image.builder()
+        val INFO_ICON = builder()
                 .contentType("image/gif")
                 .base64Data("""R0lGODlhDwAPAOYAAAAAAP////39/vn6/Pj5+9rg63KDntHZ5tXc6Nfe6dbd6AknU0ddfV15olZw
                             lk9nikxjhUpggUVZeENXdElefkZaeWWBqmiErGeDq2qFrWyHrm2Ir3CKsFhsi3SNsnaPtGR5mHeQ
@@ -395,7 +395,7 @@ data class Image(
 
         /** A success icon */
         @JvmField
-        val SUCCESS_ICON = Image.builder()
+        val SUCCESS_ICON = builder()
                 .contentType("image/gif")
                 .base64Data("""R0lGODlhDwAPAPcAAAAAAP///4SZuqa2zqe3zrzI2sfR4L/I1WN+oqGxx9/l7XeQrH+ZtKa4y5eu
                             v52zw6m9y1Nxgh0qL4KhrRolKCM4PRsnKiEzNx0sLyhDSCdBRiY+Qh4vMh0qLClGSRciIVBya5y8
@@ -420,7 +420,7 @@ data class Image(
 
         /** A warning icon */
         @JvmField
-        var WARNING_ICON = Image.builder()
+        var WARNING_ICON = builder()
                 .contentType("image/gif")
                 .base64Data("""R0lGODlhDwAPAOYAAAAAAP///7icp7qhq2JgYXdyfZOOpJiguqGov6yyxn6OsISSsmp8oKOvx2Zz
                             ioSZuqe3zrfE18TP38vU4qO0zNzj7FtNQI9LFIM/CuBrEq5UDqNODZRHDEokBvl3FfFzFO9yFOpw
@@ -445,26 +445,6 @@ data class Image(
                             AQIImQ0QQGA21ByAAAKxgQBMAgQQAxSA2AABBgAmCwCxtMIFXgAAAABJRU5ErkJggg==""")
                 .title("new window")
                 .build()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as Image
-
-        if (contentType != other.contentType) return false
-        if (title != other.title) return false
-        if (!data.contentEquals(other.data)) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = contentType.hashCode()
-        result = 31 * result + (title?.hashCode() ?: 0)
-        result = 31 * result + data.contentHashCode()
-        return result
     }
 }
 

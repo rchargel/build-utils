@@ -32,6 +32,16 @@ public class MessagesTest {
         assertEquals("Esta é a minha mensagem", portuguese.text("message.1"));
     }
 
+    @Test
+    public void testEmpty1() {
+        assertEquals("", english.text("unknown.text"));
+    }
+
+    @Test
+    public void testEmpty2() {
+        assertEquals("", english.text("unknown.text", "param", "param"));
+    }
+
     @BeforeClass
     public static void setup() {
         final ResourceBundle bundle = ResourceBundle.getBundle("testmessages");
