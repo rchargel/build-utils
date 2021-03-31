@@ -2,9 +2,9 @@ package com.github.rchargel.build.common
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import java.io.Serializable
-import java.lang.Math.pow
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 data class DistributionStatistics(
@@ -16,11 +16,12 @@ data class DistributionStatistics(
         val skewness: Double = 0.0,
         val kurtosis: Double = 0.0,
         val minimum: Double = Double.POSITIVE_INFINITY,
-        val maximum: Double = Double.NEGATIVE_INFINITY,
-        private val m2: Double = 0.0,
-        private val m3: Double = 0.0,
-        private val m4: Double = 0.0
+        val maximum: Double = Double.NEGATIVE_INFINITY
 ) : Serializable {
+    private var m2: Double = 0.0
+    private var m3: Double = 0.0
+    private var m4: Double = 0.0
+
     @get:JsonIgnore
     val standardDeviation: Double
         get() = sqrt(variance)
@@ -48,10 +49,14 @@ data class DistributionStatistics(
             val m3 = moments.m3 + deltaSquaredOverCountTimesCountMinusOne * deltaOverCount * (count - 2) - 3 * deltaOverCount * moments.m2
             val m2 = moments.m2 + deltaSquaredOverCountTimesCountMinusOne
 
-            val skewness = sqrt(count.toDouble()) * m3 / pow(m2, THREE_OVER_TWO)
+            val skewness = sqrt(count.toDouble()) * m3 / m2.pow(THREE_OVER_TWO)
             val kurtosis = count * m4 / (m2 * m2)
 
-            return DistributionStatistics(count, sum, sumOfSquares, mean, variance, skewness, kurtosis, min, max, m2, m3, m4)
+            val stats = DistributionStatistics(count, sum, sumOfSquares, mean, variance, skewness, kurtosis, min, max)
+            stats.m2 = m2
+            stats.m3 = m3
+            stats.m4 = m4
+            return stats
         }
 
         @JvmStatic
@@ -84,45 +89,16 @@ data class DistributionStatistics(
                     (count * count * count) + (6.0 * delta2 * (r1.count * r1.count * r2.m2 + r2.count * r2.count * r1.m2) /
                     (count * count) + 4.0 * delta * (r1.count * r2.m3 - r2.count * r1.m3) / count)
 
-            val skewness = sqrt(count.toDouble()) * m3 / pow(m2, THREE_OVER_TWO)
+            val skewness = sqrt(count.toDouble()) * m3 / m2.pow(THREE_OVER_TWO)
             val kurtosis = count * m4 / (m2 * m2)
 
-            return DistributionStatistics(count, sum, sumOfSquares, mean, variance, skewness, kurtosis,
-                    min(r1.minimum, r2.minimum), max(r1.maximum, r2.maximum), m2, m3, m4)
+            val stats = DistributionStatistics(count, sum, sumOfSquares, mean, variance, skewness, kurtosis,
+                    min(r1.minimum, r2.minimum), max(r1.maximum, r2.maximum))
+            stats.m2 = m2
+            stats.m3 = m3
+            stats.m4 = m4
+            return stats
         }
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as DistributionStatistics
-
-        if (count != other.count) return false
-        if (sum != other.sum) return false
-        if (sumOfSquares != other.sumOfSquares) return false
-        if (mean != other.mean) return false
-        if (variance != other.variance) return false
-        if (skewness != other.skewness) return false
-        if (kurtosis != other.kurtosis) return false
-        if (minimum != other.minimum) return false
-        if (maximum != other.maximum) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = count.hashCode()
-        result = 31 * result + sum.hashCode()
-        result = 31 * result + sumOfSquares.hashCode()
-        result = 31 * result + mean.hashCode()
-        result = 31 * result + variance.hashCode()
-        result = 31 * result + skewness.hashCode()
-        result = 31 * result + kurtosis.hashCode()
-        result = 31 * result + minimum.hashCode()
-        result = 31 * result + maximum.hashCode()
-        return result
-    }
-
 
 }
