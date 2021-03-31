@@ -10,7 +10,7 @@ import java.time.LocalDate
 class Report internal constructor(
         val body: Section,
         val publishDate: LocalDate,
-        val projectVersion: String,
+        val projectVersion: String?,
         val includeTOC: Boolean,
         val tableOfContentsTitle: String
 ) {
@@ -47,11 +47,11 @@ class Report internal constructor(
         fun includeTOC(includeTOC: Boolean) = apply { this.includeTOC = includeTOC }
         fun tableOfContentsTitle(tableOfContentsTitle: String) = apply { this.tableOfContentsTitle = tableOfContentsTitle }
         fun build() = Report(
-                sectionBuilder.build(),
-                publishDate,
-                projectVersion.orEmpty(),
-                includeTOC,
-                tableOfContentsTitle.orEmpty()
+                body = sectionBuilder.build(),
+                publishDate = publishDate,
+                projectVersion = projectVersion,
+                includeTOC = includeTOC,
+                tableOfContentsTitle = tableOfContentsTitle
         )
     }
 

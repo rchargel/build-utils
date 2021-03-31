@@ -12,9 +12,6 @@ class TextCompressor(
 ) {
     private val errorReporter = CompressionErrorReporter(warningMessageConsumer, errorMessageConsumer)
 
-    fun compressJavaScriptTo(inputStream: InputStream, outputStream: OutputStream) =
-            compressJavaScriptTo(InputStreamReader(inputStream), OutputStreamWriter(outputStream))
-
     fun compressJavaScriptTo(reader: Reader, writer: Writer) =
             JavaScriptCompressor(reader, errorReporter).compress(writer, -1, true, false, false, false)
 
@@ -29,9 +26,6 @@ class TextCompressor(
         compressJavaScriptTo(reader, writer)
         return writer.toString()
     }
-
-    fun compressCSSTo(inputStream: InputStream, outputStream: OutputStream) =
-            compressCSSTo(InputStreamReader(inputStream), OutputStreamWriter(outputStream))
 
     fun compressCSSTo(reader: Reader, writer: Writer) =
             CssCompressor(reader).compress(writer, -1)
