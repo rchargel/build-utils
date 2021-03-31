@@ -3,6 +3,7 @@ package com.github.rchargel.build.benchmark;
 import com.github.rchargel.build.benchmark.results.BenchmarkResults;
 import com.github.rchargel.build.benchmark.results.BenchmarkTestResult;
 
+import org.apache.commons.collections4.MapUtils;
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Threads;
@@ -14,17 +15,21 @@ import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static com.github.rchargel.build.common.ClasspathUtil.findClassesContainingAnnotation;
 import static com.github.rchargel.build.common.ClasspathUtil.getResourceAsFile;
+import static com.github.rchargel.build.common.ExceptionWrapper.wrap;
 
 import static net.dempsy.util.Functional.recheck;
 import static net.dempsy.util.Functional.uncheck;
@@ -36,20 +41,18 @@ public class BenchmarkExecutor {
     }
 
     private static void initCompilerHints() {
-        try {
+        wrap(RuntimeException.class, () -> {
             final String compilerHintsFile = getResourceAsFile("/META-INF/CompilerHints");
             final Field field = CompilerHints.class.getDeclaredField("defaultList");
             field.setAccessible(true);
             field.set(null, CompilerHints.fromFile(compilerHintsFile));
-        } catch (final Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        });
     }
 
     private static Map<String, BenchmarkTestResult> merge(final Map<String, BenchmarkTestResult> mapA, final Map<String, BenchmarkTestResult> mapB) {
         return Stream.of(mapA.entrySet(), mapB.entrySet())
-                .flatMap(s -> s.stream())
-                .collect(Collectors.toMap(Entry::getKey, Entry::getValue, (v1, v2) -> v1.merge(v2)));
+                .flatMap(Collection::stream)
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue, BenchmarkTestResult::merge));
     }
 
     private static Map<String, BenchmarkTestResult> addResultToSet(final Map<String, BenchmarkTestResult> map, final BenchmarkTestResult result) {
@@ -72,7 +75,7 @@ public class BenchmarkExecutor {
                 .flatMap(r -> r.stream().map(BenchmarkTestResult::fromRunResult))
                 .reduce(null, BenchmarkExecutor::addResultToSet, BenchmarkExecutor::merge), RunnerException.class);
 
-        if (testResultMap == null || testResultMap.isEmpty())
+        if (MapUtils.isEmpty(testResultMap))
             throw new RunnerException("No test results were produced");
 
         return BenchmarkResults.buildFromResults(testResultMap.values(), maxAbsZScore);
@@ -97,38 +100,33 @@ public class BenchmarkExecutor {
                 .build();
     }
 
+    private <T extends Annotation> int getAnnotationValue(final Class<?> benchmarkClass, final Class<T> type, final Function<T, Integer> transform, final int min) {
+        return Math.max(min, Optional.ofNullable(benchmarkClass.getAnnotation(type))
+                .map(transform::apply)
+                .orElse(min));
+    }
+
     private int getForks(final Class<?> benchmarkClass) {
-        final Fork fork = benchmarkClass.getAnnotation(Fork.class);
-        if (fork != null)
-            return Math.max(1, fork.value());
-        return 1;
+        return getAnnotationValue(benchmarkClass, Fork.class, Fork::value, 1);
     }
 
     private int getWarmupForks(final Class<?> benchmarkClass) {
-        final Fork fork = benchmarkClass.getAnnotation(Fork.class);
-        if (fork != null)
-            return Math.max(0, fork.warmups());
-        return 0;
+        return getAnnotationValue(benchmarkClass, Fork.class, Fork::warmups, 0);
     }
 
     private int getThreads(final Class<?> benchmarkClass) {
-        final Threads threads = benchmarkClass.getAnnotation(Threads.class);
-        if (threads != null)
-            return threads.value();
-        return 1;
+        return getAnnotationValue(benchmarkClass, Threads.class, Threads::value, 1);
     }
 
     private Runner createRunner(final Options opts) {
         final Runner runner = new Runner(opts);
-        try {
+        wrap(RuntimeException.class, () -> {
             final String benchmarkListFile = getResourceAsFile("/META-INF/BenchmarkList");
 
             final Field field = Runner.class.getDeclaredField("list");
             field.setAccessible(true);
             field.set(runner, BenchmarkList.fromFile(benchmarkListFile));
-        } catch (final Exception e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
+        });
         return runner;
     }
 }
