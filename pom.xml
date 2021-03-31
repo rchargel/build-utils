@@ -542,6 +542,12 @@
                                 <goal>prepare-agent</goal>
                             </goals>
                         </execution>
+                        <execution>
+                            <id>generate-report</id>
+                            <goals>
+                                <goal>report</goal>
+                            </goals>
+                        </execution>
                     </executions>
                 </plugin>
             </plugins>
