@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>build-utils</artifactId>
@@ -8,34 +8,20 @@
         <version>0.9.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
+    <packaging>pom</packaging>
 
-    <artifactId>build-utils-common</artifactId>
-    <description>Common build utility classes</description>
+    <artifactId>api-modeling</artifactId>
+    <description>Models the API of REST application</description>
+
+    <modules>
+        <module>api-scanner</module>
+        <module>jaxrs-api-scanner</module>
+    </modules>
 
     <dependencies>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-annotations</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.reflections</groupId>
-            <artifactId>reflections</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>net.dempsy</groupId>
-            <artifactId>dempsy-utils</artifactId>
         </dependency>
 
         <dependency>
@@ -47,8 +33,8 @@
             <groupId>com.github.rchargel.build</groupId>
             <artifactId>build-test-utils</artifactId>
             <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>
