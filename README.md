@@ -1,6 +1,7 @@
 # Build Utils
 
 [![Build Utils CI](https://github.com/rchargel/build-utils/workflows/Build%20Utils%20CI/badge.svg?branch=main)](https://github.com/rchargel/build-utils/actions)
+[![Code Coverage](https://img.shields.io/codecov/c/github/rchargel/build-utils)](https://app.codecov.io/gh/rchargel/build-utils)
 
 This project contains project build utilities which have employed on my corporate work, 
 and which I thought could be re-packaged and re-designed for open source work as well.
