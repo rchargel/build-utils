@@ -21,6 +21,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <invoker.skip>true</invoker.skip>
 
         <!-- Java Target Version -->
         <javaTargetVersion>1.8</javaTargetVersion>
@@ -48,6 +49,8 @@
         <mavenSourcePluginVersion>3.2.1</mavenSourcePluginVersion>
         <nexusStagingMavenPluginVersion>1.6.8</nexusStagingMavenPluginVersion>
         <dokkaVersion>1.4.10.2</dokkaVersion>
+        <jacocoMavenPluginVersion>0.8.6</jacocoMavenPluginVersion>
+        <buildHelperMavenPluginVersion>3.2.0</buildHelperMavenPluginVersion>
     </properties>
 
     <dependencyManagement>
@@ -76,6 +79,11 @@
             <dependency>
                 <groupId>com.github.rchargel.build</groupId>
                 <artifactId>jmh-benchmarking-executor</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.rchargel.maven</groupId>
+                <artifactId>jmh-benchmarking-maven-plugin</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
@@ -318,6 +326,25 @@
         <pluginManagement>
             <plugins>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>${buildHelperMavenPluginVersion}</version>
+                    <executions>
+                        <execution>
+                            <id>add-source</id>
+                            <phase>generate-sources</phase>
+                            <goals>
+                                <goal>add-source</goal>
+                            </goals>
+                            <configuration>
+                                <sources>
+                                    <source>${project.basedir}/src/main/kotlin</source>
+                                </sources>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
                     <version>${mavenSitePluginVersion}</version>
@@ -504,10 +531,27 @@
                         <autoReleaseAfterClose>false</autoReleaseAfterClose>
                     </configuration>
                 </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${jacocoMavenPluginVersion}</version>
+                    <executions>
+                        <execution>
+                            <id>prepare-agent</id>
+                            <goals>
+                                <goal>prepare-agent</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
             </plugins>
         </pluginManagement>
 
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -568,6 +612,23 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>cibuild</id>
+            <properties>
+                <invoker.skip>false</invoker.skip>
+            </properties>
+        </profile>
+        <profile>
+            <id>coverage</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.jacoco</groupId>
+                        <artifactId>jacoco-maven-plugin</artifactId>
                     </plugin>
                 </plugins>
             </build>
