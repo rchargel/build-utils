@@ -31,7 +31,7 @@ class BuildTester(private val underTest: Class<*>, ignoredProperties: Set<String
     private fun findMethod(builder: Any, name: String, propType: Class<*>): Method {
         return builder.javaClass.methods.filter { it.name == name }
                 .filter { it.parameterCount == 1 }
-                .firstOrNull { it.parameterTypes[0].isAssignableFrom(propType) }
+                .firstOrNull { it.parameterTypes[0].isAssignableFrom(propType) || propType.isAssignableFrom(it.parameterTypes[0]) }
                 ?: throw NoSuchMethodException("No method $name with parameter $propType")
     }
 

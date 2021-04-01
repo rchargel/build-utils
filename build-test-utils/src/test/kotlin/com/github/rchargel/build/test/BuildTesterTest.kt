@@ -99,6 +99,9 @@ class BuildTesterTest {
     @Test
     fun builderMayUseParentClass() = BuildTester(TestTen::class.java).evaluate()
 
+    @Test
+    fun builderMayUseMutableClass() = BuildTester(TestTwelve::class.java).evaluate()
+
 
     @Test
     fun builderHasWrongParameter() {
@@ -239,6 +242,20 @@ data class TestEleven internal constructor(val names: List<String>) {
         fun names(names: Set<String>) = apply { this.names = names }
 
         fun build() = TestEleven(this.names?.toList() ?: emptyList())
+    }
+}
+
+data class TestTwelve internal constructor(val names: List<String>) {
+
+    companion object {
+        @JvmStatic
+        fun builder() = Builder()
+    }
+
+    class Builder internal constructor(private var names: MutableCollection<String>? = null) {
+        fun names(names: MutableCollection<String>) = apply { this.names = names }
+
+        fun build() = TestTwelve(this.names?.toList() ?: emptyList())
     }
 }
 
