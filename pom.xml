@@ -303,6 +303,19 @@
             </dependency>
 
             <dependency>
+                <groupId>pl.pojo</groupId>
+                <artifactId>pojo-tester</artifactId>
+                <version>0.7.6</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>nl.jqno.equalsverifier</groupId>
+                <artifactId>equalsverifier</artifactId>
+                <version>3.5.5</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
                 <groupId>org.xmlunit</groupId>
                 <artifactId>xmlunit-core</artifactId>
                 <version>${xmlUnitVersion}</version>
