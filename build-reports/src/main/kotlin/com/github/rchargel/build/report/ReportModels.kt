@@ -1,5 +1,6 @@
 package com.github.rchargel.build.report
 
+import org.apache.commons.lang3.StringUtils
 import java.io.Serializable
 import java.util.*
 import kotlin.collections.ArrayList
@@ -37,6 +38,12 @@ data class Section(
             private var content: ArrayList<ReportContent> = ArrayList()
     ) {
         /**
+         * Adds a [title] to this section
+         * @return an instance of this builder
+         */
+        fun title(title: String) = apply { this.title = title }
+
+        /**
          * Adds a [subTitle] to this section
          * @return an instance of this builder
          */
@@ -49,6 +56,12 @@ data class Section(
         fun appendContent(content: ReportContent) = apply { this.content.add(content) }
 
         /**
+         * Sets the [content]
+         * @return an instance of this builder
+         */
+        fun content(content: Collection<ReportContent>) = apply { content.forEach { appendContent(it) } }
+
+        /**
          * Builds a [Section] instance
          * @return a new [Section] instance
          */
@@ -56,6 +69,10 @@ data class Section(
     }
 
     companion object {
+
+        @JvmStatic
+        fun builder() = Builder(StringUtils.EMPTY)
+
         /**
          * Uses a [title] to create a new [Builder] instance
          * @return a new instance of [Builder]
@@ -81,6 +98,8 @@ data class Division(
     class Builder internal constructor(
             private var content: ArrayList<ReportContent> = ArrayList()
     ) {
+        fun content(content: Collection<ReportContent>) = apply { content.forEach { appendContent(it) } }
+
         fun appendContent(content: ReportContent) = apply { this.content.add(content) }
 
         fun build() = Division(this.content.toList())
@@ -104,6 +123,7 @@ data class Text(
         val content: String,
         val title: String? = null
 ) : ReportContent {
+
     /**
      * Builder for the [Text] object
      */
@@ -111,6 +131,12 @@ data class Text(
             private var content: String,
             private var title: String? = null
     ) {
+        /**
+         * Adds the [content] of this text
+         * @return an instance of this builder
+         */
+        fun content(content: String) = apply { this.content = content }
+
         /**
          * Adds a [title] to the text
          * @return an instance of this builder
@@ -125,6 +151,10 @@ data class Text(
     }
 
     companion object {
+
+        @JvmStatic
+        fun builder() = Builder(StringUtils.EMPTY)
+
         /**
          * Uses the [content] to create a new [Builder] instance.
          * @return an instance of [Builder]
@@ -192,6 +222,11 @@ data class Table(
          * @return this instance of this builder
          */
         fun addRows(rows: List<Map<String, Any?>>) = apply { rows.forEach { addRow(it) } }
+
+        /**
+         * An alias for addRows
+         */
+        fun rows(rows: List<Map<String, Any?>>) = addRows(rows)
 
         /**
          * Determines the [renderHeadings] behavior
@@ -445,6 +480,28 @@ data class Image(
                             AQIImQ0QQGA21ByAAAKxgQBMAgQQAxSA2AABBgAmCwCxtMIFXgAAAABJRU5ErkJggg==""")
                 .title("new window")
                 .build()
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Image
+
+        if (contentType != other.contentType) return false
+        if (title != other.title) return false
+        if (!data.contentEquals(other.data)) return false
+        if (thumbnail != other.thumbnail) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = contentType.hashCode()
+        result = 31 * result + (title?.hashCode() ?: 0)
+        result = 31 * result + data.contentHashCode()
+        result = 31 * result + thumbnail.hashCode()
+        return result
     }
 }
 

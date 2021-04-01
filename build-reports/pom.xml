@@ -38,6 +38,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>com.github.rchargel.build</groupId>
+            <artifactId>build-test-utils</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>nl.jqno.equalsverifier</groupId>
+            <artifactId>equalsverifier</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.xmlunit</groupId>
             <artifactId>xmlunit-core</artifactId>
             <scope>test</scope>
