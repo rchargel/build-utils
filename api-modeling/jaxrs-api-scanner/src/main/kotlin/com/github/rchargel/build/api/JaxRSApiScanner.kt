@@ -1,9 +1,9 @@
-package com.github.rchargel.build.api.spring
+package com.github.rchargel.build.api
 
-import com.github.rchargel.build.api.spring.models.Api
-import com.github.rchargel.build.api.spring.models.Component
-import com.github.rchargel.build.api.spring.models.Method
-import com.github.rchargel.build.api.spring.models.Path
+import com.github.rchargel.build.api.models.Api
+import com.github.rchargel.build.api.models.Component
+import com.github.rchargel.build.api.models.Method
+import com.github.rchargel.build.api.models.Path
 import com.github.rchargel.build.common.ClasspathUtil
 import io.swagger.v3.jaxrs2.Reader
 import java.util.stream.Collectors

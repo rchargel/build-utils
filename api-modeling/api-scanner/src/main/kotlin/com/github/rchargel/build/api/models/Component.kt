@@ -1,6 +1,6 @@
-package com.github.rchargel.build.api.spring.models
+package com.github.rchargel.build.api.models
 
-data class Component(
+data class Component internal constructor(
         val name: String? = null,
         val description: String? = null,
         val paths: Set<Path> = emptySet()
@@ -17,7 +17,7 @@ data class Component(
         fun builder() = ComponentBuilder()
     }
 
-    class ComponentBuilder(
+    class ComponentBuilder internal constructor(
             private var name: String? = null,
             private var description: String? = null,
             private var paths: MutableSet<Path> = mutableSetOf()
@@ -32,4 +32,23 @@ data class Component(
                 paths = paths.toSet()
         )
     }
+}
+
+fun Set<Component>.merge(other: Collection<Component>?): Set<Component> = if (other == null) {
+    this
+} else {
+    val thisMap = this.map { it.name to it }.toMap()
+    val otherMap = other.map { it.name to it }.toMap()
+    val keys = thisMap.keys + otherMap.keys
+
+    keys.mapNotNull { key ->
+        val thisComp = thisMap[key]
+        val otherComp = otherMap[key]
+
+        when {
+            thisComp == null -> otherComp
+            otherComp == null -> thisComp
+            else -> thisComp.merge(otherComp)
+        }
+    }.toSet()
 }

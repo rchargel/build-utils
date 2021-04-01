@@ -1,4 +1,4 @@
-package com.github.rchargel.build.api.spring
+package com.github.rchargel.build.api
 
 import com.github.rchargel.build.test.ClassLoaderHelper
 import org.junit.BeforeClass
@@ -15,5 +15,10 @@ class ApiScannerTest {
     @Test
     fun shouldNotFindScanners() = assert(ApiScanner.loadScanners().isEmpty()) {
         "Should not find any scanners"
+    }
+
+    @Test
+    fun shouldNotFindAPI() = assert(null == ApiScanner.loadApi("com")) {
+        "Should not find any information"
     }
 }

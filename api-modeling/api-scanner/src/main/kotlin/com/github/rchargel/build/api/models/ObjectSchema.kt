@@ -1,4 +1,4 @@
-package com.github.rchargel.build.api.spring.models
+package com.github.rchargel.build.api.models
 
 data class ObjectSchema internal constructor(
         val name: String,
