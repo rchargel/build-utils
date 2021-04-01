@@ -1,8 +1,8 @@
 package com.github.rchargel.build.api
 
 import com.fake.jaxrs.components.TestController
-import com.github.rchargel.build.api.spring.ApiScanner
-import com.github.rchargel.build.api.spring.JaxRSApiScanner
+import com.github.rchargel.build.api.ApiScanner
+import com.github.rchargel.build.api.JaxRSApiScanner
 import com.github.rchargel.build.test.ClassLoaderHelper
 import org.junit.BeforeClass
 import org.junit.Test

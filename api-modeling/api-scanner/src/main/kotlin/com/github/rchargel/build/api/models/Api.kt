@@ -1,6 +1,6 @@
-package com.github.rchargel.build.api.spring.models
+package com.github.rchargel.build.api.models
 
-data class Api(
+data class Api internal constructor(
         val title: String? = null,
         val license: String? = null,
         val licenseUrl: String? = null,
@@ -21,6 +21,7 @@ data class Api(
                 urls = this.urls + (other?.urls ?: emptyList()),
                 version = this.version ?: other?.version,
                 description = this.description ?: other?.description,
+                components = this.components.merge(other?.components),
                 schemata = this.schemata + (other?.schemata ?: emptyMap())
         )
     }

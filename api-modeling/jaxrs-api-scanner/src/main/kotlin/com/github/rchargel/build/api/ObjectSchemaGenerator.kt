@@ -1,8 +1,8 @@
-package com.github.rchargel.build.api.spring
+package com.github.rchargel.build.api
 
-import com.github.rchargel.build.api.spring.models.ArrayType
-import com.github.rchargel.build.api.spring.models.DataType
-import com.github.rchargel.build.api.spring.models.ObjectSchema
+import com.github.rchargel.build.api.models.ArrayType
+import com.github.rchargel.build.api.models.DataType
+import com.github.rchargel.build.api.models.ObjectSchema
 import io.swagger.v3.oas.models.media.*
 
 class ObjectSchemaGenerator {

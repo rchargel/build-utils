@@ -1,4 +1,4 @@
-package com.github.rchargel.build.api.spring.models
+package com.github.rchargel.build.api.models
 
 interface DataType {
     override fun toString(): String

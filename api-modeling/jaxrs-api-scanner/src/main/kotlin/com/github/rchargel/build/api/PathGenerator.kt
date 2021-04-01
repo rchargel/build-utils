@@ -1,7 +1,7 @@
-package com.github.rchargel.build.api.spring
+package com.github.rchargel.build.api
 
-import com.github.rchargel.build.api.spring.models.Method
-import com.github.rchargel.build.api.spring.models.Path
+import com.github.rchargel.build.api.models.Method
+import com.github.rchargel.build.api.models.Path
 import io.swagger.v3.oas.models.Operation
 
 class PathGenerator {
