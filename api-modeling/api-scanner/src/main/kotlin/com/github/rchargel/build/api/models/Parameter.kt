@@ -34,11 +34,7 @@ data class Parameter internal constructor(
         fun type(type: ParameterType) = apply { this.type = type }
         fun name(name: String) = apply { this.name = name }
         fun description(description: String?) = apply { this.description = description }
-        fun required() = apply { this.required = true }
-        fun notRequired() = apply { this.required = false }
         fun required(required: Boolean) = apply { this.required = required }
-        fun deprecated() = apply { this.deprecated = true }
-        fun notDeprecated() = apply { this.deprecated = false }
         fun deprecated(deprecated: Boolean) = apply { this.deprecated = deprecated }
         fun defaultValue(defaultValue: String?) = apply { this.defaultValue = defaultValue }
         fun body(body: ObjectSchema?) = apply { this.body = body }

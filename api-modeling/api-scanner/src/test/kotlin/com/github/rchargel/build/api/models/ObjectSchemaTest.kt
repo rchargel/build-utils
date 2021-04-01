@@ -2,6 +2,7 @@ package com.github.rchargel.build.api.models
 
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
 
@@ -34,6 +35,28 @@ class ObjectSchemaTest {
     @Test
     fun testToJsonString() {
         assertEquals(expected, underTest.toJsonString())
+    }
+
+    @Test
+    fun cannotRegisterSameSchema() {
+        assertThrows(DuplicateObjectSchemaRegistrationException::class.java) {
+            ObjectSchema.builder().name("TestSchema").build()
+        }
+    }
+
+    @Test
+    fun cannotRequestUnknownSchema() {
+        assertThrows(UnknownObjectSchemaException::class.java) {
+            ObjectSchemaRegistry.getObjectSchema("FakeSchema")
+        }
+    }
+
+    @Test
+    fun canListSchemata() {
+        ObjectSchema.builder()
+                .name("NewSchema")
+                .build()
+        assert(listOf("NewSchema", "TestSchema") == ObjectSchemaRegistry.listSchemata())
     }
 
     @Before

@@ -29,6 +29,7 @@ interface DataType {
 abstract class AbstractDataType internal constructor() : DataType {
     override fun hashCode(): Int = toString().hashCode()
     override fun equals(other: Any?) = when {
+        this === other -> true
         other == null -> false
         other !is DataType -> false
         other.javaClass != this.javaClass -> false
@@ -63,5 +64,4 @@ class ObjectType internal constructor(val fields: Map<String, DataType>) : Abstr
     override fun toString() = "ObjectType[${fields.entries.joinToString(", ")}]"
     override fun toJsonStringValue(pad: Int) =
             "{${fields.entries.joinToString { "\n${"".padStart(pad)}\"${it.key}\": ${it.value.toJsonStringValue(pad + 2)}" }}\n${"".padStart(pad - 2)}}"
-//            "{\n${"".padStart(pad)}${fields.joinToString("\n${"".padStart(pad)}") { "\"${it.first}\": ${it.second.toJsonStringValue(pad + 2)}" }}\n${"".padStart((pad - 2))}}"
 }

@@ -47,6 +47,7 @@ data class Api internal constructor(
         fun version(version: String?) = apply { this.version = version }
         fun description(description: String?) = apply { this.description = description }
         fun addComponent(component: Component) = apply { this.components.add(component) }
+        fun components(components: Collection<Component>) = apply { this.components = components.toMutableSet() }
 
         fun build() = Api(
                 title = title,
