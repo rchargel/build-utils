@@ -6,7 +6,7 @@ import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 
 @RunWith(Parameterized::class)
-class ApiTest(private val a: Api, private val b: Api?, private val expected: Api) {
+class ApiMergeTest(private val a: Api, private val b: Api?, private val expected: Api) {
 
     @Test
     fun canMergeAPIs() = assert(expected == (a + b)) {

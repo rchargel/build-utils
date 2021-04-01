@@ -3,7 +3,7 @@ package com.github.rchargel.build.api.models
 data class ObjectSchema internal constructor(
         val name: String,
         val contentType: String = "application/json",
-        val fields: Collection<Pair<String, DataType>> = emptyList()
+        val fields: Set<Pair<String, DataType>> = emptySet()
 ) {
     companion object {
         @JvmStatic
@@ -46,7 +46,7 @@ object ObjectSchemaRegistry {
     fun getObjectSchema(objectSchemaName: String): ObjectSchema = internalRegistry[objectSchemaName]
             ?: throw UnknownObjectSchemaException("ObjectSchema named $objectSchemaName is not registered")
 
-    fun listSchemata(): List<String> = internalRegistry.keys.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER, { it }))
+    fun listSchemata(): List<String> = internalRegistry.keys.sortedWith(compareBy(String.CASE_INSENSITIVE_ORDER) { it })
 
     fun isSchemaRegistered(objectSchemaName: String) = internalRegistry.containsKey(objectSchemaName)
 

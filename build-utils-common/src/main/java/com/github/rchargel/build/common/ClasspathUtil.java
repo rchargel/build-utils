@@ -28,7 +28,11 @@ import java.util.stream.Stream;
 
 import static java.util.Objects.requireNonNull;
 
-public class ClasspathUtil {
+public final class ClasspathUtil {
+    private ClasspathUtil() throws InstantiationException {
+        throw new InstantiationException("This class cannot be instantiated");
+    }
+
     /**
      * Reads a file out of the classpath.
      *

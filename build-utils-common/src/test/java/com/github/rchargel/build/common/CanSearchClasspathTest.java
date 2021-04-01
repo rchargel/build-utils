@@ -3,15 +3,20 @@ package com.github.rchargel.build.common;
 import com.github.rchargel.build.test.ClassLoaderHelper;
 
 import com.fake.classes.classes.FakeAnnotation;
+import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.io.Reader;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CanSearchClasspathTest {
     @BeforeClass
@@ -58,5 +63,24 @@ public class CanSearchClasspathTest {
                 .sorted()
                 .toArray(String[]::new);
         assertArrayEquals(new String[]{"ClassWithAnnotation", "ClassWithMethodAnnotation"}, methods);
+    }
+
+    @Test
+    public void cannotInstantiateClasspathUtil() throws Exception {
+        final Constructor<?> c = ClasspathUtil.class.getDeclaredConstructor();
+        c.setAccessible(true);
+        final Exception e = Assert.assertThrows(InvocationTargetException.class, () -> c.newInstance());
+        assertEquals(InstantiationException.class, e.getCause().getClass());
+    }
+
+    @Test
+    public void findResource() throws Exception {
+        final String path = ClasspathUtil.getResourceAsFile("com/fake/classes/classes/FakeAnnotation.class");
+        assertTrue(path.endsWith("FakeAnnotation.class"));
+
+        try (final Reader reader = ClasspathUtil.readFromClasspath("com/fake/classes/classes/FakeAnnotation.class")) {
+            assertTrue(reader.read() > -1);
+        }
+
     }
 }
