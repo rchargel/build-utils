@@ -34,6 +34,22 @@ public final class ClasspathUtil {
     }
 
     /**
+     * Validates that a given fully qualified class name is in the classpath.
+     *
+     * @param className The fully qualified class name.
+     * @return Returns true if the class is available, false otherwise.
+     */
+    public static boolean classExists(final String className) {
+        requireNonNull(className);
+        try {
+            Class.forName(className);
+            return true;
+        } catch (final ClassNotFoundException e) {
+            return false;
+        }
+    }
+
+    /**
      * Reads a file out of the classpath.
      *
      * @param path The path to the file

@@ -1,6 +1,6 @@
 package com.github.rchargel.build.common
 
-import com.github.rchargel.build.common.ExceptionWrapper.ignoreException
+import com.github.rchargel.build.common.ExceptionWrapper.ignoreError
 import com.github.rchargel.build.common.ExceptionWrapper.wrap
 import org.junit.Assert.assertThrows
 import org.junit.Test
@@ -37,12 +37,12 @@ class CanWrapExceptionKotlinTest {
 
     @Test
     fun canIgnore() {
-        assert("value" == ignoreException {
+        assert("value" == ignoreError {
             assert(true) { "Will always pass" }
             "value"
         }) { "missing value" }
 
-        assert(ignoreException {
+        assert(ignoreError {
             assert(false) { "Will still pass" }
             "value"
         } == null) { "Should be null" }

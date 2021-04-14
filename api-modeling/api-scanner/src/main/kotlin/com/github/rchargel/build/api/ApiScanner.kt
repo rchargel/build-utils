@@ -2,9 +2,7 @@ package com.github.rchargel.build.api
 
 import com.github.rchargel.build.api.models.Api
 import com.github.rchargel.build.common.ClasspathUtil
-import com.github.rchargel.build.common.ExceptionWrapper
-import com.github.rchargel.build.common.ExceptionWrapper.ignoreException
-import org.reflections.ReflectionsException
+import com.github.rchargel.build.common.ExceptionWrapper.ignoreError
 import java.util.stream.Collectors
 
 interface ApiScanner {
@@ -15,14 +13,14 @@ interface ApiScanner {
 
     companion object {
         @JvmStatic
-        fun loadScanners(): List<ApiScanner> = ignoreException {
+        fun loadScanners(): List<ApiScanner> = ignoreError {
             ClasspathUtil.findSubTypes(ApiScanner::class.java).collect(Collectors.toList())
                     .mapNotNull { it.getConstructor() }.mapNotNull { it.newInstance() }
                     .filter { it.isAvailable() }
         } ?: emptyList()
 
         @JvmStatic
-        fun loadApi(basePackage: String): Api? = ignoreException {
+        fun loadApi(basePackage: String): Api? = ignoreError {
             loadScanners().mapNotNull { it.scanApi(basePackage) }.reduceRight { a, b -> a + b }
         }
     }

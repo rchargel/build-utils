@@ -12,16 +12,11 @@ class JaxRSApiScanner : ApiScanner {
     private val schemaGenerator = ObjectSchemaGenerator()
     private val pathGenerator = PathGenerator()
 
-    override fun isAvailable() = try {
-        Class.forName("javax.ws.rs.GET")
-        true
-    } catch (e: ClassNotFoundException) {
-        false
-    }
+    override fun isAvailable() = ClasspathUtil.classExists("javax.ws.rs.GET")
 
     override fun scanApi(basePackage: String): Api? {
         val classes = ClasspathUtil.findClassesInPackage(basePackage)
-                .collect(Collectors.toSet())
+            .collect(Collectors.toSet())
 
         val reader = Reader()
         val openAPI = reader.read(classes)
@@ -35,11 +30,11 @@ class JaxRSApiScanner : ApiScanner {
         } ?: listOf(null to Component.builder())).toMap().toMutableMap()
 
         val builder = Api.builder()
-                .description(openAPI.info?.description)
-                .license(openAPI.info?.license?.name)
-                .licenseUrl(openAPI.info?.license?.url)
-                .urls(openAPI.servers?.map { it.url } ?: emptyList())
-                .version(openAPI.info?.version)
+            .description(openAPI.info?.description)
+            .license(openAPI.info?.license?.name)
+            .licenseUrl(openAPI.info?.license?.url)
+            .urls(openAPI.servers?.map { it.url } ?: emptyList())
+            .version(openAPI.info?.version)
 
         println(openAPI)
 
@@ -70,16 +65,4 @@ class JaxRSApiScanner : ApiScanner {
         return api
     }
 
-    companion object {
-        private val ANNOTATIONS: Lazy<List<Class<out Annotation>>> = lazy {
-            listOf(
-                    Class.forName("javax.ws.rs.GET") as Class<out Annotation>,
-                    Class.forName("javax.ws.rs.POST") as Class<out Annotation>,
-                    Class.forName("javax.ws.rs.DELETE") as Class<out Annotation>,
-                    Class.forName("javax.ws.rs.HEAD") as Class<out Annotation>,
-                    Class.forName("javax.ws.rs.PUT") as Class<out Annotation>,
-                    Class.forName("javax.ws.rs.Path") as Class<out Annotation>
-            )
-        }
-    }
 }

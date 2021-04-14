@@ -40,8 +40,8 @@ public class CanWrapAndIgnoreExceptionsTest {
 
     @Test
     public void canIgnoreSupplier() {
-        assertEquals("value", ignoreException(() -> "value"));
-        assertNull(ignoreException(() -> {
+        assertEquals("value", ExceptionWrapper.ignoreException(() -> "value"));
+        assertNull(ExceptionWrapper.ignoreException(() -> {
             assertTrue(false);
             return "value";
         }));
