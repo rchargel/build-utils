@@ -83,7 +83,7 @@ class CanCompressTextTest(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "When processed as {0} expecting {2}")
-        fun params() = arrayOf(
+        fun params(): Collection<Array<Any?>> = listOf(
                 arrayOf(Type.CSS, """body {
                     margin: 0px;
                     color: black;
