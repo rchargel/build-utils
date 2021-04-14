@@ -34,7 +34,7 @@ object ExceptionWrapper {
         }
     }
 
-    fun <R> ignoreException(action: () -> R): R? = ignoreException(ThrowingSupplier(action))
+    fun <R> ignoreError(action: () -> R): R? = ignoreException(ThrowingSupplier(action))
 
     fun <E : Throwable, R> wrap(wrappedException: Class<E>?, action: () -> R): R? =
             wrap(wrappedException, ThrowingSupplier(action))

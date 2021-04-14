@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class CanSearchClasspathTest {
@@ -81,6 +82,11 @@ public class CanSearchClasspathTest {
         try (final Reader reader = ClasspathUtil.readFromClasspath("com/fake/classes/classes/FakeAnnotation.class")) {
             assertTrue(reader.read() > -1);
         }
+    }
 
+    @Test
+    public void canSeeIfClassExists() throws Exception {
+        assertTrue(ClasspathUtil.classExists("java.lang.String"));
+        assertFalse(ClasspathUtil.classExists("java.lang.NonString"));
     }
 }
