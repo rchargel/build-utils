@@ -1,7 +1,7 @@
 # Build Utils
 
 [![Build Utils CI](https://github.com/rchargel/build-utils/workflows/Build%20Utils%20CI/badge.svg?branch=main)](https://github.com/rchargel/build-utils/actions)
-[![Code Coverage](https://img.shields.io/codecov/c/github/rchargel/build-utils)](https://app.codecov.io/gh/rchargel/build-utils)
+[![Test Coverage](https://codecov.io/gh/rchargel/build-utils/branch/main/graph/badge.svg?token=8W3E52WJRO)](https://codecov.io/gh/rchargel/build-utils)
 [![License](https://img.shields.io/github/license/rchargel/build-utils)](https://github.com/rchargel/build-utils/blob/main/LICENSE.txt)
 [![Release](https://img.shields.io/github/v/release/rchargel/build-utils?include_prereleases)](https://github.com/rchargel/build-utils/releases/latest)
 ![Commits Since Release](https://img.shields.io/github/commits-since/rchargel/build-utils/latest)

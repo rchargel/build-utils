@@ -43,7 +43,7 @@
 
         <!-- Plugins -->
         <mavenGpgPluginVersion>1.6</mavenGpgPluginVersion>
-        <kotlinVersion>1.4.10</kotlinVersion>
+        <kotlin.version>1.4.32</kotlin.version>
         <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
         <groovyTemplatesVersion>3.0.2</groovyTemplatesVersion>
         <xmlUnitVersion>2.6.4</xmlUnitVersion>
@@ -279,7 +279,7 @@
             <dependency>
                 <groupId>org.jetbrains.kotlin</groupId>
                 <artifactId>kotlin-stdlib</artifactId>
-                <version>${kotlinVersion}</version>
+                <version>${kotlin.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.codehaus.groovy</groupId>
@@ -419,7 +419,7 @@
                 <plugin>
                     <groupId>org.jetbrains.kotlin</groupId>
                     <artifactId>kotlin-maven-plugin</artifactId>
-                    <version>${kotlinVersion}</version>
+                    <version>${kotlin.version}</version>
                     <executions>
                         <execution>
                             <id>compile</id>
