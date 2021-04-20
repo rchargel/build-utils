@@ -46,6 +46,7 @@ class CanMergeBenchmarkTest {
         assert("1" == test?.className) { "expected '1' but was '${test?.className}'" }
         assert("first" == test?.methodName) { "expected 'first' but was '${test?.methodName}'" }
         assert(listOf(listOf(1.0, 1.0, 1.0)) == test?.rawMeasurements) { "unexpected raw values" }
+        assert("{min=0.0, out-min=0.0, 1qtr=0.0, media=0.0, 3qtr=0.0, out-max=0.0, max=0.0}" == test?.shortString()) { "invalid short string" }
 
         test = mergeResult["two.2.second"]
         assert(test != null) { "missing second entry" }
@@ -53,6 +54,7 @@ class CanMergeBenchmarkTest {
         assert("2" == test?.className) { "expected '2' but was '${test?.className}'" }
         assert("second" == test?.methodName) { "expected 'second' but was '${test?.methodName}'" }
         assert(listOf(listOf(2.0), listOf(2.0), listOf(2.0)) == test?.rawMeasurements) { "unexpected raw values" }
+        assert("{min=0.0, out-min=0.0, 1qtr=0.0, media=0.0, 3qtr=0.0, out-max=0.0, max=0.0}" == test?.shortString()) { "invalid short string" }
 
         test = mergeResult["three.3.third"]
         assert(test != null) { "missing third entry" }
@@ -60,6 +62,7 @@ class CanMergeBenchmarkTest {
         assert("3" == test?.className) { "expected '3' but was '${test?.className}'" }
         assert("third" == test?.methodName) { "expected 'third' but was '${test?.methodName}'" }
         assert(listOf(listOf(3.0, 3.0), listOf(3.0, 3.0), listOf(4.0, 4.0), listOf(4.0, 4.0)) == test?.rawMeasurements) { "unexpected raw values" }
+        assert("{min=3.0, out-min=1.5, 1qtr=3.0, media=3.5, 3qtr=4.0, out-max=5.5, max=4.0}" == test?.shortString()) { "invalid short string" }
 
         assert(mergeResult["four.4.fourth"] == null) { "shouldn't find anything here" }
     }
