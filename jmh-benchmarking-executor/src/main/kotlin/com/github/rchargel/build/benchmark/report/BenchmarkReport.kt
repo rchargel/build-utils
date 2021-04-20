@@ -4,6 +4,8 @@ import com.github.rchargel.build.benchmark.results.BenchmarkResults
 import com.github.rchargel.build.benchmark.results.BenchmarkTestResult
 import com.github.rchargel.build.common.StringUtils.Companion.normalizeMemoryString
 import com.github.rchargel.build.common.StringUtils.Companion.normalizeMetricString
+import com.github.rchargel.build.common.firstOr
+import com.github.rchargel.build.common.lastOr
 import com.github.rchargel.build.report.*
 import com.github.rchargel.build.report.chart.RawDataLineChartImageMaker
 import org.jfree.data.statistics.BoxAndWhiskerItem
@@ -255,8 +257,8 @@ class BenchmarkReport {
                     q3,
                     rmin,
                     rmax,
-                    outliers.firstOrNull() ?: rmin,
-                    outliers.lastOrNull() ?: rmax,
+                    outliers.firstOr(rmin),
+                    outliers.lastOr(rmax),
                     outliers
             )
         }

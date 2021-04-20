@@ -49,7 +49,7 @@ public class BenchmarkExecutor {
         });
     }
 
-    private static Map<String, BenchmarkTestResult> merge(final Map<String, BenchmarkTestResult> mapA, final Map<String, BenchmarkTestResult> mapB) {
+    static Map<String, BenchmarkTestResult> merge(final Map<String, BenchmarkTestResult> mapA, final Map<String, BenchmarkTestResult> mapB) {
         return Stream.of(mapA.entrySet(), mapB.entrySet())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue, BenchmarkTestResult::merge));

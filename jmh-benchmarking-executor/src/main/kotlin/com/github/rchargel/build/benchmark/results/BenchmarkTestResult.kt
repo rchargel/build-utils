@@ -69,7 +69,7 @@ data class BenchmarkTestResult(
     @get:JsonIgnore
     val baselineOutlierMaximum: Double
         get() = if (baselineThirdQuarter != null)
-            baselineThirdQuarter + abs((baselineThirdQuarter ?: 0.0) - (baselineFirstQuarter ?: 0.0)) * 1.5
+            baselineThirdQuarter + abs((baselineThirdQuarter) - (baselineFirstQuarter ?: 0.0)) * 1.5
         else Double.NaN
 
     @get:JsonIgnore
@@ -240,7 +240,7 @@ data class BenchmarkTestResult(
                 val packageName = internalPackageName ?: StringUtils.join(nameParts.subList(0, nameParts.size - 2), ".")
                 val className = internalClassName ?: nameParts[nameParts.size - 2]
                 val methodName = internalMethodName
-                        ?: "${nameParts[nameParts.size - 1]}${stringifyParams(params?.entries)}"
+                        ?: "${nameParts[nameParts.size - 1]}${stringifyParams(params.entries)}"
                 val stats = rawMeasurements.flatten().stream().reduce(DistributionStatistics(),
                         { r, x -> DistributionStatistics.aggregate(r, x) },
                         { a, b -> DistributionStatistics.merge(a, b) })

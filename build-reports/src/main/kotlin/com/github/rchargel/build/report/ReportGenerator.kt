@@ -18,7 +18,7 @@ class ReportGenerator {
         config.isUseDoubleQuotes = true
         templateEngine = MarkupTemplateEngine(config)
 
-        var tmplt: Template? = null
+        var tmplt: Template?
         Thread.currentThread().contextClassLoader.getResourceAsStream("report.tpl").use {
             tmplt = templateEngine.createTemplate(InputStreamReader(it))
         }

@@ -116,7 +116,7 @@ class BuildTesterTest {
 
 data class TestOne(val name: String)
 data class TestTwo(val name: String) {
-    fun builder() = TestTwo(name)
+    fun builder() = com.github.rchargel.build.test.TestTwo(name)
 }
 
 data class TestThree internal constructor(val name: String) {
@@ -129,7 +129,7 @@ data class TestThree internal constructor(val name: String) {
         fun name(name: String) = apply { this.name = name }
 
         // invalid build method
-        fun buildIt() = TestThree(this.name ?: error("not set"))
+        fun buildIt() = com.github.rchargel.build.test.TestThree(this.name ?: error("not set"))
     }
 }
 
@@ -141,7 +141,7 @@ data class TestFour internal constructor(val name: String) {
 
     class Builder internal constructor(private var name: String? = null) {
         fun name(name: String) = apply { this.name = name }
-        fun build() = TestThree(this.name ?: error("not set"))
+        fun build() = com.github.rchargel.build.test.TestThree(this.name ?: error("not set"))
     }
 }
 
@@ -155,7 +155,7 @@ data class TestFive internal constructor(val name: String) {
 
     class Builder internal constructor(private var name: String? = null) {
         fun name(name: String) = apply { this.name = name }
-        fun build() = TestFive(this.name ?: error("not set"))
+        fun build() = com.github.rchargel.build.test.TestFive(this.name ?: error("not set"))
     }
 }
 
@@ -168,7 +168,7 @@ data class TestSix internal constructor(val name: String) {
 
     class Builder internal constructor(private var name: String? = null) {
         fun name(name: String) = apply { this.name = name }
-        fun build() = TestSix("Hello, ${this.name}")
+        fun build() = com.github.rchargel.build.test.TestSix("Hello, ${this.name}")
     }
 }
 
@@ -184,7 +184,7 @@ data class TestSeven internal constructor(val name: String) {
             this.name = name
         }
 
-        fun build() = TestSeven("Hello, ${this.name}")
+        fun build() = com.github.rchargel.build.test.TestSeven("Hello, ${this.name}")
     }
 }
 
@@ -199,7 +199,7 @@ data class TestEight internal constructor(val name: String) {
     class Builder internal constructor(private var name: String? = null) {
         fun name(name: String) = Builder(name)
 
-        fun build() = TestEight("Hello, ${this.name}")
+        fun build() = com.github.rchargel.build.test.TestEight("Hello, ${this.name}")
     }
 }
 
@@ -213,7 +213,7 @@ data class TestNine internal constructor(val name: String) {
     class Builder internal constructor(private var name: String? = null) {
         fun name(name: String, last: String) = apply { this.name = name }
 
-        fun build() = TestNine(this.name ?: error("Not set"))
+        fun build() = com.github.rchargel.build.test.TestNine(this.name ?: error("Not set"))
     }
 }
 
@@ -227,7 +227,7 @@ data class TestTen internal constructor(val names: List<String>) {
     class Builder internal constructor(private var names: Collection<String>? = null) {
         fun names(names: Collection<String>) = apply { this.names = names }
 
-        fun build() = TestTen(this.names?.toList() ?: emptyList())
+        fun build() = com.github.rchargel.build.test.TestTen(this.names?.toList() ?: emptyList())
     }
 }
 
@@ -241,7 +241,7 @@ data class TestEleven internal constructor(val names: List<String>) {
     class Builder internal constructor(private var names: Set<String>? = null) {
         fun names(names: Set<String>) = apply { this.names = names }
 
-        fun build() = TestEleven(this.names?.toList() ?: emptyList())
+        fun build() = com.github.rchargel.build.test.TestEleven(this.names?.toList() ?: emptyList())
     }
 }
 
@@ -255,7 +255,7 @@ data class TestTwelve internal constructor(val names: List<String>) {
     class Builder internal constructor(private var names: MutableCollection<String>? = null) {
         fun names(names: MutableCollection<String>) = apply { this.names = names }
 
-        fun build() = TestTwelve(this.names?.toList() ?: emptyList())
+        fun build() = com.github.rchargel.build.test.TestTwelve(this.names?.toList() ?: emptyList())
     }
 }
 
