@@ -3,13 +3,14 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>api-modeling</artifactId>
+        <artifactId>build-utils</artifactId>
         <groupId>com.github.rchargel.build</groupId>
         <version>0.9.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>jaxrs-api-scanner</artifactId>
+    <artifactId>api-scanner-jaxrs</artifactId>
+    <description>api-scanner implementation for JAXRS</description>
 
     <properties>
         <springWebVersion>5.3.5</springWebVersion>
@@ -20,12 +21,10 @@
         <dependency>
             <groupId>com.github.rchargel.build</groupId>
             <artifactId>api-scanner</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.github.rchargel.build</groupId>
             <artifactId>build-utils-common</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <dependency>
@@ -52,6 +51,16 @@
         </dependency>
 
         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.rchargel.build</groupId>
+            <artifactId>build-test-utils</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations</artifactId>
             <version>${swaggerCoreVersion}</version>
@@ -63,6 +72,14 @@
             <version>1.3.2</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>

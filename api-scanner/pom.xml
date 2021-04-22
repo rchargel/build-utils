@@ -8,22 +8,15 @@
         <version>0.9.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <packaging>pom</packaging>
 
-    <artifactId>api-modeling</artifactId>
-    <description>Models the API of REST application</description>
-
-    <modules>
-        <module>api-scanner</module>
-        <module>jaxrs-api-scanner</module>
-    </modules>
+    <artifactId>api-scanner</artifactId>
+    <description>Contains the interfaces used to model a REST API</description>
 
     <dependencies>
         <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId>
+            <groupId>com.github.rchargel.build</groupId>
+            <artifactId>build-utils-common</artifactId>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -32,7 +25,6 @@
         <dependency>
             <groupId>com.github.rchargel.build</groupId>
             <artifactId>build-test-utils</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

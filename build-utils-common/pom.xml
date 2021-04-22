@@ -46,9 +46,8 @@
         <dependency>
             <groupId>com.github.rchargel.build</groupId>
             <artifactId>build-test-utils</artifactId>
-            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
-
     </dependencies>
 
     <build>

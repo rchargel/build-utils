@@ -14,10 +14,11 @@
         <module>build-test-utils</module>
         <module>build-utils-common</module>
         <module>build-reports</module>
+        <module>api-scanner</module>
+        <module>api-scanner-jaxrs</module>
         <module>jmh-benchmarking-executor</module>
         <module>base-maven-plugin-harness</module>
         <module>jmh-benchmarking-maven-plugin</module>
-        <module>api-modeling</module>
     </modules>
 
     <properties>
@@ -77,6 +78,16 @@
             <dependency>
                 <groupId>com.github.rchargel.build</groupId>
                 <artifactId>build-reports</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.rchargel.build</groupId>
+                <artifactId>api-scanner</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.rchargel.build</groupId>
+                <artifactId>api-scanner-jaxrs</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
