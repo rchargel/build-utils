@@ -15,8 +15,8 @@ interface ApiScanner {
         @JvmStatic
         fun loadScanners(): List<ApiScanner> = ignoreError {
             ClasspathUtil.findSubTypes(ApiScanner::class.java).collect(Collectors.toList())
-                    .mapNotNull { it.getConstructor() }.mapNotNull { it.newInstance() }
-                    .filter { it.isAvailable() }
+                .mapNotNull { ignoreError { it.getConstructor().newInstance() } }
+                .filter { it.isAvailable() }
         } ?: emptyList()
 
         @JvmStatic

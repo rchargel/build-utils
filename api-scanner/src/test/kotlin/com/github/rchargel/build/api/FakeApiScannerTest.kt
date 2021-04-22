@@ -10,7 +10,11 @@ class FakeApiScannerTest {
     companion object {
         @BeforeClass
         @JvmStatic
-        fun setup() = ClassLoaderHelper.addClassToClassLoader(ApiScanner::class.java, FakeApiScannerTest::class.java)
+        fun setup() = ClassLoaderHelper.addClassToClassLoader(
+            ApiScanner::class.java,
+            FakeApiScannerTest::class.java,
+            UnavailableFakeApiScanner::class.java
+        )
 
         @AfterClass
         @JvmStatic
@@ -32,10 +36,15 @@ class FakeApiScannerTest {
         "Didn't find api"
     }
 
-    class FakeApiScanner : ApiScanner {
-        override fun scanApi(basePackage: String) = if (basePackage.startsWith("com.github.rchargel")) Api.builder().title("Fake").build()
-        else null
-
+    open class FakeApiScanner : ApiScanner {
+        override fun scanApi(basePackage: String) = if (basePackage.startsWith("com.github.rchargel")) Api.builder().title("Fake").build() else null
         override fun isAvailable() = true
+    }
+
+    class ConstructedApiScanner(name: String) : FakeApiScanner() {
+    }
+
+    class UnavailableFakeApiScanner : FakeApiScanner() {
+        override fun isAvailable() = false
     }
 }
