@@ -14,7 +14,7 @@ class ApiScannerTest {
 
     @Test
     fun shouldNotFindScanners() = assert(ApiScanner.loadScanners().isEmpty()) {
-        "Should not find any scanners"
+        "Should not find any scanners, but found:\\n${ApiScanner.loadScanners().joinToString("\\n")}"
     }
 
     @Test
