@@ -7,4 +7,7 @@ class ClassLoaderHelperTest {
     @Test
     fun notMuchToTestHere() = ClassLoaderHelper.addClassToClassLoader(ClassLoaderHelperTest::class.java)
 
+    @Test
+    fun evenLessToTestHere() = ClassLoaderHelper.resetClassLoader()
+
 }

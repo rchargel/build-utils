@@ -2,6 +2,7 @@ package com.github.rchargel.build.api
 
 import com.github.rchargel.build.api.models.Api
 import com.github.rchargel.build.test.ClassLoaderHelper
+import org.junit.AfterClass
 import org.junit.BeforeClass
 import org.junit.Test
 
@@ -10,6 +11,10 @@ class FakeApiScannerTest {
         @BeforeClass
         @JvmStatic
         fun setup() = ClassLoaderHelper.addClassToClassLoader(ApiScanner::class.java, FakeApiScannerTest::class.java)
+
+        @AfterClass
+        @JvmStatic
+        fun tearDown() = ClassLoaderHelper.resetClassLoader()
     }
 
     @Test
