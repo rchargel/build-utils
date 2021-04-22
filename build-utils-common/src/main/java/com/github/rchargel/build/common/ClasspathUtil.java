@@ -41,12 +41,7 @@ public final class ClasspathUtil {
      */
     public static boolean classExists(final String className) {
         requireNonNull(className);
-        try {
-            Class.forName(className);
-            return true;
-        } catch (final ClassNotFoundException e) {
-            return false;
-        }
+        return tryToLoadClass(className) != null;
     }
 
     /**

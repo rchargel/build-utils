@@ -30,7 +30,7 @@ public class CanSearchClasspathTest {
         final Set<Class<?>> classes = ClasspathUtil.findClassesInPackage("com.fake")
                 .collect(Collectors.toSet());
 
-        assertEquals(3, classes.size());
+        assertEquals(6, classes.size());
     }
 
     @Test
@@ -79,9 +79,13 @@ public class CanSearchClasspathTest {
         final String path = ClasspathUtil.getResourceAsFile("com/fake/classes/classes/FakeAnnotation.class");
         assertTrue(path.endsWith("FakeAnnotation.class"));
 
+        assertTrue(ClasspathUtil.getResourceAsFile("/com/fake/classes/classes/FakeAnnotation.class").endsWith("FakeAnnotation.class"));
+
         try (final Reader reader = ClasspathUtil.readFromClasspath("com/fake/classes/classes/FakeAnnotation.class")) {
             assertTrue(reader.read() > -1);
         }
+
+        Assert.assertThrows(RuntimeException.class, () -> ClasspathUtil.getResourceAsFile("com/fake/nowhere/here.class"));
     }
 
     @Test
