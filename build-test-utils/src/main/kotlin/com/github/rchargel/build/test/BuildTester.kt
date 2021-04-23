@@ -7,16 +7,17 @@ import pl.pojo.tester.internal.instantiator.ObjectGenerator
 import pl.pojo.tester.internal.utils.ThoroughFieldPermutator
 import java.beans.Introspector
 import java.lang.reflect.Method
+import java.util.*
 
 class BuildTester(private val underTest: Class<*>, ignoredProperties: Set<String> = setOf("class")) {
     private val builder: Any
     private val allIgnored: Set<String> = ignoredProperties + setOf("class")
     private val properties = Introspector.getBeanInfo(underTest).propertyDescriptors.filter { it.readMethod != null }
-            .filter { !allIgnored.contains(it.name) }
+        .filter { !allIgnored.contains(it.name) }
     private val objectGenerator = ObjectGenerator(
-            DefaultFieldValueChanger.INSTANCE,
-            ArrayListValuedHashMap<Class<*>, ConstructorParameters>(),
-            ThoroughFieldPermutator()
+        DefaultFieldValueChanger.INSTANCE,
+        ArrayListValuedHashMap<Class<*>, ConstructorParameters>(),
+        ThoroughFieldPermutator()
     )
 
     init {
@@ -30,19 +31,19 @@ class BuildTester(private val underTest: Class<*>, ignoredProperties: Set<String
 
     private fun findMethod(builder: Any, name: String, propType: Class<*>): Method {
         return builder.javaClass.methods.filter { it.name == name }
-                .filter { it.parameterCount == 1 }
-                .firstOrNull { it.parameterTypes[0].isAssignableFrom(propType) || propType.isAssignableFrom(it.parameterTypes[0]) }
-                ?: throw NoSuchMethodException("No method $name with parameter $propType")
+            .filter { it.parameterCount == 1 }
+            .firstOrNull { areTypesInSameLineage(it.parameterTypes[0], propType) }
+            ?: throw NoSuchMethodException("No method $name with parameter $propType")
     }
 
     fun evaluate() {
         val values = properties.map { prop ->
             val value = objectGenerator.createNewInstance(prop.propertyType)
             val method: Method = findMethod(builder, prop.name, prop.propertyType)
-            assert(builder.javaClass == method.returnType) {
+            assertOrFail(builder.javaClass == method.returnType) {
                 "Builder method returns type of ${method.returnType} but should be builder"
             }
-            assert(builder === method.invoke(builder, value)) {
+            assertOrFail(builder === method.invoke(builder, value)) {
                 "Builder returns new instance of builder"
             }
 
@@ -54,20 +55,22 @@ class BuildTester(private val underTest: Class<*>, ignoredProperties: Set<String
         } catch (e: NoSuchMethodException) {
             throw NoSuchMethodException("Builder must have a 'build()' method")
         }
-        val obj = buildMethod.invoke(builder)
-        assert(obj.javaClass == underTest) {
+        val obj: Any = buildMethod.invoke(builder)
+        assertOrFail(Objects.equals(obj.javaClass, underTest)) {
             "Builder produced object of type ${obj.javaClass} but expected $underTest"
         }
 
-        assert(obj != null) { "Resulting object was null" }
-
         properties.forEach { prop ->
-            val actual = prop.readMethod.invoke(obj)
+            val actual: Any? = prop.readMethod.invoke(obj)
+            val expected: Any? = values[prop.name]
 
-            assert(values[prop.name] == actual) {
+            assertOrFail(Objects.equals(expected, actual)) {
                 "${prop.name}: expected ${values[prop.name]} but was $actual"
             }
         }
     }
 
+    companion object {
+        internal fun areTypesInSameLineage(a: Class<*>, b: Class<*>) = a.isAssignableFrom(b) || b.isAssignableFrom(a)
+    }
 }

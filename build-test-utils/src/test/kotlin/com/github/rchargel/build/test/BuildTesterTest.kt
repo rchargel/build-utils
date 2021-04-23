@@ -6,6 +6,15 @@ import org.junit.Test
 class BuildTesterTest {
 
     @Test
+    fun validateTypeRelationships() {
+        assert(BuildTester.areTypesInSameLineage(List::class.java, Collection::class.java))
+        assert(BuildTester.areTypesInSameLineage(Collection::class.java, List::class.java))
+        assert(!BuildTester.areTypesInSameLineage(Set::class.java, List::class.java))
+        assert(BuildTester.areTypesInSameLineage(Object::class.java, List::class.java))
+        assert(!BuildTester.areTypesInSameLineage(Exception::class.java, Error::class.java))
+    }
+
+    @Test
     fun mustHaveABuilder() {
         val exc = Assert.assertThrows(NoSuchMethodException::class.java) {
             BuildTester(TestOne::class.java)
