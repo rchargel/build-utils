@@ -42,7 +42,7 @@
 
         <!-- Plugins -->
         <mavenGpgPluginVersion>1.6</mavenGpgPluginVersion>
-        <kotlin.version>1.4.32</kotlin.version>
+        <kotlin.version>1.6.0</kotlin.version>
         <mavenCompilerPluginVersion>3.8.1</mavenCompilerPluginVersion>
         <groovyTemplatesVersion>3.0.2</groovyTemplatesVersion>
         <xmlUnitVersion>2.6.4</xmlUnitVersion>
