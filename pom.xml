@@ -37,7 +37,7 @@
         <jmhVersion>1.28</jmhVersion>
         <reflectionsVersion>0.9.12</reflectionsVersion>
         <oshiVersion>4.6.0</oshiVersion>
-        <jacksonVersion>2.12.1</jacksonVersion>
+        <jacksonVersion>2.12.6.1</jacksonVersion>
         <junitVersion>4.13.1</junitVersion>
 
         <!-- Plugins -->
