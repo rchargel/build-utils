@@ -30,7 +30,7 @@
         <maven.compiler.source>${javaTargetVersion}</maven.compiler.source>
 
         <!-- Dependencies -->
-        <mavenPluginVersion>3.6.0</mavenPluginVersion>
+        <mavenPluginVersion>3.8.1</mavenPluginVersion>
         <mavenDependencyTreeVersion>3.0.1</mavenDependencyTreeVersion>
         <mavenSitePluginVersion>3.9.0</mavenSitePluginVersion>
         <plexusUtilsVersion>3.1.0</plexusUtilsVersion>
